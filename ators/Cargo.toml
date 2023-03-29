@@ -1,0 +1,27 @@
+[package]
+name = "ators"
+version.workspace = true
+description.workspace = true
+authors.workspace = true
+license.workspace = true
+readme.workspace = true
+homepage.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+ators-proc-macro.workspace = true
+anyhow = "1.0"
+clap = { version = "4.1.6", features = ["derive", "cargo"] }
+tracing = "0.1.37"
+
+# dwarf
+gimli = "0.26.1"
+memmap = "0.7.0"
+object = "0.28.1"
+symbolic-common = "8.5.0"
+symbolic-demangle = "8.5.0"

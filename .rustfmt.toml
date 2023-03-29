@@ -1,0 +1,9 @@
+# See also https://rust-lang.github.io/rustfmt for more settings.
+edition = "2021"
+
+newline_style = "Unix"
+
+max_width = 99
+chain_width = 55
+single_line_if_else_max_width = 55
+struct_lit_width = 33

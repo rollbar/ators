@@ -1,0 +1,28 @@
+[workspace]
+members = ["ators", "ators-proc-macro"]
+
+[workspace.package]
+version = "0.0.1-dev"
+description = """
+RiiR atos
+"""
+authors = [
+    "Matias Pequeno <matias.pequeno@gmail.com>",
+]
+license = "MIT"
+readme = "README.md"
+documentation = "https://docs.rs/ators"
+homepage = "https://github.com/matux/ators"
+repository = "https://github.com/matux/ators"
+keywords = ["atos", "debug", "dwarf", "symbolication"]
+categories = ["utilities"]
+edition = "2021"
+rust-version = "1.68.2"
+publish = false
+
+[workspace.dependencies]
+ators-proc-macro = { path = "ators-proc-macro" }
+
+[profile.release]
+lto = true
+opt-level = 3
