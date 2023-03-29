@@ -13,4 +13,5 @@ Cargo.lock
 # Used by macOS' file system to track custom attributes of containing folder
 .DS_Store
 
+/fixtures
 /log

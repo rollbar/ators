@@ -1,14 +1,10 @@
 mod cli;
+mod data;
 
 use anyhow::Result;
 
-#[tracing::instrument]
 fn main() -> Result<()> {
-    match cli::build().get_matches().subcommand() {
-        Some(("run", args)) => Ok(()),
-        Some(("check", _)) => {
-            unimplemented!()
-        }
-        _ => unreachable!(),
-    }
+    let options = data::Options::from(cli::build().get_matches());
+    println!("{:#?}", options);
+    Ok(())
 }

@@ -1,12 +1,58 @@
-use clap::{
-    arg, crate_authors, crate_version, value_parser, Arg, ArgAction, ArgGroup, ArgMatches,
-    Command, ValueHint,
-};
-use std::path::PathBuf;
+use crate::data;
+use clap::{crate_authors, crate_description, crate_name, crate_version, value_parser};
+use clap::{Arg, ArgAction, Command, ValueHint};
+use std::{fmt, path::PathBuf};
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum Opt {
+    Object,
+    LoadAddress,
+    Address,
+    Architecture,
+    Inline,
+    Verbose,
+}
+
+impl fmt::Display for Opt {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Debug::fmt(self, f)
+    }
+}
+
+impl From<Opt> for clap::Id {
+    fn from(value: Opt) -> Self {
+        Self::from(value.to_string())
+    }
+}
+
+impl From<clap::ArgMatches> for data::Options {
+    fn from(matches: clap::ArgMatches) -> Self {
+        Self {
+            object: matches
+                .get_one(&Opt::Object.to_string())
+                .map(Clone::clone)
+                .unwrap(),
+            load_address: matches
+                .get_one(&Opt::LoadAddress.to_string())
+                .map(Clone::clone)
+                .unwrap(),
+            addresses: matches
+                .get_many(&Opt::Address.to_string())
+                .unwrap()
+                .copied()
+                .collect(),
+            architecture: matches
+                .get_one(&Opt::Architecture.to_string())
+                .map(Clone::clone),
+            expand_inline: matches.get_flag(&Opt::Inline.to_string()),
+            verbose: matches.get_flag(&Opt::Verbose.to_string()),
+        }
+    }
+}
 
 pub fn build() -> Command {
-    Command::new("ators")
-        .about("convert numeric addresses to symbols of binary images")
+    Command::new(crate_name!())
+        .about(crate_description!())
         .long_about(
             "convert numeric addresses to symbols of binary images\n\n\
             The ators command converts numeric addresses to their symbolic equivalents.  If\n\
@@ -15,56 +61,40 @@ pub fn build() -> Command {
         .author(crate_authors!())
         .version(crate_version!())
         .before_help(TITLE)
-        .next_line_help(true)
-        .help_expected(true)
         .arg_required_else_help(true)
         .args([
-            arg!(object: -o "The path to a binary image file or dSYM in which to look up symbols")
+            Arg::new(Opt::Object).short('o')
                 .help_heading("Arguments")
-                .action(ArgAction::Set)
-                .display_order(1)
+                .help("The path to a binary image or dSYM in which to look up symbols")
                 .required(true)
-                .num_args(1)
-                .action(ArgAction::Set)
                 .value_hint(ValueHint::FilePath)
-                .value_name("binary-image-file | dSYM")
+                .value_name("binary-image | dSYM")
                 .value_parser(value_parser!(PathBuf)),
-            arg!(loadAddress: -l "The load address of the binary image")
+            Arg::new(Opt::LoadAddress).short('l')
                 .help_heading("Arguments")
-                .action(ArgAction::Set)
-                .display_order(2)
+                .help("The load address of the binary image")
                 .required(true)
-                .num_args(1)
-                .action(ArgAction::Set)
                 .value_name("load-address")
-                .value_parser(value_parser!(usize))
+                .value_parser(str::parse::<data::Address>)
                 .long_help(
                     "The load address of the binary image.  This value is always assumed to be\n\
                     in hex, even without a \"0x\" prefix.  The input addresses are assumed to be\n\
                     in a binary image with that load address.  Load addresses for binary images\n\
                     can be found in the \"Binary Images:\" section at the bottom of crash,\n\
                     sample, leaks, and malloc_history reports."),
-            arg!(address: [address] "A list of input addresses at the end of the argument list.")
+            Arg::new(Opt::Address).last(true)
                 .help_heading("Arguments")
+                .help("\tA list of input addresses at the end of the argument list.")
                 .action(ArgAction::Append)
-                .display_order(3)
                 .required(true)
                 .num_args(1..)
-                .last(true)
-                .value_parser(value_parser!(usize))
+                .value_name("address")
+                .value_parser(str::parse::<data::Address>)
         ])
-        .group(
-            ArgGroup::new("required")
-                .args(["object", "loadAddress", "address"])
-                .requires_all(["object", "loadAddress", "address"]))
         .args([
-            arg!(arch: -a --arch <architecture> "The particular architecure of a binary image file in which to look up symbols.")
-                .action(ArgAction::Set)
-                .display_order(4)
-                .required(false)
-                .requires("object")
-                .requires("loadAddress")
-                .requires("address")
+            Arg::new(Opt::Architecture).short('a').long("arch")
+                .help("The architecure of a binary image in which to look up symbols")
+                .value_name("architecture")
                 .value_parser(value_parser!(String))
                 .long_help(
                     "The particular architecure of a binary image file in which to look up\n\
@@ -76,21 +106,12 @@ pub fn build() -> Command {
                     (such as i386 or arm) and pass in a corresponding symbol-rich Mach-O binary\n\
                     image file with a binary image of the corresponding architecture (such as a\n\
                     Universal Binary)."),
-            arg!(inline: -i --inlineFrames "Display inlined symbols")
-                .action(ArgAction::SetTrue)
-                .display_order(5)
-                .required(false)
-                .requires("object")
-                .requires("loadAddress")
-                .requires("address"),
-            arg!(verbose: -v --verbose "Display verbose output")
-                .action(ArgAction::SetTrue)
-                .display_order(6)
-                .required(false)
-                .requires("object")
-                .requires("loadAddress")
-                .requires("address")
-                .display_order(1000),
+            Arg::new(Opt::Inline).short('i').long("inlineFrames")
+                .help("Display inlined symbols")
+                .action(ArgAction::SetTrue),
+            Arg::new(Opt::Verbose).short('v').long("verbose")
+                .help("Display verbose output")
+                .action(ArgAction::SetTrue),
         ])
         .after_long_help(
             "\t\t\t\t- - -\n\n\

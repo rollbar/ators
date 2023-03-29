@@ -3,9 +3,7 @@ members = ["ators", "ators-proc-macro"]
 
 [workspace.package]
 version = "0.0.1-dev"
-description = """
-RiiR atos
-"""
+description = "convert numeric addresses to symbols of binary images"
 authors = [
     "Matias Pequeno <matias.pequeno@gmail.com>",
 ]
