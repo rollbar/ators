@@ -1,5 +1,5 @@
 use anyhow::Result;
-use control::dump_object;
+use control::{dump_object, dump_sections};
 use memmap2::Mmap;
 use std::fs;
 
@@ -11,7 +11,7 @@ fn lookup(context: data::Context) -> Result<Vec<String>> {
     let file = fs::File::open(context.object_path)?;
     let mmap = unsafe { Mmap::map(&file) }?;
     let object = object::File::parse(&*mmap)?;
-    dump_object(&object)
+    dump_sections(&object)
 }
 
 fn main() -> Result<()> {

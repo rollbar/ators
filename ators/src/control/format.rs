@@ -1,4 +1,17 @@
 use super::{Attr, Entry, Header, Unit};
+use anyhow::Result;
+use object::{ObjectSection, Section};
+
+pub fn section(section: &Section) -> Result<String> {
+    Ok(format!(
+        "{:#018x}:  {:#8}  {:#12}  {:#18}  ({:?})",
+        section.address(),
+        section.size(),
+        section.segment_name()?.unwrap_or("None"),
+        section.name()?,
+        section.kind(),
+    ))
+}
 
 pub fn header(header: &Header) -> String {
     format!(

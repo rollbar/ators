@@ -6,6 +6,7 @@ use gimli::{Dwarf, EndianSlice};
 use object::{Object, ObjectSection};
 use std::borrow::Cow;
 
+#[allow(dead_code)]
 pub fn dump_object(object: &object::File) -> Result<Vec<String>> {
     let dwarf = Dwarf::load(|section_id| -> Result<Cow<[u8]>> {
         Ok(object
@@ -40,4 +41,9 @@ pub fn dump_object(object: &object::File) -> Result<Vec<String>> {
         .collect()?;
 
     Ok(lines)
+}
+
+#[allow(dead_code)]
+pub fn dump_sections(object: &object::File) -> Result<Vec<String>> {
+    Ok(convert(object.sections().map(|s| format::section(&s))).collect()?)
 }

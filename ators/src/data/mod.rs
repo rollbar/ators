@@ -1,7 +1,7 @@
 pub mod address;
 pub mod context;
-pub mod endian;
+pub mod object;
 
+pub use self::object::Endian;
 pub use address::Address;
 pub use context::Context;
-pub use endian::Endian;
