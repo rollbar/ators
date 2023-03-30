@@ -25,10 +25,10 @@ impl From<Opt> for clap::Id {
     }
 }
 
-impl From<clap::ArgMatches> for data::Options {
+impl From<clap::ArgMatches> for data::Context {
     fn from(matches: clap::ArgMatches) -> Self {
         Self {
-            object: matches
+            object_path: matches
                 .get_one(&Opt::Object.to_string())
                 .map(Clone::clone)
                 .unwrap(),

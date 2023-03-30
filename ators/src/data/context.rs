@@ -1,9 +1,10 @@
 use crate::data::Address;
 use std::path::PathBuf;
 
+/// The program's context, defines its behavior.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct Options {
-    pub object: PathBuf,
+pub struct Context {
+    pub object_path: PathBuf,
     pub load_address: Address,
     pub addresses: Vec<Address>,
     pub architecture: Option<String>,

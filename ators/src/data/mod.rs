@@ -1,6 +1,7 @@
 pub mod address;
+pub mod context;
 pub mod endian;
-pub mod options;
 
 pub use address::Address;
-pub use options::Options;
+pub use context::Context;
+pub use endian::Endian;
