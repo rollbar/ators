@@ -4,8 +4,14 @@ use std::{cmp::Ordering, fmt, str::FromStr};
 pub struct Address(u64);
 
 impl Address {
-    pub fn new(addr: u64) -> Self {
-        Self(addr)
+    pub fn nil() -> Self {
+        Self(0)
+    }
+}
+
+impl Default for Address {
+    fn default() -> Self {
+        Self::nil()
     }
 }
 

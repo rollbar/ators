@@ -30,13 +30,49 @@ pub mod object {
                     _ => None,
                 })
                 .ok_or(crate::Error::TextSegmentNotFound)
-                .map(Address::new)
+                .map(Address::from)
         }
     }
 }
 
 pub mod gimli {
+    use std::ops::Range;
+
     use crate::data::Address;
+    use gimli::{AttributeValue, EndianSlice, RunTimeEndian};
+
+    pub trait DebuggingInformationEntry {
+        fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
+        fn pc(&self) -> Option<Range<Address>>;
+    }
+
+    impl<'abbrev, 'unit, 'input> DebuggingInformationEntry
+        for gimli::DebuggingInformationEntry<
+            'abbrev,
+            'unit,
+            EndianSlice<'input, RunTimeEndian>,
+            usize,
+        >
+    {
+        fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
+            self.attr_value(gimli::DW_AT_name).ok().flatten()
+        }
+
+        fn pc(&self) -> Option<Range<Address>> {
+            let low = match self.attr_value(gimli::DW_AT_low_pc).ok().flatten() {
+                Some(AttributeValue::Addr(addr)) => Some(addr.into()),
+                _ => None,
+            };
+
+            let high = match self.attr_value(gimli::DW_AT_high_pc).ok().flatten() {
+                Some(AttributeValue::Addr(addr)) => Some(addr.into()),
+                Some(AttributeValue::Udata(len)) if low.is_some() => Some(low.unwrap() + len),
+                _ => None,
+            };
+
+            low.zip(high).map(|pc| pc.0..pc.1)
+        }
+    }
 
     pub trait ArangeEntry {
         fn contains(&self, addr: Address) -> Result<bool, gimli::Error>;

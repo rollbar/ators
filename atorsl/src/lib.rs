@@ -22,6 +22,9 @@ pub enum Error {
 
     #[error("Address not found")]
     AddressNotFound,
+
+    #[error("Address is not a symbol")]
+    AddressNotSymbol,
 }
 
 #[macro_export]
