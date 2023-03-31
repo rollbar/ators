@@ -1,10 +1,11 @@
 use crate::{
     data::{Address, Context},
+    ext::gimli::ArangeEntry,
     Error,
 };
 use fallible_iterator::FallibleIterator;
-use gimli::{ArangeEntry, DebugInfoOffset, Dwarf, EndianSlice, RunTimeEndian};
 use gimli::{DW_TAG_inlined_subroutine, DW_TAG_subprogram};
+use gimli::{DebugInfoOffset, Dwarf, EndianSlice, RunTimeEndian};
 
 pub trait Lookup {
     fn lookup(&self, vmaddr: Address, context: Context) -> Result<Vec<String>, Error>;
@@ -49,22 +50,5 @@ impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
                 })
             })?
             .ok_or(Error::AddressNotFound)
-    }
-}
-
-pub trait ContainsAddress {
-    fn contains(&self, addr: Address) -> Result<bool, gimli::Error>;
-}
-
-impl ContainsAddress for ArangeEntry {
-    fn contains(&self, addr: Address) -> Result<bool, gimli::Error> {
-        let range = (
-            self.address(),
-            self.address()
-                .checked_add(self.length())
-                .ok_or(gimli::Error::InvalidAddressRange)?,
-        );
-
-        Ok(addr >= range.0 && addr < range.1)
     }
 }

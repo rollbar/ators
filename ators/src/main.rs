@@ -1,7 +1,6 @@
 mod cli;
 
-use atorsl::{data::Context, ext::object::File, read::Lookup};
-use atorsl::{load_dwarf, load_object};
+use atorsl::{data::Context, ext::object::File, read::Lookup, *};
 use cli::FromArgs;
 
 fn main() -> anyhow::Result<()> {

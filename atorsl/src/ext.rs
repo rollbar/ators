@@ -34,3 +34,24 @@ pub mod object {
         }
     }
 }
+
+pub mod gimli {
+    use crate::data::Address;
+
+    pub trait ArangeEntry {
+        fn contains(&self, addr: Address) -> Result<bool, gimli::Error>;
+    }
+
+    impl ArangeEntry for gimli::ArangeEntry {
+        fn contains(&self, addr: Address) -> Result<bool, gimli::Error> {
+            let range = (
+                self.address(),
+                self.address()
+                    .checked_add(self.length())
+                    .ok_or(gimli::Error::InvalidAddressRange)?,
+            );
+
+            Ok(addr >= range.0 && addr < range.1)
+        }
+    }
+}
