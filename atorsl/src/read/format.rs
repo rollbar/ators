@@ -1,8 +1,7 @@
 use super::{Attr, Entry, Header, Unit};
-use anyhow::Result;
 use object::{ObjectSection, Section};
 
-pub fn section(section: &Section) -> Result<String> {
+pub fn section(section: &Section) -> object::read::Result<String> {
     Ok(format!(
         "{:#018x}:  {:#8}  {:#12}  {:#18}  ({:?})",
         section.address(),

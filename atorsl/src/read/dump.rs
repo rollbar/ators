@@ -1,16 +1,15 @@
 use crate::read::format;
-use anyhow::Result;
 use fallible_iterator::{convert, FallibleIterator};
 use object::Object;
 
 use super::Dwarf;
 
 pub trait Dump {
-    fn dump(&self) -> Result<Vec<String>>;
+    fn dump(&self) -> Result<Vec<String>, crate::Error>;
 }
 
 impl Dump for Dwarf<'_> {
-    fn dump(&self) -> Result<Vec<String>> {
+    fn dump(&self) -> Result<Vec<String>, crate::Error> {
         // let cow;
         // let dwarf = load_dwarf!(self, cow);
         let lines = self
@@ -41,7 +40,7 @@ impl Dump for Dwarf<'_> {
 }
 
 impl Dump for object::File<'_> {
-    fn dump(&self) -> Result<Vec<String>> {
+    fn dump(&self) -> Result<Vec<String>, crate::Error> {
         Ok(convert(self.sections().map(|s| format::section(&s))).collect()?)
     }
 }
