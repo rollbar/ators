@@ -1,6 +1,7 @@
 mod format;
 
 pub mod data;
+pub mod ext;
 pub mod read;
 
 use thiserror::Error;
@@ -47,7 +48,7 @@ macro_rules! load_dwarf {
         $binding.borrow(|section| {
             gimli::EndianSlice::new(
                 &*section,
-                <object::File as atorsl::data::ObjectExt>::runtime_endian(&$object),
+                <object::File as atorsl::ext::object::File>::runtime_endian(&$object),
             )
         })
     }};

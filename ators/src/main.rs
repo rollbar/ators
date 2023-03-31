@@ -1,14 +1,10 @@
 mod cli;
 
-use anyhow::Result;
-use atorsl::{
-    data::{Context, ObjectExt},
-    load_dwarf, load_object,
-    read::Lookup,
-};
+use atorsl::{data::Context, ext::object::File, read::Lookup};
+use atorsl::{load_dwarf, load_object};
 use cli::FromArgs;
 
-fn main() -> Result<()> {
+fn main() -> anyhow::Result<()> {
     let context = Context::from_args(cli::build().get_matches());
 
     let (mmap, cow);
