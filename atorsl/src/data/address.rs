@@ -3,6 +3,12 @@ use std::{cmp::Ordering, fmt, str::FromStr};
 #[derive(atorspm::Newtype, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Address(u64);
 
+impl Address {
+    pub fn new(addr: u64) -> Self {
+        Self(addr)
+    }
+}
+
 impl FromStr for Address {
     type Err = <u64 as FromStr>::Err;
 
