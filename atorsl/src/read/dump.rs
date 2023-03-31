@@ -1,22 +1,18 @@
-use crate::read::format;
+use crate::format;
 use fallible_iterator::{convert, FallibleIterator};
+use gimli::{Dwarf, EndianSlice, RunTimeEndian};
 use object::Object;
-
-use super::Dwarf;
 
 pub trait Dump {
     fn dump(&self) -> Result<Vec<String>, crate::Error>;
 }
 
-impl Dump for Dwarf<'_> {
+impl Dump for Dwarf<EndianSlice<'_, RunTimeEndian>> {
     fn dump(&self) -> Result<Vec<String>, crate::Error> {
-        // let cow;
-        // let dwarf = load_dwarf!(self, cow);
         let lines = self
             .units()
             .map(|header| Ok((header, self.unit(header)?)))
             .flat_map(|(header, unit)| {
-                //dwarf.unit(header)?.entries_tree(Some(UnitOffset(0)))
                 let mut lines = vec![format::header(&header)];
                 let mut depth = 0;
                 let mut entries = unit.entries();
