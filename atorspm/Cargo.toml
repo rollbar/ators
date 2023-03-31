@@ -1,5 +1,5 @@
 [package]
-name = "ators-proc-macro"
+name = "atorspm"
 version.workspace = true
 description = "Procedural Macros used in ators"
 authors.workspace = true

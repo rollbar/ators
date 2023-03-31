@@ -15,7 +15,7 @@ publish.workspace = true
 
 [dependencies]
 atorsl.workspace = true
-ators-proc-macro.workspace = true
+atorspm.workspace = true
 anyhow = "1.0.70"
 clap = { version = "4.2.1", features = ["derive", "cargo", "string"] }
 fallible-iterator = { version = "0.2.0", features = ["std", "alloc"] }

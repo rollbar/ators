@@ -1,6 +1,6 @@
 #![allow(clippy::no_effect, unused_must_use)]
 
-use ators_proc_macro::{Deref, DerefMut, From, Newtype};
+use atorspm::{Deref, DerefMut, From, Newtype};
 
 struct B<T>(T);
 

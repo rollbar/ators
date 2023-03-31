@@ -1,7 +1,6 @@
-use ators_proc_macro::Newtype;
 use std::{cmp::Ordering, fmt, str::FromStr};
 
-#[derive(Newtype, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(atorspm::Newtype, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Address(u64);
 
 impl FromStr for Address {
