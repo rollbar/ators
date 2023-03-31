@@ -1,17 +1,13 @@
 mod cli;
 
 use anyhow::Result;
-use atorsl::{data, read::Dump};
+use atorsl::{data::Context, load_object, read::Dump};
 use cli::FromArgs;
-use std::fs;
 
 fn main() -> Result<()> {
-    let context = data::Context::from_args(cli::build().get_matches());
-
-    let file = fs::File::open(&context.object_path)?;
-    let mmap = unsafe { memmap2::Mmap::map(&file) }?;
-
-    object::File::parse(&*mmap)?
+    let binding;
+    let context = Context::from_args(cli::build().get_matches());
+    load_object!(context.object_path, binding)?
         .dump()?
         .into_iter()
         .for_each(|symbol| println!("{symbol}"));

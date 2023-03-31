@@ -16,6 +16,6 @@ macro_rules! load_dwarf {
 macro_rules! load_object {
     ($path:expr, $binding:ident) => {{
         $binding = unsafe { memmap2::Mmap::map(&std::fs::File::open(&$path)?) }?;
-        Result::<object::File, crate::Error>::Ok(object::File::parse(&*$binding)?)
+        Result::<object::File, atorsl::Error>::Ok(object::File::parse(&*$binding)?)
     }};
 }
