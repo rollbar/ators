@@ -10,12 +10,12 @@ pub trait Lookup {
 
 impl<'data> Lookup for object::File<'data> {
     fn lookup<'a>(&'a self, _: Context) -> gimli::Result<Vec<String>> {
-        let cow;
-        let dwarf = load_dwarf!(self, cow);
+        // let cow;
+        //let dwarf = load_dwarf!(self, cow);
 
-        let _ = dwarf
-            .units()
-            .map(|header| Ok((header, dwarf.unit(header)?)));
+        // let _ = dwarf
+        //     .units()
+        //     .map(|header| Ok((header, dwarf.unit(header)?)));
 
         unimplemented!()
     }

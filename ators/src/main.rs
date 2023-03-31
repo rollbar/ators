@@ -1,13 +1,17 @@
 mod cli;
 
 use anyhow::Result;
-use atorsl::{data::Context, load_object, read::Dump};
+use atorsl::{data::Context, load_dwarf, load_object, read::Dump};
 use cli::FromArgs;
 
 fn main() -> Result<()> {
-    let binding;
+    let mmap;
+    let cow;
     let context = Context::from_args(cli::build().get_matches());
-    load_object!(context.object_path, binding)?
+    let object = load_object!(context.object_path, mmap)?;
+    let dwarf = load_dwarf!(object, cow);
+
+    object
         .dump()?
         .into_iter()
         .for_each(|symbol| println!("{symbol}"));
