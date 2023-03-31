@@ -1,20 +1,21 @@
-use crate::{control::format, data::ObjectExt, load_dwarf};
+use crate::read::format;
 use anyhow::Result;
 use fallible_iterator::{convert, FallibleIterator};
-use object::{Object, ObjectSection};
+use object::Object;
+
+use super::Dwarf;
 
 pub trait Dump {
     fn dump(&self) -> Result<Vec<String>>;
-    fn dump_sections(&self) -> Result<Vec<String>>;
 }
 
-impl<'data> Dump for object::File<'data> {
+impl Dump for Dwarf<'_> {
     fn dump(&self) -> Result<Vec<String>> {
-        let cow;
-        let dwarf = load_dwarf!(self, cow);
-        let lines = dwarf
+        // let cow;
+        // let dwarf = load_dwarf!(self, cow);
+        let lines = self
             .units()
-            .map(|header| Ok((header, dwarf.unit(header)?)))
+            .map(|header| Ok((header, self.unit(header)?)))
             .flat_map(|(header, unit)| {
                 //dwarf.unit(header)?.entries_tree(Some(UnitOffset(0)))
                 let mut lines = vec![format::header(&header)];
@@ -37,8 +38,10 @@ impl<'data> Dump for object::File<'data> {
 
         Ok(lines)
     }
+}
 
-    fn dump_sections(&self) -> Result<Vec<String>> {
+impl Dump for object::File<'_> {
+    fn dump(&self) -> Result<Vec<String>> {
         Ok(convert(self.sections().map(|s| format::section(&s))).collect()?)
     }
 }

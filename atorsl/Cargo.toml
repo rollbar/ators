@@ -1,5 +1,5 @@
 [package]
-name = "ators"
+name = "atorsl"
 version.workspace = true
 description.workspace = true
 authors.workspace = true
@@ -10,17 +10,12 @@ repository.workspace = true
 keywords.workspace = true
 categories.workspace = true
 edition.workspace = true
-rust-version = "1.68.2"
 publish.workspace = true
 
 [dependencies]
-atorsl.workspace = true
 ators-proc-macro.workspace = true
 anyhow = "1.0.70"
-clap = { version = "4.2.1", features = ["derive", "cargo", "string"] }
 fallible-iterator = { version = "0.2.0", features = ["std", "alloc"] }
-
-# object
 gimli = "0.27.2"
 memmap2 = "0.5.10"
 object = "0.30.3"

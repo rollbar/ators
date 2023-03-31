@@ -1,24 +1,23 @@
 [workspace]
-members = ["ators", "ators-proc-macro"]
+members = ["ators", "atorsl", "ators-proc-macro"]
 
 [workspace.package]
-version = "0.0.1-dev"
+version = "0.0.1"
 description = "convert numeric addresses to symbols of binary images"
-authors = [
-    "Matias Pequeno <matias.pequeno@gmail.com>",
-]
+authors = ["Matias Pequeno <matias.pequeno@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-documentation = "https://docs.rs/ators"
 homepage = "https://github.com/matux/ators"
+documentation = "https://docs.rs/ators"
 repository = "https://github.com/matux/ators"
-keywords = ["atos", "debug", "dwarf", "symbolication"]
-categories = ["utilities"]
+categories = ["development-tools::debugging", "utilities"]
+keywords = ["atos", "debug", "DWARF", "symbolication"]
 edition = "2021"
-rust-version = "1.68.2"
+exclude = ["/.github"]
 publish = false
 
 [workspace.dependencies]
+atorsl = { path = "atorsl" }
 ators-proc-macro = { path = "ators-proc-macro" }
 
 [profile.release]

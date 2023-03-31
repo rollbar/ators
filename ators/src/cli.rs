@@ -1,10 +1,9 @@
-use crate::data;
 use clap::{crate_authors, crate_description, crate_name, crate_version, value_parser};
 use clap::{Arg, ArgAction, Command, ValueHint};
 use std::{fmt, path::PathBuf};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum Opt {
+enum Opt {
     Object,
     LoadAddress,
     Address,
@@ -25,27 +24,31 @@ impl From<Opt> for clap::Id {
     }
 }
 
-impl From<clap::ArgMatches> for data::Context {
-    fn from(matches: clap::ArgMatches) -> Self {
+pub trait FromArgs {
+    fn from_args(args: clap::ArgMatches) -> Self;
+}
+
+impl FromArgs for atorsl::data::Context {
+    fn from_args(args: clap::ArgMatches) -> Self {
         Self {
-            object_path: matches
+            object_path: args
                 .get_one(&Opt::Object.to_string())
                 .map(Clone::clone)
                 .unwrap(),
-            load_address: matches
+            load_address: args
                 .get_one(&Opt::LoadAddress.to_string())
                 .map(Clone::clone)
                 .unwrap(),
-            addresses: matches
+            addresses: args
                 .get_many(&Opt::Address.to_string())
                 .unwrap()
                 .copied()
                 .collect(),
-            architecture: matches
+            architecture: args
                 .get_one(&Opt::Architecture.to_string())
                 .map(Clone::clone),
-            expand_inline: matches.get_flag(&Opt::Inline.to_string()),
-            verbose: matches.get_flag(&Opt::Verbose.to_string()),
+            expand_inline: args.get_flag(&Opt::Inline.to_string()),
+            verbose: args.get_flag(&Opt::Verbose.to_string()),
         }
     }
 }
@@ -75,7 +78,7 @@ pub fn build() -> Command {
                 .help("The load address of the binary image")
                 .required(true)
                 .value_name("load-address")
-                .value_parser(str::parse::<data::Address>)
+                .value_parser(str::parse::<atorsl::data::Address>)
                 .long_help(
                     "The load address of the binary image.  This value is always assumed to be\n\
                     in hex, even without a \"0x\" prefix.  The input addresses are assumed to be\n\
@@ -89,7 +92,7 @@ pub fn build() -> Command {
                 .required(true)
                 .num_args(1..)
                 .value_name("address")
-                .value_parser(str::parse::<data::Address>)
+                .value_parser(str::parse::<atorsl::data::Address>)
         ])
         .args([
             Arg::new(Opt::Architecture).short('a').long("arch")
