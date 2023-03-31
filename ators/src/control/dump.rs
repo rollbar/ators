@@ -1,10 +1,7 @@
-use crate::control::format;
-use crate::data::Endian;
+use crate::{control::format, data::ObjectExt, load_dwarf};
 use anyhow::Result;
 use fallible_iterator::{convert, FallibleIterator};
-use gimli::{Dwarf, EndianSlice};
 use object::{Object, ObjectSection};
-use std::borrow::Cow;
 
 pub trait Dump {
     fn dump(&self) -> Result<Vec<String>>;
@@ -13,15 +10,8 @@ pub trait Dump {
 
 impl<'data> Dump for object::File<'data> {
     fn dump(&self) -> Result<Vec<String>> {
-        let dwarf = Dwarf::load(|section_id| -> Result<Cow<[u8]>> {
-            Ok(self
-                .section_by_name(section_id.name())
-                .and_then(|section| section.uncompressed_data().ok())
-                .unwrap_or(Cow::Borrowed(&[][..])))
-        })?;
-
-        let dwarf = dwarf.borrow(|section| EndianSlice::new(&*section, self.runtime_endian()));
-
+        let cow;
+        let dwarf = load_dwarf!(self, cow);
         let lines = dwarf
             .units()
             .map(|header| Ok((header, dwarf.unit(header)?)))
