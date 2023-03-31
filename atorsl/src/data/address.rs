@@ -48,3 +48,31 @@ impl PartialOrd<Address> for u64 {
         other.0.partial_cmp(self)
     }
 }
+
+macro_rules! binops {
+    ($Out:tt $i:ident $e:expr => $(($Lhs:ty, $Rhs:ty))*) => { $(
+        impl std::ops::Add<$Rhs> for $Lhs {
+            type Output = $Out;
+
+            fn add(self, $i: $Rhs) -> $Out {
+                $Out(self.0 + $e)
+            }
+        }
+
+        impl std::ops::Sub<$Rhs> for $Lhs {
+            type Output = $Out;
+
+            fn sub(self, $i: $Rhs) -> $Out {
+                $Out(self.0 - $e)
+            }
+        }
+    )* }
+}
+
+macro_rules! add_sub_impl {
+    ($tt:tt) => { binops!($tt rhs rhs.0 => ($tt, $tt)($tt, &$tt)(&$tt, $tt)(&$tt, &$tt)); };
+    ($tl:tt $tr:ty) => { binops!($tl rhs rhs => ($tl, $tr)($tl, &$tr)(&$tl, $tr)(&$tl, &$tr)); }
+}
+
+add_sub_impl!(Address);
+add_sub_impl!(Address u64);
