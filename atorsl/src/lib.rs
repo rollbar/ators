@@ -1,5 +1,6 @@
+mod format;
+
 pub mod data;
-pub mod format;
 pub mod read;
 
 use thiserror::Error;
@@ -14,6 +15,9 @@ pub enum Error {
 
     #[error("Error reading binary image object")]
     Object(#[from] object::read::Error),
+
+    #[error("__TEXT segment not found")]
+    TextSegmentNotFound,
 }
 
 #[macro_export]

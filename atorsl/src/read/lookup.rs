@@ -1,21 +1,20 @@
-use crate::data::Context;
-use crate::data::ObjectExt;
-use crate::load_dwarf;
-use fallible_iterator::FallibleIterator;
-use object::{Object, ObjectSection};
+use crate::{data::Context, Error};
+use gimli::{Dwarf, EndianSlice, RunTimeEndian};
+use object::{Object, ObjectSegment};
 
 pub trait Lookup {
-    fn lookup(&self, context: Context) -> gimli::Result<Vec<String>>;
+    fn lookup(&self, object: object::File, context: Context) -> Result<Vec<String>, Error>;
 }
 
-impl<'data> Lookup for object::File<'data> {
-    fn lookup<'a>(&'a self, _: Context) -> gimli::Result<Vec<String>> {
-        // let cow;
-        //let dwarf = load_dwarf!(self, cow);
-
-        // let _ = dwarf
-        //     .units()
-        //     .map(|header| Ok((header, dwarf.unit(header)?)));
+impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
+    fn lookup<'a>(&'a self, object: object::File, _: Context) -> Result<Vec<String>, Error> {
+        let vmaddr = object
+            .segments()
+            .find_map(|seg| match seg.name().ok().flatten() {
+                Some(name) if name == "__TEXT" => Some(seg.address()),
+                _ => None,
+            })
+            .ok_or(Error::TextSegmentNotFound)?;
 
         unimplemented!()
     }
