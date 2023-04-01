@@ -1,5 +1,3 @@
-mod format;
-
 pub mod addr;
 pub mod ext;
 pub mod lookup;

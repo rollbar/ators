@@ -107,3 +107,17 @@ impl LookupExt for Dwarf<'_> {
             .ok_or(Error::AddrNoDebugOffset(addr))
     }
 }
+
+#[allow(dead_code)]
+fn fmt(entry: &Entry, dwarf: &Dwarf, header: &UnitHeader, unit: &Unit) -> String {
+    format!(
+        "│ {:#010x} │ {:^#39.39} │ {:#25} │ {:#80.80} │",
+        entry.offset().to_debug_info_offset(&header).unwrap().0,
+        format!("{:?}", entry.pc().unwrap_or(Addr::nil()..Addr::nil())),
+        entry.tag(),
+        entry
+            .symbol()
+            .and_then(|v| <Dwarf as ext::gimli::Dwarf>::try_attr_string(dwarf, &unit, v))
+            .unwrap_or_else(String::default),
+    )
+}
