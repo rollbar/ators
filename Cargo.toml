@@ -2,8 +2,6 @@
 members = ["ators", "atorsl"]
 
 [workspace.package]
-version = "0.1.0"
-description = "convert numeric addresses to symbols of binary images"
 authors = ["Matias Pequeno <matias.pequeno@gmail.com>"]
 license = "MIT"
 readme = "README.md"
@@ -14,7 +12,7 @@ categories = ["development-tools::debugging", "utilities"]
 keywords = ["atos", "debug", "DWARF", "symbolication"]
 edition = "2021"
 exclude = ["/.github"]
-publish = false
+publish = true
 
 [workspace.dependencies]
 atorsl = { path = "atorsl" }

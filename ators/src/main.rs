@@ -4,9 +4,9 @@ use atorsl::{data::Context, ext::object::File, *};
 use cli::FromArgs;
 
 fn main() -> anyhow::Result<()> {
-    let context = Context::from_args(cli::build().get_matches());
-
     let (mmap, cow);
+
+    let context = Context::from_args(cli::build().get_matches());
     let object = load_object!(context.objpath, mmap)?;
 
     load_dwarf!(object, cow)

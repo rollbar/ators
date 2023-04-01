@@ -1,7 +1,7 @@
 [package]
 name = "ators"
-version.workspace = true
-description.workspace = true
+version = "0.1.0"
+description = "convert numeric addresses to symbols of binary images"
 authors.workspace = true
 license.workspace = true
 readme.workspace = true
@@ -10,13 +10,12 @@ repository.workspace = true
 keywords.workspace = true
 categories.workspace = true
 edition.workspace = true
-rust-version = "1.68.2"
 publish.workspace = true
 
 [dependencies]
 atorsl.workspace = true
 anyhow = "1.0.70"
-clap = { version = "4.2.1", features = ["derive", "cargo", "string"] }
+clap = { version = "4.2.1", features = ["cargo", "string"] }
 
 # object
 memmap2 = "0.5.10"
