@@ -1,7 +1,7 @@
 use crate::{
     data::{Address, Context},
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
-    Error,
+    format, Error,
 };
 use fallible_iterator::FallibleIterator;
 use gimli::{AttributeValue, DW_TAG_subprogram};
@@ -44,18 +44,7 @@ impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
             };
 
             if context.verbose {
-                println!(
-                    "{:#010x}  {:?}  {:#24}: {:?} : {:?}",
-                    entry.offset().to_debug_info_offset(&header).unwrap().0,
-                    entry.pc(),
-                    entry.tag(),
-                    entry
-                        .name()
-                        .and_then(|val| self.symbol(val, &unit).ok()),
-                    entry
-                        .linkage_name()
-                        .and_then(|val| self.symbol(val, &unit).ok())
-                );
+                println!("{}", format::entry(entry, self, &header, &unit));
             }
 
             match entry.pc() {

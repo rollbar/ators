@@ -1,6 +1,11 @@
 use gimli::{EndianSlice, RunTimeEndian};
 use object::ObjectSection;
 
+use crate::{
+    data::Address,
+    ext::gimli::{DebuggingInformationEntry, Dwarf},
+};
+
 pub fn section(section: &object::Section) -> object::read::Result<String> {
     Ok(format!(
         "{:#018x}:  {:#8}  {:#12}  {:#18}  ({:?})",
@@ -19,11 +24,24 @@ pub fn header(header: &gimli::UnitHeader<EndianSlice<RunTimeEndian>, usize>) -> 
     )
 }
 
-pub fn entry<'a>(
-    depth: isize,
-    entry: &gimli::DebuggingInformationEntry<'a, 'a, EndianSlice<'_, RunTimeEndian>, usize>,
+pub fn entry(
+    entry: &gimli::DebuggingInformationEntry<'_, '_, EndianSlice<'_, RunTimeEndian>, usize>,
+    dwarf: &gimli::Dwarf<EndianSlice<'_, RunTimeEndian>>,
+    header: &gimli::UnitHeader<EndianSlice<RunTimeEndian>, usize>,
+    unit: &gimli::Unit<EndianSlice<RunTimeEndian>, usize>,
 ) -> String {
-    format!("<{}><{:#018x}> {}", depth, entry.offset().0, entry.tag())
+    format!(
+        "{:#010x}:  {:#45?}  {:#26}: {:?} : {:?}",
+        entry.offset().to_debug_info_offset(&header).unwrap().0,
+        entry.pc().unwrap_or(Address::nil()..Address::nil()),
+        entry.tag(),
+        entry
+            .name()
+            .and_then(|value| dwarf.try_attr_string(&unit, value)),
+        entry
+            .linkage_name()
+            .and_then(|value| dwarf.try_attr_string(&unit, value))
+    )
 }
 
 pub fn attr(attr: &gimli::Attribute<EndianSlice<'_, RunTimeEndian>>) -> String {

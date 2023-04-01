@@ -18,7 +18,7 @@ impl Dump for Dwarf<EndianSlice<'_, RunTimeEndian>> {
                 let mut entries = unit.entries();
                 while let Some((delta_depth, entry)) = entries.next_dfs()? {
                     depth += delta_depth;
-                    lines.push(format::entry(depth, entry));
+                    //lines.push(format::entry(depth, entry));
                     lines.append(
                         &mut entry
                             .attrs()
