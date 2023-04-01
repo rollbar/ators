@@ -1,68 +1,68 @@
 use std::{cmp::Ordering, fmt, str::FromStr};
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Address(u64);
+pub struct Addr(u64);
 
-impl Address {
+impl Addr {
     pub fn nil() -> Self {
         Self(0)
     }
 }
 
-impl Default for Address {
+impl Default for Addr {
     fn default() -> Self {
         Self::nil()
     }
 }
 
-impl From<u64> for Address {
+impl From<u64> for Addr {
     fn from(addr: u64) -> Self {
         Self(addr)
     }
 }
 
-impl FromStr for Address {
+impl FromStr for Addr {
     type Err = <u64 as FromStr>::Err;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         s.parse::<u64>()
             .or_else(|_| u64::from_str_radix(s.trim_start_matches("0x"), 16))
-            .map(Address::from)
+            .map(Addr::from)
     }
 }
 
-impl fmt::Display for Address {
+impl fmt::Display for Addr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_fmt(format_args!("{:#018x}", self.0))
     }
 }
 
-impl fmt::Debug for Address {
+impl fmt::Debug for Addr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(self, f)
     }
 }
 
-impl PartialEq<u64> for Address {
+impl PartialEq<u64> for Addr {
     fn eq(&self, other: &u64) -> bool {
         self.0 == *other
     }
 }
 
-impl PartialEq<Address> for u64 {
-    fn eq(&self, other: &Address) -> bool {
+impl PartialEq<Addr> for u64 {
+    fn eq(&self, other: &Addr) -> bool {
         other.0 == *self
     }
 }
 
-impl PartialOrd<u64> for Address {
+impl PartialOrd<u64> for Addr {
     fn partial_cmp(&self, other: &u64) -> Option<Ordering> {
         self.0.partial_cmp(other)
     }
 }
 
-impl PartialOrd<Address> for u64 {
-    fn partial_cmp(&self, other: &Address) -> Option<Ordering> {
+impl PartialOrd<Addr> for u64 {
+    fn partial_cmp(&self, other: &Addr) -> Option<Ordering> {
         other.0.partial_cmp(self)
     }
 }
@@ -92,5 +92,5 @@ macro_rules! add_sub_impl {
     ($tl:tt $tr:ty) => { binops!($tl rhs rhs => ($tl, $tr)($tl, &$tr)(&$tl, $tr)(&$tl, &$tr)); }
 }
 
-add_sub_impl!(Address);
-add_sub_impl!(Address u64);
+add_sub_impl!(Addr);
+add_sub_impl!(Addr u64);

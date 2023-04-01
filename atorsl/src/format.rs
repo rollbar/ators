@@ -4,7 +4,7 @@ use object::ObjectSection;
 
 use crate::{
     ext::gimli::{DebuggingInformationEntry, Dwarf},
-    Address,
+    Addr,
 };
 
 pub fn section(section: &object::Section) -> object::read::Result<String> {
@@ -34,7 +34,7 @@ pub fn entry(
     format!(
         "{:#010x}:  {:#45?}  {:#26}: {:?} : {:?}",
         entry.offset().to_debug_info_offset(&header).unwrap().0,
-        entry.pc().unwrap_or(Address::nil()..Address::nil()),
+        entry.pc().unwrap_or(Addr::nil()..Addr::nil()),
         entry.tag(),
         entry
             .name()

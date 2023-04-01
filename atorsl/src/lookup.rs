@@ -1,6 +1,6 @@
 use crate::{
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
-    format, Address, Context, Error,
+    format, Addr, Context, Error,
 };
 use fallible_iterator::FallibleIterator;
 use gimli::{DW_TAG_subprogram, DebugInfoOffset, Dwarf, EndianSlice, RunTimeEndian};
@@ -11,16 +11,16 @@ type Entry<'abbrev, 'unit, 'input> =
     gimli::DebuggingInformationEntry<'abbrev, 'unit, EndianSlice<'input, RunTimeEndian>, usize>;
 
 pub trait Lookup {
-    fn lookup(&self, vmaddr: Address, context: &Context) -> Result<Vec<String>, Error>;
-    fn lookup_addr(&self, address: Address, context: &Context) -> Result<String, Error>;
+    fn lookup(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error>;
+    fn lookup_addr(&self, address: Addr, context: &Context) -> Result<String, Error>;
 
     fn symbolicate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
-    fn unit_from_addr(&self, addr: Address) -> Result<(UnitHeader, Unit), Error>;
-    fn debug_info_offset_from_addr(&self, addr: Address) -> Result<DebugInfoOffset, Error>;
+    fn unit_from_addr(&self, addr: Addr) -> Result<(UnitHeader, Unit), Error>;
+    fn debug_info_offset_from_addr(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
 }
 
 impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
-    fn lookup(&self, vmaddr: Address, context: &Context) -> Result<Vec<String>, Error> {
+    fn lookup(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
         fallible_iterator::convert(
             context
                 .addrs
@@ -31,7 +31,7 @@ impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
         .collect()
     }
 
-    fn lookup_addr(&self, addr: Address, context: &Context) -> Result<String, Error> {
+    fn lookup_addr(&self, addr: Addr, context: &Context) -> Result<String, Error> {
         let (header, unit) = self.unit_from_addr(addr)?;
         let mut entries = unit.entries();
 
@@ -67,13 +67,13 @@ impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
             })
     }
 
-    fn unit_from_addr(&self, addr: Address) -> Result<(UnitHeader, Unit), Error> {
+    fn unit_from_addr(&self, addr: Addr) -> Result<(UnitHeader, Unit), Error> {
         let offset = self.debug_info_offset_from_addr(addr)?;
         let header = self.debug_info.header_from_offset(offset)?;
         Ok((header, self.unit(header)?))
     }
 
-    fn debug_info_offset_from_addr(&self, addr: Address) -> Result<DebugInfoOffset, Error> {
+    fn debug_info_offset_from_addr(&self, addr: Addr) -> Result<DebugInfoOffset, Error> {
         self.debug_aranges
             .headers()
             .find_map(|header| {

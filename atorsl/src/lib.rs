@@ -1,18 +1,18 @@
 mod format;
 
-pub mod address;
+pub mod addr;
 pub mod ext;
 pub mod lookup;
 
-pub use address::Address;
+pub use addr::Addr;
 pub use lookup::Lookup;
 
 /// The program's context, defines its behavior.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Context {
     pub objpath: std::path::PathBuf,
-    pub loadaddr: Address,
-    pub addrs: Vec<Address>,
+    pub loadaddr: Addr,
+    pub addrs: Vec<Addr>,
     pub arch: Option<String>,
     pub inline: bool,
     pub verbose: bool,
@@ -33,13 +33,13 @@ pub enum Error {
     TextSegmentNotFound,
 
     #[error("Address not found ({0})")]
-    AddressNotFound(Address),
+    AddressNotFound(Addr),
 
     #[error("Address is not a symbol")]
     AddressHasNoSymbol,
 
     #[error("No debug offset in address ({0})")]
-    NoDebugOffsetInAddress(Address),
+    NoDebugOffsetInAddress(Addr),
 }
 
 #[macro_export]

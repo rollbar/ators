@@ -1,5 +1,5 @@
 pub mod object {
-    use crate::Address;
+    use crate::Addr;
     use object::{Object, ObjectSegment};
 
     pub trait File {
@@ -7,7 +7,7 @@ pub mod object {
 
         fn runtime_endian(&self) -> gimli::RunTimeEndian;
 
-        fn vmaddr(&self) -> Result<Address, crate::Error>;
+        fn vmaddr(&self) -> Result<Addr, crate::Error>;
     }
 
     impl File for object::File<'_> {
@@ -23,14 +23,14 @@ pub mod object {
             }
         }
 
-        fn vmaddr(&self) -> Result<Address, crate::Error> {
+        fn vmaddr(&self) -> Result<Addr, crate::Error> {
             self.segments()
                 .find_map(|seg| match seg.name().ok().flatten() {
                     Some(name) if name == "__TEXT" => Some(seg.address()),
                     _ => None,
                 })
                 .ok_or(crate::Error::TextSegmentNotFound)
-                .map(Address::from)
+                .map(Addr::from)
         }
     }
 }
@@ -38,7 +38,7 @@ pub mod object {
 pub mod gimli {
     use std::ops::Range;
 
-    use crate::Address;
+    use crate::Addr;
     use gimli::{AttributeValue, EndianSlice, RunTimeEndian};
 
     pub trait Dwarf {
@@ -64,7 +64,7 @@ pub mod gimli {
     pub trait DebuggingInformationEntry {
         fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
         fn linkage_name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
-        fn pc(&self) -> Option<Range<Address>>;
+        fn pc(&self) -> Option<Range<Addr>>;
     }
 
     impl DebuggingInformationEntry
@@ -80,7 +80,7 @@ pub mod gimli {
                 .flatten()
         }
 
-        fn pc(&self) -> Option<Range<Address>> {
+        fn pc(&self) -> Option<Range<Addr>> {
             let low = match self.attr_value(gimli::DW_AT_low_pc).ok().flatten() {
                 Some(AttributeValue::Addr(addr)) => Some(addr.into()),
                 _ => None,
@@ -97,11 +97,11 @@ pub mod gimli {
     }
 
     pub trait ArangeEntry {
-        fn contains(&self, addr: Address) -> Result<bool, gimli::Error>;
+        fn contains(&self, addr: Addr) -> Result<bool, gimli::Error>;
     }
 
     impl ArangeEntry for gimli::ArangeEntry {
-        fn contains(&self, addr: Address) -> Result<bool, gimli::Error> {
+        fn contains(&self, addr: Addr) -> Result<bool, gimli::Error> {
             let range = (
                 self.address(),
                 self.address()
