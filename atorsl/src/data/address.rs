@@ -1,6 +1,6 @@
 use std::{cmp::Ordering, fmt, str::FromStr};
 
-#[derive(atorspm::Newtype, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Address(u64);
 
 impl Address {
@@ -12,6 +12,12 @@ impl Address {
 impl Default for Address {
     fn default() -> Self {
         Self::nil()
+    }
+}
+
+impl From<u64> for Address {
+    fn from(addr: u64) -> Self {
+        Self(addr)
     }
 }
 

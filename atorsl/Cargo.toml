@@ -13,9 +13,8 @@ edition.workspace = true
 publish.workspace = true
 
 [dependencies]
-atorspm.workspace = true
+fallible-iterator = "0.2.0"
 thiserror = "1.0.40"
-gimli = "0.27.2"
 memmap2 = "0.5.10"
 object = "0.30.3"
-fallible-iterator = "0.2.0"
+gimli = "0.27.2"
