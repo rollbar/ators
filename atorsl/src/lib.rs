@@ -1,15 +1,24 @@
 mod format;
 
-pub mod data;
+pub mod address;
 pub mod ext;
 pub mod lookup;
 
+pub use address::Address;
 pub use lookup::Lookup;
 
-use data::Address;
-use thiserror::Error;
+/// The program's context, defines its behavior.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct Context {
+    pub objpath: std::path::PathBuf,
+    pub loadaddr: Address,
+    pub addrs: Vec<Address>,
+    pub arch: Option<String>,
+    pub inline: bool,
+    pub verbose: bool,
+}
 
-#[derive(Error, Debug)]
+#[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error("Failed to open file: {0}")]
     Io(#[from] std::io::Error),

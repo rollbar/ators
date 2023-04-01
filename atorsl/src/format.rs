@@ -3,8 +3,8 @@ use gimli::{EndianSlice, RunTimeEndian};
 use object::ObjectSection;
 
 use crate::{
-    data::Address,
     ext::gimli::{DebuggingInformationEntry, Dwarf},
+    Address,
 };
 
 pub fn section(section: &object::Section) -> object::read::Result<String> {

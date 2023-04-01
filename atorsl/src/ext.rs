@@ -1,5 +1,5 @@
 pub mod object {
-    use crate::data::Address;
+    use crate::Address;
     use object::{Object, ObjectSegment};
 
     pub trait File {
@@ -38,7 +38,7 @@ pub mod object {
 pub mod gimli {
     use std::ops::Range;
 
-    use crate::data::Address;
+    use crate::Address;
     use gimli::{AttributeValue, EndianSlice, RunTimeEndian};
 
     pub trait Dwarf {

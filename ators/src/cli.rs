@@ -28,7 +28,7 @@ pub trait FromArgs {
     fn from_args(args: clap::ArgMatches) -> Self;
 }
 
-impl FromArgs for atorsl::data::Context {
+impl FromArgs for atorsl::Context {
     fn from_args(args: clap::ArgMatches) -> Self {
         Self {
             objpath: args
@@ -78,7 +78,7 @@ pub fn build() -> Command {
                 .help("The load address of the binary image")
                 .required(true)
                 .value_name("load-address")
-                .value_parser(str::parse::<atorsl::data::Address>)
+                .value_parser(str::parse::<atorsl::Address>)
                 .long_help(
                     "The load address of the binary image.  This value is always assumed to be\n\
                     in hex, even without a \"0x\" prefix.  The input addresses are assumed to be\n\
@@ -92,7 +92,7 @@ pub fn build() -> Command {
                 .required(true)
                 .num_args(1..)
                 .value_name("address")
-                .value_parser(str::parse::<atorsl::data::Address>)
+                .value_parser(str::parse::<atorsl::Address>)
         ])
         .args([
             Arg::new(Opt::Architecture).short('a').long("arch")

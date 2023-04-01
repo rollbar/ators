@@ -1,11 +1,9 @@
 use crate::{
-    data::{Address, Context},
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
-    format, Error,
+    format, Address, Context, Error,
 };
 use fallible_iterator::FallibleIterator;
-use gimli::DW_TAG_subprogram;
-use gimli::{DebugInfoOffset, Dwarf, EndianSlice, RunTimeEndian};
+use gimli::{DW_TAG_subprogram, DebugInfoOffset, Dwarf, EndianSlice, RunTimeEndian};
 
 type Unit<'input> = gimli::Unit<EndianSlice<'input, RunTimeEndian>, usize>;
 type UnitHeader<'input> = gimli::UnitHeader<EndianSlice<'input, RunTimeEndian>, usize>;
