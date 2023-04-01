@@ -2,7 +2,9 @@ mod format;
 
 pub mod data;
 pub mod ext;
-pub mod read;
+pub mod lookup;
+
+pub use lookup::Lookup;
 
 use data::Address;
 use thiserror::Error;

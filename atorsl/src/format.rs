@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use gimli::{EndianSlice, RunTimeEndian};
 use object::ObjectSection;
 
