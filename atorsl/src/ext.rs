@@ -3,24 +3,10 @@ pub mod object {
     use object::{Object, ObjectSegment};
 
     pub trait File {
-        fn is_dwarf(&self) -> bool;
-        fn runtime_endian(&self) -> gimli::RunTimeEndian;
         fn vmaddr(&self) -> Result<Addr, Error>;
     }
 
     impl File for object::File<'_> {
-        fn is_dwarf(&self) -> bool {
-            self.section_by_name("__debug_line").is_some()
-        }
-
-        fn runtime_endian(&self) -> gimli::RunTimeEndian {
-            if self.is_little_endian() {
-                gimli::RunTimeEndian::Little
-            } else {
-                gimli::RunTimeEndian::Big
-            }
-        }
-
         fn vmaddr(&self) -> Result<Addr, Error> {
             self.segments()
                 .find_map(|seg| match seg.name().ok().flatten() {
@@ -62,18 +48,28 @@ pub mod gimli {
     pub trait DebuggingInformationEntry {
         fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
         fn linkage_name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
+        fn abstract_origin(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
         fn pc(&self) -> Option<Range<Addr>>;
     }
 
     impl DebuggingInformationEntry
         for gimli::DebuggingInformationEntry<'_, '_, EndianSlice<'_, RunTimeEndian>, usize>
     {
+        #[inline]
         fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
             self.attr_value(gimli::DW_AT_name).ok().flatten()
         }
 
+        #[inline]
         fn linkage_name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
             self.attr_value(gimli::DW_AT_linkage_name)
+                .ok()
+                .flatten()
+        }
+
+        #[inline]
+        fn abstract_origin(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
+            self.attr_value(gimli::DW_AT_abstract_origin)
                 .ok()
                 .flatten()
         }

@@ -66,7 +66,11 @@ macro_rules! load_dwarf {
         $binding.borrow(|section| {
             gimli::EndianSlice::new(
                 &*section,
-                <object::File as atorsl::ext::object::File>::runtime_endian(&$object),
+                if <object::File as object::Object>::is_little_endian($object) {
+                    gimli::RunTimeEndian::Little
+                } else {
+                    gimli::RunTimeEndian::Big
+                },
             )
         })
     }};
