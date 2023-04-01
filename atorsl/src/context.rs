@@ -9,5 +9,4 @@ pub struct Context {
     pub addrs: Vec<Addr>,
     pub arch: Option<String>,
     pub inline: bool,
-    pub verbose: bool,
 }

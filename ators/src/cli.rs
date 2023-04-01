@@ -9,7 +9,6 @@ enum Opt {
     Address,
     Architecture,
     Inline,
-    Verbose,
 }
 
 impl fmt::Display for Opt {
@@ -48,7 +47,6 @@ impl FromArgs for atorsl::Context {
                 .get_one(&Opt::Architecture.to_string())
                 .map(Clone::clone),
             inline: args.get_flag(&Opt::Inline.to_string()),
-            verbose: args.get_flag(&Opt::Verbose.to_string()),
         }
     }
 }
@@ -111,9 +109,6 @@ pub fn build() -> Command {
                     Universal Binary)."),
             Arg::new(Opt::Inline).short('i').long("inlineFrames")
                 .help("Display inlined symbols")
-                .action(ArgAction::SetTrue),
-            Arg::new(Opt::Verbose).short('v').long("verbose")
-                .help("Display verbose output")
                 .action(ArgAction::SetTrue),
         ])
         .after_long_help(
