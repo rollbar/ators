@@ -3,22 +3,18 @@ use crate::{
     Addr, Context, Error,
 };
 use fallible_iterator::FallibleIterator;
-use gimli::{AttributeValue, DebugInfoOffset, EndianSlice, RunTimeEndian};
 use gimli::{DW_TAG_inlined_subroutine, DW_TAG_subprogram};
+use gimli::{DebugInfoOffset, EndianSlice, RunTimeEndian};
 
 type Dwarf<'input> = gimli::Dwarf<EndianSlice<'input, RunTimeEndian>>;
 type Unit<'input> = gimli::Unit<EndianSlice<'input, RunTimeEndian>, usize>;
 type UnitHeader<'input> = gimli::UnitHeader<EndianSlice<'input, RunTimeEndian>, usize>;
 type Entry<'abbrev, 'unit, 'input> =
     gimli::DebuggingInformationEntry<'abbrev, 'unit, EndianSlice<'input, RunTimeEndian>, usize>;
+type AttrValue<'input> = gimli::AttributeValue<EndianSlice<'input, RunTimeEndian>>;
 
 pub trait Lookup {
     fn lookup(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error>;
-    fn lookup_addr(&self, address: Addr, context: &Context) -> Result<String, Error>;
-
-    fn symbolicate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
-    fn unit_from_addr(&self, addr: Addr) -> Result<(UnitHeader, Unit), Error>;
-    fn debug_info_offset_from_addr(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
 }
 
 impl Lookup for Dwarf<'_> {
@@ -28,12 +24,21 @@ impl Lookup for Dwarf<'_> {
                 .addrs
                 .to_owned()
                 .into_iter()
-                .map(|addr| self.lookup_addr(addr - context.loadaddr + vmaddr, &context)),
+                .map(|addr| self.lookup_addr(addr - context.loadaddr + vmaddr, context.inline)),
         )
         .collect()
     }
+}
 
-    fn lookup_addr(&self, addr: Addr, context: &Context) -> Result<String, Error> {
+trait LookupExt {
+    fn lookup_addr(&self, address: Addr, expand_inlined: bool) -> Result<String, Error>;
+    fn symbolicate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
+    fn unit_from_addr(&self, addr: Addr) -> Result<(UnitHeader, Unit), Error>;
+    fn debug_info_offset_from_addr(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
+}
+
+impl LookupExt for Dwarf<'_> {
+    fn lookup_addr(&self, addr: Addr, expand_inlined: bool) -> Result<String, Error> {
         let (_, unit) = self.unit_from_addr(addr)?;
         let mut entries = unit.entries();
 
@@ -51,7 +56,7 @@ impl Lookup for Dwarf<'_> {
         };
 
         match entry {
-            Some(entry) if context.inline && entry.has_children() => {
+            Some(entry) if expand_inlined && entry.has_children() => {
                 let mut symbol = result?;
                 let mut depth = 0;
                 loop {
@@ -82,7 +87,7 @@ impl Lookup for Dwarf<'_> {
             .symbol()
             .ok_or(Error::AddrHasNoSymbol)
             .and_then(|value| match value {
-                AttributeValue::UnitRef(offset) => self.symbolicate(&unit.entry(offset)?, &unit),
+                AttrValue::UnitRef(offset) => self.symbolicate(&unit.entry(offset)?, &unit),
                 _ => Ok(self
                     .attr_string(&unit, value)
                     .map_err(Error::Gimli)?
