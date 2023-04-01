@@ -29,7 +29,3 @@ pub fn entry<'a>(
 pub fn attr(attr: &gimli::Attribute<EndianSlice<'_, RunTimeEndian>>) -> String {
     format!("\t{}: {:?}", attr.name(), attr.value())
 }
-
-pub fn unit(_: &gimli::Unit<EndianSlice<'_, RunTimeEndian>, usize>) -> String {
-    String::default()
-}

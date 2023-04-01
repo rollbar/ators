@@ -55,7 +55,9 @@ pub mod gimli {
         >
     {
         fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
-            self.attr_value(gimli::DW_AT_name).ok().flatten()
+            [gimli::DW_AT_name, gimli::DW_AT_linkage_name]
+                .into_iter()
+                .find_map(|attr| self.attr_value(attr).ok().flatten())
         }
 
         fn pc(&self) -> Option<Range<Address>> {

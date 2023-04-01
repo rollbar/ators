@@ -4,27 +4,31 @@ pub mod data;
 pub mod ext;
 pub mod read;
 
+use data::Address;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("Failed to open file")]
+    #[error("Failed to open file: {0}")]
     Io(#[from] std::io::Error),
 
-    #[error("Error reading DWARF")]
+    #[error("Error reading DWARF: {0}")]
     Gimli(#[from] gimli::Error),
 
-    #[error("Error reading binary image object")]
+    #[error("Error reading binary image object: {0}")]
     Object(#[from] object::read::Error),
 
     #[error("__TEXT segment not found in DWARF")]
     TextSegmentNotFound,
 
-    #[error("Address not found")]
-    AddressNotFound,
+    #[error("Address not found ({0})")]
+    AddressNotFound(Address),
 
-    #[error("Address is not a symbol")]
-    AddressNotSymbol,
+    #[error("Address is not a symbol ({0})")]
+    AddressNotSymbol(Address),
+
+    #[error("No debug offset in address ({0})")]
+    NoDebugOffsetInAddress(Address),
 }
 
 #[macro_export]
