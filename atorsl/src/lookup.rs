@@ -79,9 +79,7 @@ impl Lookup for Dwarf<'_> {
 
     fn symbolicate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
         entry
-            .linkage_name()
-            .or_else(|| entry.abstract_origin())
-            .or_else(|| entry.name())
+            .symbol()
             .ok_or(Error::AddrHasNoSymbol)
             .and_then(|value| match value {
                 AttributeValue::UnitRef(offset) => self.symbolicate(&unit.entry(offset)?, &unit),

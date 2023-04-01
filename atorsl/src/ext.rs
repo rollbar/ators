@@ -46,32 +46,21 @@ pub mod gimli {
     }
 
     pub trait DebuggingInformationEntry {
-        fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
-        fn linkage_name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
-        fn abstract_origin(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
+        fn symbol(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
         fn pc(&self) -> Option<Range<Addr>>;
     }
 
     impl DebuggingInformationEntry
         for gimli::DebuggingInformationEntry<'_, '_, EndianSlice<'_, RunTimeEndian>, usize>
     {
-        #[inline]
-        fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
-            self.attr_value(gimli::DW_AT_name).ok().flatten()
-        }
-
-        #[inline]
-        fn linkage_name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
-            self.attr_value(gimli::DW_AT_linkage_name)
-                .ok()
-                .flatten()
-        }
-
-        #[inline]
-        fn abstract_origin(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
-            self.attr_value(gimli::DW_AT_abstract_origin)
-                .ok()
-                .flatten()
+        fn symbol(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
+            [
+                gimli::DW_AT_linkage_name,
+                gimli::DW_AT_abstract_origin,
+                gimli::DW_AT_name,
+            ]
+            .into_iter()
+            .find_map(|dw_at| self.attr_value(dw_at).ok().flatten())
         }
 
         fn pc(&self) -> Option<Range<Addr>> {
