@@ -7,6 +7,10 @@ impl Addr {
     pub fn nil() -> Self {
         Self(0)
     }
+
+    pub fn is_nil(&self) -> bool {
+        self == 0
+    }
 }
 
 impl Default for Addr {
@@ -49,6 +53,12 @@ impl PartialEq<u64> for Addr {
     }
 }
 
+impl PartialEq<u64> for &Addr {
+    fn eq(&self, other: &u64) -> bool {
+        self.0 == *other
+    }
+}
+
 impl PartialEq<Addr> for u64 {
     fn eq(&self, other: &Addr) -> bool {
         other.0 == *self
@@ -56,6 +66,12 @@ impl PartialEq<Addr> for u64 {
 }
 
 impl PartialOrd<u64> for Addr {
+    fn partial_cmp(&self, other: &u64) -> Option<Ordering> {
+        self.0.partial_cmp(other)
+    }
+}
+
+impl PartialOrd<u64> for &Addr {
     fn partial_cmp(&self, other: &u64) -> Option<Ordering> {
         self.0.partial_cmp(other)
     }

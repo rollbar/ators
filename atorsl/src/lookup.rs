@@ -1,10 +1,12 @@
 use crate::{
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
-    format, Addr, Context, Error,
+    Addr, Context, Error,
 };
 use fallible_iterator::FallibleIterator;
-use gimli::{DW_TAG_subprogram, DebugInfoOffset, Dwarf, EndianSlice, RunTimeEndian};
+use gimli::{AttributeValue, DebugInfoOffset, EndianSlice, RunTimeEndian};
+use gimli::{DW_TAG_inlined_subroutine, DW_TAG_subprogram};
 
+type Dwarf<'input> = gimli::Dwarf<EndianSlice<'input, RunTimeEndian>>;
 type Unit<'input> = gimli::Unit<EndianSlice<'input, RunTimeEndian>, usize>;
 type UnitHeader<'input> = gimli::UnitHeader<EndianSlice<'input, RunTimeEndian>, usize>;
 type Entry<'abbrev, 'unit, 'input> =
@@ -19,7 +21,7 @@ pub trait Lookup {
     fn debug_info_offset_from_addr(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
 }
 
-impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
+impl Lookup for Dwarf<'_> {
     fn lookup(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
         fallible_iterator::convert(
             context
@@ -32,38 +34,62 @@ impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
     }
 
     fn lookup_addr(&self, addr: Addr, context: &Context) -> Result<String, Error> {
-        let (header, unit) = self.unit_from_addr(addr)?;
+        let (_, unit) = self.unit_from_addr(addr)?;
         let mut entries = unit.entries();
 
-        loop {
+        let (entry, result) = loop {
             let Some((_, entry)) = entries.next_dfs()? else {
-                break Err(Error::AddrNotFound(addr))
+                break (None, Err(Error::AddrNotFound(addr)))
             };
-
-            if context.verbose {
-                println!("{}", format::entry(entry, self, &header, &unit));
-            }
 
             match entry.pc() {
                 Some(pc) if entry.tag() == DW_TAG_subprogram && pc.contains(&addr) => {
-                    break self.symbolicate(entry, &unit)
+                    break (Some(entry), self.symbolicate(entry, &unit))
                 }
                 _ => continue,
             }
+        };
+
+        match entry {
+            Some(entry) if context.inline && entry.has_children() => {
+                let mut symbol = result?;
+                let mut depth = 0;
+                loop {
+                    let Some((step, entry)) = entries.next_dfs()? else {
+                        break;
+                    };
+
+                    depth += step;
+
+                    if depth.signum() < 1 {
+                        break;
+                    }
+
+                    if entry.tag() == DW_TAG_inlined_subroutine {
+                        symbol.insert(0, '\n');
+                        symbol.insert_str(0, self.symbolicate(entry, &unit)?.as_str());
+                    }
+                }
+
+                Ok(symbol)
+            }
+            _ => result,
         }
     }
 
     fn symbolicate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
         entry
             .linkage_name()
+            .or_else(|| entry.abstract_origin())
             .or_else(|| entry.name())
             .ok_or(Error::AddrHasNoSymbol)
-            .and_then(|value| {
-                Ok(self
+            .and_then(|value| match value {
+                AttributeValue::UnitRef(offset) => self.symbolicate(&unit.entry(offset)?, &unit),
+                _ => Ok(self
                     .attr_string(&unit, value)
                     .map_err(Error::Gimli)?
                     .to_string_lossy()
-                    .to_string())
+                    .to_string()),
             })
     }
 

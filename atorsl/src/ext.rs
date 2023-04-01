@@ -100,14 +100,10 @@ pub mod gimli {
 
     impl ArangeEntry for gimli::ArangeEntry {
         fn contains(&self, addr: Addr) -> Result<bool, gimli::Error> {
-            let range = (
-                self.address(),
-                self.address()
-                    .checked_add(self.length())
-                    .ok_or(gimli::Error::InvalidAddressRange)?,
-            );
-
-            Ok(addr >= range.0 && addr < range.1)
+            self.address()
+                .checked_add(self.length())
+                .map(|address_end| (self.address()..address_end).contains(&addr))
+                .ok_or(gimli::Error::InvalidAddressRange)
         }
     }
 }
