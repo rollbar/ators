@@ -5,32 +5,33 @@ use crate::{
 use fallible_iterator::FallibleIterator;
 use gimli::DebugInfoOffset;
 
-pub trait Lookup {
-    fn lookup(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error>;
+pub trait Symbolicate {
+    fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error>;
 }
 
-impl Lookup for Dwarf<'_> {
-    fn lookup(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
+impl Symbolicate for Dwarf<'_> {
+    fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
         fallible_iterator::convert(
             context
                 .addrs
                 .to_owned()
                 .into_iter()
-                .map(|addr| self.lookup_addr(addr - context.loadaddr + vmaddr, context.inline)),
+                .map(|addr| self.lookup(addr - context.loadaddr + vmaddr, context.inline)),
         )
         .collect()
     }
 }
 
-trait LookupExt {
-    fn lookup_addr(&self, address: Addr, expand_inlined: bool) -> Result<String, Error>;
-    fn symbolicate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
+trait Lookup {
+    fn lookup(&self, address: Addr, expand_inlined: bool) -> Result<String, Error>;
+    fn translate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
+    fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String>;
     fn unit_from_addr(&self, addr: Addr) -> Result<(UnitHeader, Unit), Error>;
     fn debug_info_offset_from_addr(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
 }
 
-impl LookupExt for Dwarf<'_> {
-    fn lookup_addr(&self, addr: Addr, expand_inlined: bool) -> Result<String, Error> {
+impl Lookup for Dwarf<'_> {
+    fn lookup(&self, addr: Addr, expand_inlined: bool) -> Result<String, Error> {
         let (_, unit) = self.unit_from_addr(addr)?;
         let mut entries = unit.entries();
 
@@ -41,7 +42,7 @@ impl LookupExt for Dwarf<'_> {
 
             match entry.pc() {
                 Some(pc) if entry.tag() == gimli::DW_TAG_subprogram && pc.contains(&addr) => {
-                    break (Some(entry), self.symbolicate(entry, &unit))
+                    break (Some(entry), self.translate(entry, &unit))
                 }
                 _ => continue,
             }
@@ -64,7 +65,7 @@ impl LookupExt for Dwarf<'_> {
 
                     if entry.tag() == gimli::DW_TAG_inlined_subroutine {
                         symbol.insert(0, '\n');
-                        symbol.insert_str(0, self.symbolicate(entry, &unit)?.as_str());
+                        symbol.insert_str(0, self.translate(entry, &unit)?.as_str());
                     }
                 }
 
@@ -74,18 +75,24 @@ impl LookupExt for Dwarf<'_> {
         }
     }
 
-    fn symbolicate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
+    fn translate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
         entry
             .symbol()
             .ok_or(Error::AddrHasNoSymbol)
             .and_then(|value| match value {
-                AttrValue::UnitRef(offset) => self.symbolicate(&unit.entry(offset)?, &unit),
+                AttrValue::UnitRef(offset) => self.translate(&unit.entry(offset)?, &unit),
                 _ => Ok(self
                     .attr_string(&unit, value)
                     .map_err(Error::Gimli)?
                     .to_string_lossy()
                     .to_string()),
             })
+    }
+
+    fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String> {
+        self.attr_string(&unit, value)
+            .ok()
+            .map(|slice| slice.to_string_lossy().to_string())
     }
 
     fn unit_from_addr(&self, addr: Addr) -> Result<(UnitHeader, Unit), Error> {
@@ -117,7 +124,7 @@ fn fmt(entry: &Entry, dwarf: &Dwarf, header: &UnitHeader, unit: &Unit) -> String
         entry.tag(),
         entry
             .symbol()
-            .and_then(|v| <Dwarf as ext::gimli::Dwarf>::try_attr_string(dwarf, &unit, v))
+            .and_then(|v| dwarf.try_attr_string(&unit, v))
             .unwrap_or_else(String::default),
     )
 }

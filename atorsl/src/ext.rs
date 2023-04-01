@@ -19,23 +19,10 @@ pub mod object {
     }
 }
 
-pub mod gimli {
-    use std::ops::Range;
-
-    use crate::{Addr, AttrValue, Unit};
+pub(crate) mod gimli {
+    use crate::{Addr, AttrValue};
     use gimli::{AttributeValue, EndianSlice, RunTimeEndian};
-
-    pub(crate) trait Dwarf {
-        fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String>;
-    }
-
-    impl Dwarf for gimli::Dwarf<EndianSlice<'_, RunTimeEndian>> {
-        fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String> {
-            self.attr_string(&unit, value)
-                .ok()
-                .map(|slice| slice.to_string_lossy().to_string())
-        }
-    }
+    use std::ops::Range;
 
     pub(crate) trait DebuggingInformationEntry {
         fn symbol(&self) -> Option<AttrValue>;

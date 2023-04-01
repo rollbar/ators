@@ -10,7 +10,7 @@ fn main() -> anyhow::Result<()> {
     let object = load_object!(context.objpath, mmap)?;
 
     load_dwarf!(&object, cow)
-        .lookup(object.vmaddr()?, &context)?
+        .symbolicate(object.vmaddr()?, &context)?
         .into_iter()
         .for_each(|symbol| println!("{symbol}"));
 
