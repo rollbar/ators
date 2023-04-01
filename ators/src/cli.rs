@@ -31,23 +31,23 @@ pub trait FromArgs {
 impl FromArgs for atorsl::data::Context {
     fn from_args(args: clap::ArgMatches) -> Self {
         Self {
-            object_path: args
+            objpath: args
                 .get_one(&Opt::Object.to_string())
                 .map(Clone::clone)
                 .unwrap(),
-            load_address: args
+            loadaddr: args
                 .get_one(&Opt::LoadAddress.to_string())
                 .map(Clone::clone)
                 .unwrap(),
-            addresses: args
+            addrs: args
                 .get_many(&Opt::Address.to_string())
                 .unwrap()
                 .copied()
                 .collect(),
-            architecture: args
+            arch: args
                 .get_one(&Opt::Architecture.to_string())
                 .map(Clone::clone),
-            expand_inline: args.get_flag(&Opt::Inline.to_string()),
+            inline: args.get_flag(&Opt::Inline.to_string()),
             verbose: args.get_flag(&Opt::Verbose.to_string()),
         }
     }

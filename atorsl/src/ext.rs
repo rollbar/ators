@@ -43,6 +43,7 @@ pub mod gimli {
 
     pub trait DebuggingInformationEntry {
         fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
+        fn linkage_name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
         fn pc(&self) -> Option<Range<Address>>;
     }
 
@@ -55,9 +56,13 @@ pub mod gimli {
         >
     {
         fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
-            [gimli::DW_AT_name, gimli::DW_AT_linkage_name]
-                .into_iter()
-                .find_map(|attr| self.attr_value(attr).ok().flatten())
+            self.attr_value(gimli::DW_AT_name).ok().flatten()
+        }
+
+        fn linkage_name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
+            self.attr_value(gimli::DW_AT_linkage_name)
+                .ok()
+                .flatten()
         }
 
         fn pc(&self) -> Option<Range<Address>> {

@@ -2,7 +2,7 @@
 members = ["ators", "atorsl", "atorspm"]
 
 [workspace.package]
-version = "0.0.1"
+version = "0.1.0"
 description = "convert numeric addresses to symbols of binary images"
 authors = ["Matias Pequeno <matias.pequeno@gmail.com>"]
 license = "MIT"
