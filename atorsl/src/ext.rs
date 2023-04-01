@@ -41,19 +41,34 @@ pub mod gimli {
     use crate::data::Address;
     use gimli::{AttributeValue, EndianSlice, RunTimeEndian};
 
+    pub trait Dwarf {
+        fn try_attr_string(
+            &self,
+            unit: &gimli::Unit<EndianSlice<RunTimeEndian>, usize>,
+            value: AttributeValue<EndianSlice<RunTimeEndian>>,
+        ) -> Option<String>;
+    }
+
+    impl Dwarf for gimli::Dwarf<EndianSlice<'_, RunTimeEndian>> {
+        fn try_attr_string(
+            &self,
+            unit: &gimli::Unit<EndianSlice<RunTimeEndian>, usize>,
+            value: AttributeValue<EndianSlice<RunTimeEndian>>,
+        ) -> Option<String> {
+            self.attr_string(&unit, value)
+                .ok()
+                .map(|slice| slice.to_string_lossy().to_string())
+        }
+    }
+
     pub trait DebuggingInformationEntry {
         fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
         fn linkage_name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
         fn pc(&self) -> Option<Range<Address>>;
     }
 
-    impl<'abbrev, 'unit, 'input> DebuggingInformationEntry
-        for gimli::DebuggingInformationEntry<
-            'abbrev,
-            'unit,
-            EndianSlice<'input, RunTimeEndian>,
-            usize,
-        >
+    impl DebuggingInformationEntry
+        for gimli::DebuggingInformationEntry<'_, '_, EndianSlice<'_, RunTimeEndian>, usize>
     {
         fn name(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
             self.attr_value(gimli::DW_AT_name).ok().flatten()
