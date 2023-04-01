@@ -37,7 +37,11 @@ impl FromStr for Addr {
 
 impl fmt::Display for Addr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_fmt(format_args!("{:#018x}", self.0))
+        if self.is_nil() {
+            f.write_str("nil")
+        } else {
+            f.write_fmt(format_args!("{:#018x}", self.0))
+        }
     }
 }
 

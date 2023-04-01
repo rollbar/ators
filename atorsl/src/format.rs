@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+
 use gimli::{EndianSlice, RunTimeEndian};
 use object::ObjectSection;
 
@@ -32,16 +33,18 @@ pub fn entry(
     unit: &gimli::Unit<EndianSlice<RunTimeEndian>, usize>,
 ) -> String {
     format!(
-        "{:#010x}:  {:#45?}  {:#26}: {:?} : {:?}",
+        "│ {:#010x} │ {:^#39.39} │ {:#25} │ {:#40.40} │ {:#80.80} │",
         entry.offset().to_debug_info_offset(&header).unwrap().0,
-        entry.pc().unwrap_or(Addr::nil()..Addr::nil()),
+        format!("{:?}", entry.pc().unwrap_or(Addr::nil()..Addr::nil())),
         entry.tag(),
         entry
             .name()
-            .and_then(|value| dwarf.try_attr_string(&unit, value)),
+            .and_then(|v| dwarf.try_attr_string(&unit, v))
+            .unwrap_or_else(String::default),
         entry
             .linkage_name()
-            .and_then(|value| dwarf.try_attr_string(&unit, value))
+            .and_then(|v| dwarf.try_attr_string(&unit, v))
+            .unwrap_or_else(String::default),
     )
 }
 
