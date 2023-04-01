@@ -22,38 +22,30 @@ pub mod object {
 pub mod gimli {
     use std::ops::Range;
 
-    use crate::Addr;
+    use crate::{Addr, AttrValue, Unit};
     use gimli::{AttributeValue, EndianSlice, RunTimeEndian};
 
-    pub trait Dwarf {
-        fn try_attr_string(
-            &self,
-            unit: &gimli::Unit<EndianSlice<RunTimeEndian>, usize>,
-            value: AttributeValue<EndianSlice<RunTimeEndian>>,
-        ) -> Option<String>;
+    pub(crate) trait Dwarf {
+        fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String>;
     }
 
     impl Dwarf for gimli::Dwarf<EndianSlice<'_, RunTimeEndian>> {
-        fn try_attr_string(
-            &self,
-            unit: &gimli::Unit<EndianSlice<RunTimeEndian>, usize>,
-            value: AttributeValue<EndianSlice<RunTimeEndian>>,
-        ) -> Option<String> {
+        fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String> {
             self.attr_string(&unit, value)
                 .ok()
                 .map(|slice| slice.to_string_lossy().to_string())
         }
     }
 
-    pub trait DebuggingInformationEntry {
-        fn symbol(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>>;
+    pub(crate) trait DebuggingInformationEntry {
+        fn symbol(&self) -> Option<AttrValue>;
         fn pc(&self) -> Option<Range<Addr>>;
     }
 
     impl DebuggingInformationEntry
         for gimli::DebuggingInformationEntry<'_, '_, EndianSlice<'_, RunTimeEndian>, usize>
     {
-        fn symbol(&self) -> Option<AttributeValue<EndianSlice<RunTimeEndian>>> {
+        fn symbol(&self) -> Option<AttrValue> {
             [
                 gimli::DW_AT_linkage_name,
                 gimli::DW_AT_abstract_origin,
@@ -79,7 +71,7 @@ pub mod gimli {
         }
     }
 
-    pub trait ArangeEntry {
+    pub(crate) trait ArangeEntry {
         fn contains(&self, addr: Addr) -> Result<bool, gimli::Error>;
     }
 

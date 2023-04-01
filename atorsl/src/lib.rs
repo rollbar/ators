@@ -75,3 +75,12 @@ macro_rules! load_dwarf {
         })
     }};
 }
+
+use gimli::{EndianSlice, RunTimeEndian};
+
+pub(crate) type Dwarf<'input> = gimli::Dwarf<EndianSlice<'input, RunTimeEndian>>;
+pub(crate) type Unit<'input> = gimli::Unit<EndianSlice<'input, RunTimeEndian>, usize>;
+pub(crate) type UnitHeader<'input> = gimli::UnitHeader<EndianSlice<'input, RunTimeEndian>, usize>;
+pub(crate) type Entry<'abbrev, 'unit, 'input> =
+    gimli::DebuggingInformationEntry<'abbrev, 'unit, EndianSlice<'input, RunTimeEndian>, usize>;
+pub(crate) type AttrValue<'input> = gimli::AttributeValue<EndianSlice<'input, RunTimeEndian>>;

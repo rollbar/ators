@@ -1,17 +1,9 @@
 use crate::{
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
-    Addr, Context, Error,
+    *,
 };
 use fallible_iterator::FallibleIterator;
-use gimli::{DW_TAG_inlined_subroutine, DW_TAG_subprogram};
-use gimli::{DebugInfoOffset, EndianSlice, RunTimeEndian};
-
-type Dwarf<'input> = gimli::Dwarf<EndianSlice<'input, RunTimeEndian>>;
-type Unit<'input> = gimli::Unit<EndianSlice<'input, RunTimeEndian>, usize>;
-type UnitHeader<'input> = gimli::UnitHeader<EndianSlice<'input, RunTimeEndian>, usize>;
-type Entry<'abbrev, 'unit, 'input> =
-    gimli::DebuggingInformationEntry<'abbrev, 'unit, EndianSlice<'input, RunTimeEndian>, usize>;
-type AttrValue<'input> = gimli::AttributeValue<EndianSlice<'input, RunTimeEndian>>;
+use gimli::DebugInfoOffset;
 
 pub trait Lookup {
     fn lookup(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error>;
@@ -48,7 +40,7 @@ impl LookupExt for Dwarf<'_> {
             };
 
             match entry.pc() {
-                Some(pc) if entry.tag() == DW_TAG_subprogram && pc.contains(&addr) => {
+                Some(pc) if entry.tag() == gimli::DW_TAG_subprogram && pc.contains(&addr) => {
                     break (Some(entry), self.symbolicate(entry, &unit))
                 }
                 _ => continue,
@@ -70,7 +62,7 @@ impl LookupExt for Dwarf<'_> {
                         break;
                     }
 
-                    if entry.tag() == DW_TAG_inlined_subroutine {
+                    if entry.tag() == gimli::DW_TAG_inlined_subroutine {
                         symbol.insert(0, '\n');
                         symbol.insert_str(0, self.symbolicate(entry, &unit)?.as_str());
                     }
