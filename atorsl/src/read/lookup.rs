@@ -4,20 +4,19 @@ use crate::{
     format, Error,
 };
 use fallible_iterator::FallibleIterator;
-use gimli::{AttributeValue, DW_TAG_subprogram};
+use gimli::DW_TAG_subprogram;
 use gimli::{DebugInfoOffset, Dwarf, EndianSlice, RunTimeEndian};
 
 type Unit<'input> = gimli::Unit<EndianSlice<'input, RunTimeEndian>, usize>;
 type UnitHeader<'input> = gimli::UnitHeader<EndianSlice<'input, RunTimeEndian>, usize>;
 type Entry<'abbrev, 'unit, 'input> =
     gimli::DebuggingInformationEntry<'abbrev, 'unit, EndianSlice<'input, RunTimeEndian>, usize>;
-type AttrValue<'input> = AttributeValue<EndianSlice<'input, RunTimeEndian>>;
 
 pub trait Lookup {
     fn lookup(&self, vmaddr: Address, context: &Context) -> Result<Vec<String>, Error>;
     fn lookup_addr(&self, address: Address, context: &Context) -> Result<String, Error>;
 
-    fn symbol(&self, value: AttrValue, unit: &Unit) -> Result<String, Error>;
+    fn symbolicate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
     fn unit_from_addr(&self, addr: Address) -> Result<(UnitHeader, Unit), Error>;
     fn debug_info_offset_from_addr(&self, addr: Address) -> Result<DebugInfoOffset, Error>;
 }
@@ -49,21 +48,25 @@ impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
 
             match entry.pc() {
                 Some(pc) if entry.tag() == DW_TAG_subprogram && pc.contains(&addr) => {
-                    break entry
-                        .linkage_name()
-                        .ok_or(Error::EntryHasNoLinkageName)
-                        .and_then(|val| self.symbol(val, &unit))
+                    break self.symbolicate(entry, &unit)
                 }
                 _ => continue,
             }
         }
     }
 
-    fn symbol(&self, value: AttrValue, unit: &Unit) -> Result<String, Error> {
-        Ok(self
-            .attr_string(&unit, value)?
-            .to_string_lossy()
-            .to_string())
+    fn symbolicate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
+        entry
+            .linkage_name()
+            .or_else(|| entry.name())
+            .ok_or(Error::AddressHasNoSymbol)
+            .and_then(|value| {
+                Ok(self
+                    .attr_string(&unit, value)
+                    .map_err(Error::Gimli)?
+                    .to_string_lossy()
+                    .to_string())
+            })
     }
 
     fn unit_from_addr(&self, addr: Address) -> Result<(UnitHeader, Unit), Error> {

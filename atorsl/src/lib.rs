@@ -24,14 +24,8 @@ pub enum Error {
     #[error("Address not found ({0})")]
     AddressNotFound(Address),
 
-    #[error("Address is not a symbol ({0})")]
-    AddressNotSymbol(Address),
-
-    #[error("Entry has no name")]
-    EntryHasNoName,
-
-    #[error("Entry has no linkage name")]
-    EntryHasNoLinkageName,
+    #[error("Address is not a symbol")]
+    AddressHasNoSymbol,
 
     #[error("No debug offset in address ({0})")]
     NoDebugOffsetInAddress(Address),
