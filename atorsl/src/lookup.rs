@@ -37,7 +37,7 @@ impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
 
         loop {
             let Some((_, entry)) = entries.next_dfs()? else {
-                break Err(Error::AddressNotFound(addr))
+                break Err(Error::AddrNotFound(addr))
             };
 
             if context.verbose {
@@ -57,7 +57,7 @@ impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
         entry
             .linkage_name()
             .or_else(|| entry.name())
-            .ok_or(Error::AddressHasNoSymbol)
+            .ok_or(Error::AddrHasNoSymbol)
             .and_then(|value| {
                 Ok(self
                     .attr_string(&unit, value)
@@ -83,6 +83,6 @@ impl<'data> Lookup for Dwarf<EndianSlice<'_, RunTimeEndian>> {
                     None
                 })
             })?
-            .ok_or(Error::NoDebugOffsetInAddress(addr))
+            .ok_or(Error::AddrNoDebugOffset(addr))
     }
 }

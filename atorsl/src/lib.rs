@@ -29,17 +29,17 @@ pub enum Error {
     #[error("Error reading binary image object: {0}")]
     Object(#[from] object::read::Error),
 
-    #[error("__TEXT segment not found in DWARF")]
-    TextSegmentNotFound,
+    #[error("vmaddr: __TEXT segment not found")]
+    VmAddrTextSegmentNotFound,
 
     #[error("Address not found ({0})")]
-    AddressNotFound(Addr),
+    AddrNotFound(Addr),
 
-    #[error("Address is not a symbol")]
-    AddressHasNoSymbol,
+    #[error("Address has no a symbols")]
+    AddrHasNoSymbol,
 
     #[error("No debug offset in address ({0})")]
-    NoDebugOffsetInAddress(Addr),
+    AddrNoDebugOffset(Addr),
 }
 
 #[macro_export]

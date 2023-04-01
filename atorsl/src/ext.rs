@@ -1,13 +1,11 @@
 pub mod object {
-    use crate::Addr;
+    use crate::{Addr, Error};
     use object::{Object, ObjectSegment};
 
     pub trait File {
         fn is_dwarf(&self) -> bool;
-
         fn runtime_endian(&self) -> gimli::RunTimeEndian;
-
-        fn vmaddr(&self) -> Result<Addr, crate::Error>;
+        fn vmaddr(&self) -> Result<Addr, Error>;
     }
 
     impl File for object::File<'_> {
@@ -23,13 +21,13 @@ pub mod object {
             }
         }
 
-        fn vmaddr(&self) -> Result<Addr, crate::Error> {
+        fn vmaddr(&self) -> Result<Addr, Error> {
             self.segments()
                 .find_map(|seg| match seg.name().ok().flatten() {
                     Some(name) if name == "__TEXT" => Some(seg.address()),
                     _ => None,
                 })
-                .ok_or(crate::Error::TextSegmentNotFound)
+                .ok_or(Error::VmAddrTextSegmentNotFound)
                 .map(Addr::from)
         }
     }
