@@ -1,5 +1,6 @@
 use std::{cmp::Ordering, fmt, str::FromStr};
 
+/// A 64-bit address.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Addr(u64);
 

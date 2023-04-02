@@ -1,5 +1,6 @@
 use crate::Addr;
 
+/// An atorsl error.
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error("Failed to open file: {0}")]

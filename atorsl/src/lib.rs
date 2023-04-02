@@ -9,6 +9,8 @@ pub use context::Context;
 pub use error::Error;
 pub use lookup::Symbolicate;
 
+/// Loads a binary image file.
+///
 /// # Safety
 ///
 /// The caller must ensure that the object file loaded isn't subsequently modified, applications
@@ -30,6 +32,7 @@ macro_rules! load_object {
     }};
 }
 
+/// Loads a binary image object as DWARF.
 #[macro_export]
 macro_rules! load_dwarf {
     ($object:expr, $binding:ident) => {{
@@ -56,11 +59,27 @@ macro_rules! load_dwarf {
     }};
 }
 
-use gimli::{EndianSlice, RunTimeEndian};
+/// All of the commonly used DWARF sections, and other common information.
+pub(crate) type Dwarf<'input> = gimli::Dwarf<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
 
-pub(crate) type Dwarf<'input> = gimli::Dwarf<EndianSlice<'input, RunTimeEndian>>;
-pub(crate) type Unit<'input> = gimli::Unit<EndianSlice<'input, RunTimeEndian>, usize>;
-pub(crate) type UnitHeader<'input> = gimli::UnitHeader<EndianSlice<'input, RunTimeEndian>, usize>;
-pub(crate) type Entry<'abbrev, 'unit, 'input> =
-    gimli::DebuggingInformationEntry<'abbrev, 'unit, EndianSlice<'input, RunTimeEndian>, usize>;
-pub(crate) type AttrValue<'input> = gimli::AttributeValue<EndianSlice<'input, RunTimeEndian>>;
+/// All of the commonly used information for a unit in the `.debug_info` or `.debug_types` sections.
+pub(crate) type Unit<'input> =
+    gimli::Unit<gimli::EndianSlice<'input, gimli::RunTimeEndian>, usize>;
+
+/// The common fields for the headers of compilation units and type units.
+pub(crate) type UnitHeader<'input> =
+    gimli::UnitHeader<gimli::EndianSlice<'input, gimli::RunTimeEndian>, usize>;
+
+/// The value of an attribute in a `DebuggingInformationEntry`.
+pub(crate) type AttrValue<'input> =
+    gimli::AttributeValue<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
+
+/// A Debugging Information Entry (DIE).
+///
+/// DIEs have a set of attributes and optionally have children DIEs as well.
+pub(crate) type Entry<'abbrev, 'unit, 'input> = gimli::DebuggingInformationEntry<
+    'abbrev,
+    'unit,
+    gimli::EndianSlice<'input, gimli::RunTimeEndian>,
+    usize,
+>;
