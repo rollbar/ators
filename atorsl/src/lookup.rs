@@ -26,13 +26,13 @@ trait Lookup {
     fn lookup(&self, address: Addr, expand_inlined: bool) -> Result<String, Error>;
     fn translate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
     fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String>;
-    fn unit_from_addr(&self, addr: Addr) -> Result<(UnitHeader, Unit), Error>;
+    fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error>;
     fn debug_info_offset_from_addr(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
 }
 
 impl Lookup for Dwarf<'_> {
     fn lookup(&self, addr: Addr, expand_inlined: bool) -> Result<String, Error> {
-        let (_, unit) = self.unit_from_addr(addr)?;
+        let unit = self.unit_from_addr(addr)?;
         let mut entries = unit.entries();
 
         let (entry, result) = loop {
@@ -95,10 +95,10 @@ impl Lookup for Dwarf<'_> {
             .map(|slice| slice.to_string_lossy().to_string())
     }
 
-    fn unit_from_addr(&self, addr: Addr) -> Result<(UnitHeader, Unit), Error> {
+    fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error> {
         let offset = self.debug_info_offset_from_addr(addr)?;
         let header = self.debug_info.header_from_offset(offset)?;
-        Ok((header, self.unit(header)?))
+        Ok(self.unit(header)?)
     }
 
     fn debug_info_offset_from_addr(&self, addr: Addr) -> Result<DebugInfoOffset, Error> {
