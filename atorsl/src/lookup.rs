@@ -14,43 +14,43 @@ impl Symbolicate for Dwarf<'_> {
         fallible_iterator::convert(
             context
                 .addrs
-                .to_owned()
+                .clone()
                 .into_iter()
-                .map(|addr| self.lookup(addr - context.loadaddr + vmaddr, context.inline)),
+                .map(|addr| self.atos(addr - context.loadaddr + vmaddr, context.inline)),
         )
         .collect()
     }
 }
 
 trait Lookup {
-    fn lookup(&self, address: Addr, expand_inlined: bool) -> Result<String, Error>;
-    fn translate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
+    fn atos(&self, address: Addr, include_inlined: bool) -> Result<String, Error>;
+    fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
     fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String>;
     fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error>;
-    fn debug_info_offset_from_addr(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
+    fn debug_info_offset(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
 }
 
 impl Lookup for Dwarf<'_> {
-    fn lookup(&self, addr: Addr, expand_inlined: bool) -> Result<String, Error> {
+    fn atos(&self, addr: Addr, include_inlined: bool) -> Result<String, Error> {
         let unit = self.unit_from_addr(addr)?;
         let mut entries = unit.entries();
 
-        let (entry, result) = loop {
+        let (entry, symbol) = loop {
             let Some((_, entry)) = entries.next_dfs()? else {
                 break (None, Err(Error::AddrNotFound(addr)))
             };
 
             match entry.pc() {
                 Some(pc) if entry.tag() == gimli::DW_TAG_subprogram && pc.contains(&addr) => {
-                    break (Some(entry), self.translate(entry, &unit))
+                    break (Some(entry), self.symbol(entry, &unit))
                 }
                 _ => continue,
             }
         };
 
         match entry {
-            Some(entry) if expand_inlined && entry.has_children() => {
-                let mut symbol = result?;
+            Some(entry) if include_inlined && entry.has_children() => {
+                let mut symbol = symbol?;
                 let mut depth = 0;
                 loop {
                     let Some((step, entry)) = entries.next_dfs()? else {
@@ -65,22 +65,22 @@ impl Lookup for Dwarf<'_> {
 
                     if entry.tag() == gimli::DW_TAG_inlined_subroutine {
                         symbol.insert(0, '\n');
-                        symbol.insert_str(0, self.translate(entry, &unit)?.as_str());
+                        symbol.insert_str(0, self.symbol(entry, &unit)?.as_str());
                     }
                 }
 
                 Ok(symbol)
             }
-            _ => result,
+            _ => symbol,
         }
     }
 
-    fn translate(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
+    fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
         entry
             .symbol()
             .ok_or(Error::AddrHasNoSymbol)
             .and_then(|value| match value {
-                AttrValue::UnitRef(offset) => self.translate(&unit.entry(offset)?, &unit),
+                AttrValue::UnitRef(offset) => self.symbol(&unit.entry(offset)?, &unit),
                 _ => Ok(self
                     .attr_string(&unit, value)
                     .map_err(Error::Gimli)?
@@ -96,12 +96,12 @@ impl Lookup for Dwarf<'_> {
     }
 
     fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error> {
-        let offset = self.debug_info_offset_from_addr(addr)?;
+        let offset = self.debug_info_offset(addr)?;
         let header = self.debug_info.header_from_offset(offset)?;
         Ok(self.unit(header)?)
     }
 
-    fn debug_info_offset_from_addr(&self, addr: Addr) -> Result<DebugInfoOffset, Error> {
+    fn debug_info_offset(&self, addr: Addr) -> Result<DebugInfoOffset, Error> {
         self.debug_aranges
             .headers()
             .find_map(|header| {
