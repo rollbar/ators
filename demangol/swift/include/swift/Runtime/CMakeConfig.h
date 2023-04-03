@@ -7,4 +7,7 @@
 #define SWIFT_BNI_OS_BUILD 0
 #define SWIFT_BNI_XCODE_BUILD 0
 
+#define SWIFT_VERSION_MAJOR "5"
+#define SWIFT_VERSION_MINOR "9"
+
 #endif

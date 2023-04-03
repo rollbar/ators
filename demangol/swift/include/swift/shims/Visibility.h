@@ -34,6 +34,9 @@
 #define __has_cpp_attribute(attribute) 0
 #endif
 
+// TODO: These macro definitions are duplicated in BridgedSwiftObject.h. Move
+// them to a single file if we find a location that both Visibility.h and
+// BridgedSwiftObject.h can import.
 #if __has_feature(nullability)
 // Provide macros to temporarily suppress warning about the use of
 // _Nullable and _Nonnull.
@@ -100,6 +103,18 @@
 #define SWIFT_ATTRIBUTE_UNAVAILABLE
 #endif
 
+#if (__has_attribute(weak_import))
+#define SWIFT_WEAK_IMPORT __attribute__((weak_import))
+#else
+#define SWIFT_WEAK_IMPORT
+#endif
+
+#if __has_attribute(musttail)
+#define SWIFT_MUSTTAIL [[clang::musttail]]
+#else
+#define SWIFT_MUSTTAIL
+#endif
+
 // Define the appropriate attributes for sharing symbols across
 // image (executable / shared-library) boundaries.
 //
@@ -112,7 +127,7 @@
 // are known to be exported from a different image.  This never
 // includes a definition.
 //
-// Getting the right attribute on a declaratioon can be pretty awkward,
+// Getting the right attribute on a declaration can be pretty awkward,
 // but it's necessary under the C translation model.  All of this
 // ceremony is familiar to Windows programmers; C/C++ programmers
 // everywhere else usually don't bother, but since we have to get it
@@ -178,6 +193,11 @@
 #else
 #define SWIFT_IMAGE_EXPORTS_swift_Concurrency 0
 #endif
+#if defined(swiftDistributed_EXPORTS)
+#define SWIFT_IMAGE_EXPORTS_swiftDistributed 1
+#else
+#define SWIFT_IMAGE_EXPORTS_swiftDistributed 0
+#endif
 #if defined(swift_Differentiation_EXPORTS)
 #define SWIFT_IMAGE_EXPORTS_swift_Differentiation 1
 #else
@@ -197,10 +217,13 @@
 // TODO: use this in shims headers in overlays.
 #if defined(__cplusplus)
 #define SWIFT_EXPORT_FROM(LIBRARY) extern "C" SWIFT_EXPORT_FROM_ATTRIBUTE(LIBRARY)
+#define SWIFT_EXTERN_C extern "C" 
 #else
 #define SWIFT_EXPORT_FROM(LIBRARY) SWIFT_EXPORT_FROM_ATTRIBUTE(LIBRARY)
+#define SWIFT_EXTERN_C
 #endif
 #define SWIFT_RUNTIME_EXPORT SWIFT_EXPORT_FROM(swiftCore)
+#define SWIFT_RUNTIME_EXPORT_ATTRIBUTE SWIFT_EXPORT_FROM_ATTRIBUTE(swiftCore)
 
 #if __cplusplus > 201402l && __has_cpp_attribute(fallthrough)
 #define SWIFT_FALLTHROUGH [[fallthrough]]
@@ -214,7 +237,7 @@
 #define SWIFT_FALLTHROUGH
 #endif
 
-#if __cplusplus >= 201402l && __has_cpp_attribute(nodiscard)
+#if __cplusplus > 201402l && __has_cpp_attribute(nodiscard)
 #define SWIFT_NODISCARD [[nodiscard]]
 #elif __has_cpp_attribute(clang::warn_unused_result)
 #define SWIFT_NODISCARD [[clang::warn_unused_result]]
@@ -222,6 +245,13 @@
 #define SWIFT_NODISCARD
 #endif
 
+#if __has_cpp_attribute(gnu::returns_nonnull)
+#define SWIFT_RETURNS_NONNULL [[gnu::returns_nonnull]]
+#elif defined(_MSC_VER) && defined(_Ret_notnull_)
+#define SWIFT_RETURNS_NONNULL _Ret_notnull_
+#else
+#define SWIFT_RETURNS_NONNULL
+#endif
 
 /// Attributes for runtime-stdlib interfaces.
 /// Use these for C implementations that are imported into Swift via SwiftShims

@@ -20,6 +20,39 @@
 #include "swift/Basic/Compiler.h"
 #include "swift/Runtime/CMakeConfig.h"
 
+/// SWIFT_RUNTIME_WEAK_IMPORT - Marks a symbol for weak import.
+#if (__has_attribute(weak_import))
+#define SWIFT_RUNTIME_WEAK_IMPORT __attribute__((weak_import))
+#else
+#define SWIFT_RUNTIME_WEAK_IMPORT
+#endif
+
+/// SWIFT_RUNTIME_WEAK_CHECK - Tests if a potentially weakly linked function
+/// is linked into the runtime.  This is useful on Apple platforms where it is
+/// possible that system functions are only available on newer versions.
+#ifdef __clang__
+#define SWIFT_RUNTIME_WEAK_CHECK(x)                                     \
+  _Pragma("clang diagnostic push")                                      \
+  _Pragma("clang diagnostic ignored \"-Wunguarded-availability\"")      \
+  _Pragma("clang diagnostic ignored \"-Wunguarded-availability-new\"")  \
+  (&x)                                                                  \
+  _Pragma("clang diagnostic pop")
+#else
+#define SWIFT_RUNTIME_WEAK_CHECK(x) &x
+#endif
+
+/// SWIFT_RUNTIME_WEAK_USE - Use a potentially weakly imported symbol.
+#ifdef __clang__
+#define SWIFT_RUNTIME_WEAK_USE(x)                                       \
+  _Pragma("clang diagnostic push")                                      \
+  _Pragma("clang diagnostic ignored \"-Wunguarded-availability\"")      \
+  _Pragma("clang diagnostic ignored \"-Wunguarded-availability-new\"")  \
+  (x)                                                                   \
+  _Pragma("clang diagnostic pop")
+#else
+#define SWIFT_RUNTIME_WEAK_USE(x) x
+#endif
+
 /// SWIFT_RUNTIME_LIBRARY_VISIBILITY - If a class marked with this attribute is
 /// linked into a shared library, then the class should be private to the
 /// library and not accessible from outside it.  Can also be used to mark
@@ -96,38 +129,35 @@
 #error Masking ISAs are incompatible with opaque ISAs
 #endif
 
+#if defined(__APPLE__) && defined(__LP64__) && __has_include(<malloc_type_private.h>) && SWIFT_STDLIB_HAS_DARWIN_LIBMALLOC
+# include <TargetConditionals.h>
+# if TARGET_OS_IOS && !TARGET_OS_SIMULATOR
+#  define SWIFT_STDLIB_HAS_MALLOC_TYPE 1
+# endif
+#endif
+#ifndef SWIFT_STDLIB_HAS_MALLOC_TYPE
+# define SWIFT_STDLIB_HAS_MALLOC_TYPE 0
+#endif
+
 /// Which bits in the class metadata are used to distinguish Swift classes
 /// from ObjC classes?
 #ifndef SWIFT_CLASS_IS_SWIFT_MASK
-
-// Non-Apple platforms always use 1.
-# if !defined(__APPLE__)
-#  define SWIFT_CLASS_IS_SWIFT_MASK 1ULL
-
-// Builds for Swift-in-the-OS always use 2.
-# elif SWIFT_BNI_OS_BUILD
-#  define SWIFT_CLASS_IS_SWIFT_MASK 2ULL
-
-// Builds for Xcode always use 1.
-# elif SWIFT_BNI_XCODE_BUILD
-#  define SWIFT_CLASS_IS_SWIFT_MASK 1ULL
 
 // Compatibility hook libraries cannot rely on the "is swift" bit being either
 // value, since they must work with both OS and Xcode versions of the libraries.
 // Generate a reference to a nonexistent symbol so that we get obvious linker
 // errors if we try.
-# elif SWIFT_COMPATIBILITY_LIBRARY
+# if SWIFT_COMPATIBILITY_LIBRARY
 extern uintptr_t __COMPATIBILITY_LIBRARIES_CANNOT_CHECK_THE_IS_SWIFT_BIT_DIRECTLY__;
 #  define SWIFT_CLASS_IS_SWIFT_MASK __COMPATIBILITY_LIBRARIES_CANNOT_CHECK_THE_IS_SWIFT_BIT_DIRECTLY__
 
-// Other builds (such as local builds on developers' computers)
-// dynamically choose the bit at runtime based on the current OS
-// version.
+// Apple platforms always use 2
+# elif defined(__APPLE__)
+#  define SWIFT_CLASS_IS_SWIFT_MASK 2ULL
+
+// Non-Apple platforms always use 1.
 # else
-#  define SWIFT_CLASS_IS_SWIFT_MASK _swift_classIsSwiftMask
-#  define SWIFT_CLASS_IS_SWIFT_MASK_GLOBAL_VARIABLE 1
-#  define SWIFT_BUILD_HAS_BACK_DEPLOYMENT 1
-#  include "BackDeployment.h"
+#  define SWIFT_CLASS_IS_SWIFT_MASK 1ULL
 
 # endif
 #endif
@@ -146,7 +176,15 @@ extern uintptr_t __COMPATIBILITY_LIBRARIES_CANNOT_CHECK_THE_IS_SWIFT_BIT_DIRECTL
 #endif
 
 // Bring in visibility attribute macros
-#include "../../../stdlib/public/SwiftShims/Visibility.h"
+#include "swift/shims/Visibility.h"
+
+// Temporary definitions to allow compilation on clang-15.
+#if defined(__cplusplus)
+#define SWIFT_EXTERN_C extern "C"
+#else
+#define SWIFT_EXTERN_C
+#endif
+#define SWIFT_RUNTIME_EXPORT_ATTRIBUTE SWIFT_EXPORT_FROM_ATTRIBUTE(swiftCore)
 
 // Define mappings for calling conventions.
 
@@ -182,6 +220,12 @@ extern uintptr_t __COMPATIBILITY_LIBRARIES_CANNOT_CHECK_THE_IS_SWIFT_BIT_DIRECTL
 #define SWIFT_ASYNC_CONTEXT
 #endif
 
+#if __has_attribute(optnone)
+#define SWIFT_OPTNONE __attribute__((optnone))
+#else
+#define SWIFT_OPTNONE
+#endif
+
 // SWIFT_CC(swiftasync) is the Swift async calling convention.
 // We assume that it supports mandatory tail call elimination.
 #if __has_feature(swiftasynccc) && __has_attribute(swiftasynccall)
@@ -205,6 +249,16 @@ extern uintptr_t __COMPATIBILITY_LIBRARIES_CANNOT_CHECK_THE_IS_SWIFT_BIT_DIRECTL
 // FIXME: the runtime's code does not honor DefaultCC
 // so changing this value is not sufficient.
 #define SWIFT_DEFAULT_LLVM_CC llvm::CallingConv::C
+
+/// Should we use absolute function pointers instead of relative ones?
+/// WebAssembly target uses it by default.
+#ifndef SWIFT_COMPACT_ABSOLUTE_FUNCTION_POINTER
+# if defined(__wasm__)
+#  define SWIFT_COMPACT_ABSOLUTE_FUNCTION_POINTER 1
+# else
+#  define SWIFT_COMPACT_ABSOLUTE_FUNCTION_POINTER 0
+# endif
+#endif
 
 // Pointer authentication.
 #if __has_feature(ptrauth_calls)
@@ -250,9 +304,15 @@ extern uintptr_t __COMPATIBILITY_LIBRARIES_CANNOT_CHECK_THE_IS_SWIFT_BIT_DIRECTL
 #define __ptrauth_swift_dispatch_invoke_function                               \
   __ptrauth(ptrauth_key_process_independent_code, 1,                           \
             SpecialPointerAuthDiscriminators::DispatchInvokeFunction)
+#define __ptrauth_swift_accessible_function_record                             \
+  __ptrauth(ptrauth_key_process_independent_data, 1,                           \
+            SpecialPointerAuthDiscriminators::AccessibleFunctionRecord)
 #define __ptrauth_swift_objc_superclass                                        \
   __ptrauth(ptrauth_key_process_independent_data, 1,                           \
             swift::SpecialPointerAuthDiscriminators::ObjCSuperclass)
+#define __ptrauth_swift_nonunique_extended_existential_type_shape              \
+  __ptrauth(ptrauth_key_process_independent_data, 1,                           \
+            SpecialPointerAuthDiscriminators::NonUniqueExtendedExistentialTypeShape)
 #define swift_ptrauth_sign_opaque_read_resume_function(__fn, __buffer)         \
   ptrauth_auth_and_resign(__fn, ptrauth_key_function_pointer, 0,               \
                           ptrauth_key_process_independent_code,                \
@@ -263,6 +323,9 @@ extern uintptr_t __COMPATIBILITY_LIBRARIES_CANNOT_CHECK_THE_IS_SWIFT_BIT_DIRECTL
                           ptrauth_key_process_independent_code,                \
                           ptrauth_blend_discriminator(__buffer,                \
             SpecialPointerAuthDiscriminators::OpaqueModifyResumeFunction))
+#define __ptrauth_swift_type_layout_string                                     \
+  __ptrauth(ptrauth_key_process_independent_data, 1,                           \
+            SpecialPointerAuthDiscriminators::TypeLayoutString)
 #else
 #define SWIFT_PTRAUTH 0
 #define __ptrauth_swift_function_pointer(__typekey)
@@ -279,24 +342,32 @@ extern uintptr_t __COMPATIBILITY_LIBRARIES_CANNOT_CHECK_THE_IS_SWIFT_BIT_DIRECTL
 #define __ptrauth_swift_cancellation_notification_function
 #define __ptrauth_swift_escalation_notification_function
 #define __ptrauth_swift_dispatch_invoke_function
+#define __ptrauth_swift_accessible_function_record
 #define __ptrauth_swift_objc_superclass
 #define __ptrauth_swift_runtime_function_entry
 #define __ptrauth_swift_runtime_function_entry_with_key(__key)
 #define __ptrauth_swift_runtime_function_entry_strip(__fn) (__fn)
 #define __ptrauth_swift_heap_object_destructor
 #define __ptrauth_swift_type_descriptor
+#define __ptrauth_swift_nonunique_extended_existential_type_shape
 #define __ptrauth_swift_dynamic_replacement_key
 #define swift_ptrauth_sign_opaque_read_resume_function(__fn, __buffer) (__fn)
 #define swift_ptrauth_sign_opaque_modify_resume_function(__fn, __buffer) (__fn)
+#define __ptrauth_swift_type_layout_string
 #endif
 
 #ifdef __cplusplus
 
 /// Copy an address-discriminated signed pointer from the source to the dest.
 template <class T>
-SWIFT_RUNTIME_ATTRIBUTE_ALWAYS_INLINE
-static inline void swift_ptrauth_copy(T *dest, const T *src, unsigned extra) {
+SWIFT_RUNTIME_ATTRIBUTE_ALWAYS_INLINE static inline void
+swift_ptrauth_copy(T *dest, const T *src, unsigned extra, bool allowNull) {
 #if SWIFT_PTRAUTH
+  if (allowNull && *src == nullptr) {
+    *dest = nullptr;
+    return;
+  }
+
   *dest = ptrauth_auth_and_resign(*src,
                                   ptrauth_key_function_pointer,
                                   ptrauth_blend_discriminator(src, extra),
@@ -312,8 +383,13 @@ static inline void swift_ptrauth_copy(T *dest, const T *src, unsigned extra) {
 template <class T>
 SWIFT_RUNTIME_ATTRIBUTE_ALWAYS_INLINE
 static inline void swift_ptrauth_copy_data(T *dest, const T *src,
-                                           unsigned extra) {
+                                           unsigned extra, bool allowNull) {
 #if SWIFT_PTRAUTH
+  if (allowNull && *src == nullptr) {
+    *dest = nullptr;
+    return;
+  }
+
   *dest = ptrauth_auth_and_resign(*src,
                                   ptrauth_key_process_independent_data,
                                   ptrauth_blend_discriminator(src, extra),
@@ -329,11 +405,11 @@ static inline void swift_ptrauth_copy_data(T *dest, const T *src,
 template <class T>
 SWIFT_RUNTIME_ATTRIBUTE_ALWAYS_INLINE static inline void
 swift_ptrauth_copy_code_or_data(T *dest, const T *src, unsigned extra,
-                                bool isCode) {
+                                bool isCode, bool allowNull) {
   if (isCode) {
-    return swift_ptrauth_copy(dest, src, extra);
+    return swift_ptrauth_copy(dest, src, extra, allowNull);
   } else {
-    return swift_ptrauth_copy_data(dest, src, extra);
+    return swift_ptrauth_copy_data(dest, src, extra, allowNull);
   }
 }
 
@@ -404,6 +480,34 @@ swift_auth_code(T value, unsigned extra) {
   return value;
 #endif
 }
+
+/// Does this platform support backtrace-on-crash?
+#ifdef __APPLE__
+#  include <TargetConditionals.h>
+#  if TARGET_OS_OSX
+#    define SWIFT_BACKTRACE_ON_CRASH_SUPPORTED 1
+#    define SWIFT_BACKTRACE_SECTION "__DATA,swift5_backtrace"
+#  else
+#    define SWIFT_BACKTRACE_ON_CRASH_SUPPORTED 0
+#  endif
+#elif defined(_WIN32)
+#  define SWIFT_BACKTRACE_ON_CRASH_SUPPORTED 0
+#  define SWIFT_BACKTRACE_SECTION ".sw5bckt"
+#elif defined(__linux__)
+#  define SWIFT_BACKTRACE_ON_CRASH_SUPPORTED 0
+#  define SWIFT_BACKTRACE_SECTION "swift5_backtrace"
+#else
+#  define SWIFT_BACKTRACE_ON_CRASH_SUPPORTED 0
+#endif
+
+/// What is the system page size?
+#if defined(__APPLE__) && defined(__arm64__)
+  // Apple Silicon systems use a 16KB page size
+  #define SWIFT_PAGE_SIZE 16384
+#else
+  // Everything else uses 4KB pages
+  #define SWIFT_PAGE_SIZE 4096
+#endif
 
 #endif
 

@@ -81,6 +81,13 @@
 #define SWIFT_ATTRIBUTE_ALWAYS_INLINE
 #endif
 
+// Needed for C++ bridging functions which return types with pointers.
+#if __has_attribute(swift_attr)
+#define SWIFT_IMPORT_UNSAFE __attribute__((swift_attr("import_unsafe")))
+#else
+#define SWIFT_IMPORT_UNSAFE
+#endif
+
 #ifdef __GNUC__
 #define SWIFT_ATTRIBUTE_NORETURN __attribute__((noreturn))
 #elif defined(_MSC_VER)
@@ -94,14 +101,13 @@
 #endif
 
 #define SWIFT_BUG_REPORT_MESSAGE_BASE \
-  "submit a bug report (" SWIFT_BUG_REPORT_URL \
-  ") and include the project"
+  "submit a bug report (" SWIFT_BUG_REPORT_URL ")"
 
 #define SWIFT_BUG_REPORT_MESSAGE \
   "please " SWIFT_BUG_REPORT_MESSAGE_BASE
 
 #define SWIFT_CRASH_BUG_REPORT_MESSAGE \
-  "Please " SWIFT_BUG_REPORT_MESSAGE_BASE " and the crash backtrace."
+  "Please " SWIFT_BUG_REPORT_MESSAGE_BASE " and include the crash backtrace."
 
 // Conditionally exclude declarations or statements that are only needed for
 // assertions from release builds (NDEBUG) without cluttering the surrounding
@@ -161,5 +167,36 @@
 #define SWIFT_ASM_LABEL_RAW(STRING) __asm__(STRING)
 #define SWIFT_ASM_LABEL_WITH_PREFIX(STRING) \
   SWIFT_ASM_LABEL_RAW(SWIFT_SYMBOL_PREFIX_STRING STRING)
+
+// SWIFT_FORMAT(fmt,first) marks a function as taking a format string argument
+// at argument `fmt`, with the first argument for the format string as `first`.
+#if __has_attribute(format)
+#define SWIFT_FORMAT(fmt, first) __attribute__((format(printf, fmt, first)))
+#else
+#define SWIFT_FORMAT(fmt, first)
+#endif
+
+// SWIFT_VFORMAT(fmt) marks a function as taking a format string argument at
+// argument `fmt`, with the arguments in a `va_list`.
+#if __has_attribute(format)
+#define SWIFT_VFORMAT(fmt) __attribute__((format(printf, fmt, 0)))
+#else
+#define SWIFT_VFORMAT(fmt)
+#endif
+
+// Tells Swift's ClangImporter to import a C++ type as a foreign reference type.
+#if __has_attribute(swift_attr)
+#define SWIFT_IMPORT_REFERENCE __attribute__((swift_attr("import_reference"))) \
+  __attribute__((swift_attr("retain:immortal")))                               \
+  __attribute__((swift_attr("release:immortal")))
+#else
+#define SWIFT_IMPORT_REFERENCE
+#endif
+
+#if __has_attribute(enum_extensibility)
+#define ENUM_EXTENSIBILITY_ATTR(arg) __attribute__((enum_extensibility(arg)))
+#else
+#define ENUM_EXTENSIBILITY_ATTR(arg)
+#endif
 
 #endif // SWIFT_BASIC_COMPILER_H
