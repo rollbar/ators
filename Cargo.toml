@@ -1,5 +1,5 @@
 [workspace]
-members = ["ators", "atorsl"]
+members = ["ators", "atorsl", "demangol"]
 
 [workspace.package]
 authors = ["Matias Pequeno <matias.pequeno@gmail.com>"]
@@ -16,6 +16,7 @@ publish = true
 
 [workspace.dependencies]
 atorsl = { path = "atorsl" }
+demangol = { path = "demangol" }
 
 [profile.release]
 lto = true

@@ -1,0 +1,16 @@
+[package]
+name = "demangol"
+version = "0.1.0"
+description = "demangle all the things"
+authors.workspace = true
+license.workspace = true
+readme.workspace = true
+homepage.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+thiserror = "1.0.40"
