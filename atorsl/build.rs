@@ -13,6 +13,7 @@ fn main() {
             "src/swift/lib/Punycode.cpp",
         ])
         .flag_if_supported("-std=c++17")
+        .flag_if_supported("-fpermissive")
         .flag("-DLLVM_DISABLE_ABI_BREAKING_CHECKS_ENFORCING=1")
         .flag("-DSWIFT_STDLIB_HAS_TYPE_PRINTING")
         .flag("-DSWIFT_SUPPORT_OLD_MANGLING")
