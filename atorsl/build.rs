@@ -11,7 +11,6 @@ fn main() {
             "src/swift/lib/NodePrinter.cpp",
             "src/swift/lib/OldDemangler.cpp",
             "src/swift/lib/Punycode.cpp",
-            "src/swift/lib/Remangler.cpp",
         ])
         .flag_if_supported("-std=c++17")
         .flag("-DLLVM_DISABLE_ABI_BREAKING_CHECKS_ENFORCING=1")
