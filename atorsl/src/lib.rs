@@ -3,12 +3,12 @@ pub mod context;
 pub mod demangle;
 pub mod error;
 pub mod ext;
-pub mod lookup;
+pub mod symbolicate;
 
 pub use addr::Addr;
 pub use context::Context;
 pub use error::Error;
-pub use lookup::Symbolicate;
+pub use symbolicate::Symbolicate;
 
 /// Loads a binary image file.
 ///
