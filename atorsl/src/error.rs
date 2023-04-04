@@ -23,4 +23,7 @@ pub enum Error {
 
     #[error("No debug offset in address ({0})")]
     AddrNoDebugOffset(Addr),
+
+    #[error("Couldn't demangle {0}")]
+    CannotDemangleSymbol(String),
 }

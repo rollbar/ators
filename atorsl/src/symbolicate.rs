@@ -14,20 +14,15 @@ impl Symbolicate for Dwarf<'_> {
     fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
         fallible_iterator::convert(context.addrs.clone().iter().map(|addr| {
             self.atos(addr - context.loadaddr + vmaddr, context.inline)
-                .map(|symbol| {
-                    if swift::is_mangled(&symbol) {
-                        swift::demangle(&symbol).unwrap_or(symbol)
-                    } else {
-                        symbol
-                    }
-                })
+                .and_then(demangle)
+                .map(|symbols| symbols.join("\n"))
         }))
         .collect()
     }
 }
 
 trait Lookup {
-    fn atos(&self, address: Addr, include_inlined: bool) -> Result<String, Error>;
+    fn atos(&self, address: Addr, include_inlined: bool) -> Result<Vec<String>, Error>;
     fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
     fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String>;
     fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error>;
@@ -35,7 +30,7 @@ trait Lookup {
 }
 
 impl Lookup for Dwarf<'_> {
-    fn atos(&self, addr: Addr, include_inlined: bool) -> Result<String, Error> {
+    fn atos(&self, addr: Addr, include_inlined: bool) -> Result<Vec<String>, Error> {
         let unit = self.unit_from_addr(addr)?;
         let mut entries = unit.entries();
 
@@ -52,31 +47,28 @@ impl Lookup for Dwarf<'_> {
             }
         };
 
-        match entry {
-            Some(entry) if include_inlined && entry.has_children() => {
-                let mut symbol = symbol?;
-                let mut depth = 0;
-                loop {
-                    let Some((step, entry)) = entries.next_dfs()? else {
-                        break;
-                    };
+        let mut symbols = vec![symbol];
 
-                    depth += step;
+        if include_inlined && entry.map(Entry::has_children).unwrap_or(false) {
+            let mut depth = 0;
+            loop {
+                let Some((step, entry)) = entries.next_dfs()? else {
+                    break;
+                };
 
-                    if depth.signum() < 1 {
-                        break;
-                    }
+                depth += step;
 
-                    if entry.tag() == gimli::DW_TAG_inlined_subroutine {
-                        symbol.insert(0, '\n');
-                        symbol.insert_str(0, self.symbol(entry, &unit)?.as_str());
-                    }
+                if depth.signum() < 1 {
+                    break;
                 }
 
-                Ok(symbol)
+                if entry.tag() == gimli::DW_TAG_inlined_subroutine {
+                    symbols.push(self.symbol(entry, &unit));
+                }
             }
-            _ => symbol,
         }
+
+        fallible_iterator::convert(symbols.into_iter().rev()).collect()
     }
 
     fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
@@ -117,6 +109,17 @@ impl Lookup for Dwarf<'_> {
             })?
             .ok_or(Error::AddrNoDebugOffset(addr))
     }
+}
+
+fn demangle(symbols: Vec<String>) -> Result<Vec<String>, Error> {
+    fallible_iterator::convert(symbols.into_iter().map(|symbol| {
+        if swift::is_mangled(&symbol) {
+            swift::demangle(&symbol).ok_or_else(|| Error::CannotDemangleSymbol(symbol))
+        } else {
+            Ok(symbol)
+        }
+    }))
+    .collect()
 }
 
 #[allow(dead_code)]
