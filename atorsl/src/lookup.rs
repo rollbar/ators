@@ -1,4 +1,5 @@
 use crate::{
+    demangle::swift,
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
     *,
 };
@@ -11,13 +12,16 @@ pub trait Symbolicate {
 
 impl Symbolicate for Dwarf<'_> {
     fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
-        fallible_iterator::convert(
-            context
-                .addrs
-                .clone()
-                .into_iter()
-                .map(|addr| self.atos(addr - context.loadaddr + vmaddr, context.inline)),
-        )
+        fallible_iterator::convert(context.addrs.clone().iter().map(|addr| {
+            self.atos(addr - context.loadaddr + vmaddr, context.inline)
+                .map(|symbol| {
+                    if swift::is_mangled(&symbol) {
+                        swift::demangle(&symbol).unwrap_or(symbol)
+                    } else {
+                        symbol
+                    }
+                })
+        }))
         .collect()
     }
 }

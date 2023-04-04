@@ -1,5 +1,6 @@
 pub mod addr;
 pub mod context;
+pub mod demangle;
 pub mod error;
 pub mod ext;
 pub mod lookup;
@@ -59,10 +60,10 @@ macro_rules! load_dwarf {
     }};
 }
 
-/// All of the commonly used DWARF sections, and other common information.
+/// Commonly used DWARF sections, and other common information.
 pub(crate) type Dwarf<'input> = gimli::Dwarf<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
 
-/// All of the commonly used information for a unit in the `.debug_info` or `.debug_types` sections.
+/// Commonly used information for a unit in the `.debug_info` or `.debug_types` sections.
 pub(crate) type Unit<'input> =
     gimli::Unit<gimli::EndianSlice<'input, gimli::RunTimeEndian>, usize>;
 
