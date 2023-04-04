@@ -1,5 +1,4 @@
 use crate::{
-    demangle::swift,
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
     *,
 };
@@ -14,23 +13,22 @@ impl Symbolicate for Dwarf<'_> {
     fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
         fallible_iterator::convert(context.addrs.clone().iter().map(|addr| {
             self.atos(addr - context.loadaddr + vmaddr, context.inline)
-                .and_then(demangle)
-                .map(|symbols| symbols.join("\n"))
+                .map(|symbols| symbols.into_iter().rev().map(Symbol::demangle).join())
         }))
         .collect()
     }
 }
 
 trait Lookup {
-    fn atos(&self, address: Addr, include_inlined: bool) -> Result<Vec<String>, Error>;
-    fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
+    fn atos(&self, address: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error>;
+    fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<Symbol, Error>;
     fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String>;
     fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error>;
     fn debug_info_offset(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
 }
 
 impl Lookup for Dwarf<'_> {
-    fn atos(&self, addr: Addr, include_inlined: bool) -> Result<Vec<String>, Error> {
+    fn atos(&self, addr: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error> {
         let unit = self.unit_from_addr(addr)?;
         let mut entries = unit.entries();
 
@@ -68,20 +66,19 @@ impl Lookup for Dwarf<'_> {
             }
         }
 
-        fallible_iterator::convert(symbols.into_iter().rev()).collect()
+        fallible_iterator::convert(symbols.into_iter()).collect()
     }
 
-    fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
+    fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<Symbol, Error> {
         entry
             .symbol()
             .ok_or(Error::AddrHasNoSymbol)
             .and_then(|value| match value {
                 AttrValue::UnitRef(offset) => self.symbol(&unit.entry(offset)?, &unit),
-                _ => Ok(self
+                _ => self
                     .attr_string(&unit, value)
-                    .map_err(Error::Gimli)?
-                    .to_string_lossy()
-                    .to_string()),
+                    .map_err(Error::Gimli)
+                    .map(Symbol::from),
             })
     }
 
@@ -94,7 +91,7 @@ impl Lookup for Dwarf<'_> {
     fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error> {
         let offset = self.debug_info_offset(addr)?;
         let header = self.debug_info.header_from_offset(offset)?;
-        Ok(self.unit(header)?)
+        self.unit(header).map_err(Error::Gimli)
     }
 
     fn debug_info_offset(&self, addr: Addr) -> Result<DebugInfoOffset, Error> {
@@ -109,17 +106,6 @@ impl Lookup for Dwarf<'_> {
             })?
             .ok_or(Error::AddrNoDebugOffset(addr))
     }
-}
-
-fn demangle(symbols: Vec<String>) -> Result<Vec<String>, Error> {
-    fallible_iterator::convert(symbols.into_iter().map(|symbol| {
-        if swift::is_mangled(&symbol) {
-            swift::demangle(&symbol).ok_or_else(|| Error::CannotDemangleSymbol(symbol))
-        } else {
-            Ok(symbol)
-        }
-    }))
-    .collect()
 }
 
 #[allow(dead_code)]

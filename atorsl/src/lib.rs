@@ -3,12 +3,16 @@ pub mod context;
 pub mod demangle;
 pub mod error;
 pub mod ext;
+pub mod symbol;
 pub mod symbolicate;
 
 pub use addr::Addr;
 pub use context::Context;
 pub use error::Error;
 pub use symbolicate::Symbolicate;
+
+pub(crate) use symbol::JoinInlinedSymbols;
+pub(crate) use symbol::Symbol;
 
 /// Loads a binary image file.
 ///

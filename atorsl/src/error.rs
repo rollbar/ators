@@ -1,4 +1,4 @@
-use crate::Addr;
+use crate::{Addr, Symbol};
 
 /// An atorsl error.
 #[derive(thiserror::Error, Debug)]
@@ -25,5 +25,5 @@ pub enum Error {
     AddrNoDebugOffset(Addr),
 
     #[error("Couldn't demangle {0}")]
-    CannotDemangleSymbol(String),
+    CannotDemangleSymbol(Symbol),
 }
