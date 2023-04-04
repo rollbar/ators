@@ -1,8 +1,3 @@
-#include <cstdio>
-#include <string>
-#include <iostream>
-#include <__functional/mem_fun_ref.h>
-
 #include "swift/Demangling/Demangle.h"
 
 using namespace swift::Demangle;
