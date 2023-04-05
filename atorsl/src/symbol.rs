@@ -83,12 +83,6 @@ impl From<&str> for Symbol {
     }
 }
 
-impl<'a> From<&'a Symbol> for &'a str {
-    fn from(value: &'a Symbol) -> Self {
-        value.0.as_str()
-    }
-}
-
 impl<'input> From<EndianSlice<'input, RunTimeEndian>> for Symbol {
     fn from(value: EndianSlice<'input, RunTimeEndian>) -> Self {
         Self(value.to_string_lossy().to_string())
