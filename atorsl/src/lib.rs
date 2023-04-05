@@ -8,6 +8,7 @@ pub mod symbolicate;
 
 pub use addr::Addr;
 pub use context::Context;
+pub use context::Loc;
 pub use error::Error;
 pub use symbol::Symbol;
 pub use symbolicate::Symbolicate;

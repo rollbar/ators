@@ -1,55 +1,10 @@
-use clap::{crate_authors, crate_description, crate_name, crate_version, value_parser};
-use clap::{Arg, ArgAction, Command, ValueHint};
-use std::{fmt, path::PathBuf};
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-enum Opt {
-    Object,
-    LoadAddress,
-    Address,
-    Architecture,
-    Inline,
-}
-
-impl fmt::Display for Opt {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Debug::fmt(self, f)
-    }
-}
-
-impl From<Opt> for clap::Id {
-    fn from(value: Opt) -> Self {
-        Self::from(value.to_string())
-    }
-}
-
-pub trait FromArgs {
-    fn from_args(args: clap::ArgMatches) -> Self;
-}
-
-impl FromArgs for atorsl::Context {
-    fn from_args(args: clap::ArgMatches) -> Self {
-        Self {
-            objpath: args
-                .get_one(&Opt::Object.to_string())
-                .map(Clone::clone)
-                .unwrap(),
-            loadaddr: args
-                .get_one(&Opt::LoadAddress.to_string())
-                .map(Clone::clone)
-                .unwrap(),
-            addrs: args
-                .get_many(&Opt::Address.to_string())
-                .unwrap()
-                .copied()
-                .collect(),
-            arch: args
-                .get_one(&Opt::Architecture.to_string())
-                .map(Clone::clone),
-            include_inlined: args.get_flag(&Opt::Inline.to_string()),
-        }
-    }
-}
+use crate::opt::Opt;
+use atorsl::Loc;
+use clap::{
+    crate_authors, crate_description, crate_name, crate_version, value_parser, Arg, ArgAction,
+    ArgGroup, Command, ValueHint,
+};
+use std::path::PathBuf;
 
 pub fn build() -> Command {
     Command::new(crate_name!())
@@ -69,20 +24,40 @@ pub fn build() -> Command {
                 .help("The path to a binary image or dSYM in which to look up symbols")
                 .required(true)
                 .value_hint(ValueHint::FilePath)
-                .value_name("binary-image | dSYM")
+                .value_name("binary|dSYM")
                 .value_parser(value_parser!(PathBuf)),
-            Arg::new(Opt::LoadAddress).short('l')
+            Arg::new(Opt::LoadAddr).short('l')
                 .help_heading("Arguments")
                 .help("The load address of the binary image")
-                .required(true)
+                .group("loc")
                 .value_name("load-address")
-                .value_parser(str::parse::<atorsl::Addr>)
+                .value_parser(|addr: &str| addr.parse().map(Loc::Load))
                 .long_help(
                     "The load address of the binary image.  This value is always assumed to be\n\
                     in hex, even without a \"0x\" prefix.  The input addresses are assumed to be\n\
                     in a binary image with that load address.  Load addresses for binary images\n\
                     can be found in the \"Binary Images:\" section at the bottom of crash,\n\
                     sample, leaks, and malloc_history reports."),
+            Arg::new(Opt::SlideAddr).short('s')
+                .help_heading("Arguments")
+                .help("The slide value of the binary image")
+                .group("loc")
+                .value_name("slide")
+                .value_parser(|addr: &str| addr.parse().map(Loc::Slide))
+                .long_help(
+                    "The slide value of the binary image.  This is the difference between the\n\
+                    load address of a binary image, and the address at which the binary image\n\
+                    was built.  This slide value is subtracted from the input addresses.  It is\n\
+                    usually easier to directly specify the load address with the -l argument\n\
+                    than to manually calculate a slide value."),
+            Arg::new(Opt::Offset).long("offset")
+                .help_heading("Arguments")
+                .help("Treat all given addresses as offsets into the binary")
+                .group("loc")
+                .action(ArgAction::SetTrue)
+                .long_help(
+                    "Treat all given addresses as offsets into the binary.  Only one of the\n\
+                    following options can be used at a time: -s , -l or -offset."),
             Arg::new(Opt::Address).last(true)
                 .help_heading("Arguments")
                 .help("\tA list of input addresses at the end of the argument list.")
@@ -92,8 +67,9 @@ pub fn build() -> Command {
                 .value_name("address")
                 .value_parser(str::parse::<atorsl::Addr>)
         ])
+        .group(ArgGroup::new("loc").required(true))
         .args([
-            Arg::new(Opt::Architecture).short('a').long("arch")
+            Arg::new(Opt::Arch).short('a').long("arch")
                 .help("The architecure of a binary image in which to look up symbols")
                 .value_name("architecture")
                 .value_parser(value_parser!(String))

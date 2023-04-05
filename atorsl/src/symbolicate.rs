@@ -12,9 +12,15 @@ pub trait Symbolicate {
 
 impl Symbolicate for Dwarf<'_> {
     fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
+        let offset = match context.loc {
+            Loc::Load(laddr) => laddr - vmaddr,
+            Loc::Slide(saddr) => saddr,
+            Loc::Offset => Addr::nil(),
+        };
+
         fallible_iterator::convert(context.addrs.iter().map(|addr| {
             Ok(self
-                .atos(addr - context.loadaddr + vmaddr, context.include_inlined)?
+                .atos(addr - offset, context.include_inlined)?
                 .into_iter()
                 .map(Symbol::demangle)
                 .rev()
