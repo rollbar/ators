@@ -2,6 +2,7 @@
 
 using namespace swift::Demangle;
 
+/// Returns the preferred options to pass to the demangler.
 static DemangleOptions DemanglerOptions() {
     auto opts = DemangleOptions();
     opts.SynthesizeSugarOnTypes = true;
@@ -34,8 +35,11 @@ static DemangleOptions DemanglerOptions() {
 
 /// Demangle the given symbol and return the readable name.
 ///
-/// \param symbol The mangled Swift  symbol string.
-/// \param buffer A mutable pointer
+/// \param symbol The mangled Swift symbol string.
+/// \param buffer A mutable pointer to hold the demangled symbol.
+/// \param buffer_length The size of the buffer.
+///
+/// \return whether the operation was successful (1) or not (0).
 extern "C" int demangleSwiftSymbol(
     const char *symbol,
     char *buffer,
@@ -53,6 +57,11 @@ extern "C" int demangleSwiftSymbol(
     return true;
 }
 
+/// Checks whether the given string is a mangled Swift symbol.
+///
+/// \param symbol The mangled Swift symbol to check.
+///
+/// \return whether the string is a mangled Swift symbol (1) or not (0).
 extern "C" int isMangledSwiftSymbol(const char *symbol) {
     return isSwiftSymbol(symbol);
 }
