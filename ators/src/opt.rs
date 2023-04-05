@@ -1,6 +1,4 @@
-use std::{any::Any, fmt, path::PathBuf};
-
-use clap::ArgMatches;
+use std::{fmt, path::PathBuf};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Opt {
@@ -8,7 +6,7 @@ pub enum Opt {
     LoadAddr,
     SlideAddr,
     Offset,
-    Address,
+    Addr,
     Arch,
     Inline,
     Delimiter,
@@ -26,42 +24,32 @@ impl From<Opt> for clap::Id {
     }
 }
 
-pub trait MatchesEither {
-    fn get_either<T: Any + Clone + Send + Sync + 'static>(
-        &self,
-        ids: impl IntoIterator<Item = Opt>,
-    ) -> Option<&T>;
-}
-
-impl MatchesEither for clap::ArgMatches {
-    fn get_either<T>(&self, ids: impl IntoIterator<Item = Opt>) -> Option<&T>
-    where
-        T: Any + Clone + Send + Sync + 'static,
-    {
-        ids.into_iter()
-            .find_map(|id| self.get_one(&id.to_string()))
-    }
-}
-
 pub trait FromArgs<'a>
 where
     Self: Sized,
 {
-    fn from_args(args: &'a ArgMatches) -> Option<Self>;
+    fn from_args(args: &'a clap::ArgMatches) -> Option<Self>;
 }
 
 impl<'a> FromArgs<'a> for atorsl::Context<'a> {
-    fn from_args(args: &'a ArgMatches) -> Option<Self> {
+    fn from_args(args: &'a clap::ArgMatches) -> Option<Self> {
         Some(Self {
             path: args.get_one::<PathBuf>(&Opt::Object.to_string())?,
-            loc: args.get_either([Opt::LoadAddr, Opt::SlideAddr, Opt::Offset])?,
-            addrs: args.get_many(&Opt::Address.to_string())?.collect(),
+
+            loc: [Opt::LoadAddr, Opt::SlideAddr, Opt::Offset]
+                .into_iter()
+                .find_map(|opt| args.get_one(&opt.to_string()))?,
+
+            addrs: args.get_many(&Opt::Addr.to_string())?.collect(),
+
             arch: args
                 .get_one(&Opt::Arch.to_string())
                 .map(String::as_str),
+
             include_inlined: args.get_flag(&Opt::Inline.to_string()),
+
             delimiter: args
-                .get_one::<String>(&Opt::Delimiter.to_string())
+                .get_one(&Opt::Delimiter.to_string())
                 .map(String::as_str)
                 .unwrap_or("\n"),
         })

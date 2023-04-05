@@ -58,7 +58,7 @@ pub fn build() -> Command {
                 .long_help(
                     "Treat all given addresses as offsets into the binary.  Only one of the\n\
                     following options can be used at a time: -s , -l or -offset."),
-            Arg::new(Opt::Address).last(true)
+            Arg::new(Opt::Addr).last(true)
                 .help_heading("Arguments")
                 .help("\tA list of input addresses at the end of the argument list.")
                 .action(ArgAction::Append)

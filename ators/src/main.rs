@@ -8,11 +8,11 @@ fn main() -> anyhow::Result<()> {
     let (mmap, cow);
 
     let args = cli::build().get_matches();
-    let context = Context::from_args(&args).expect("Couldn't build Context from arguments");
-    let object = load_object!(context.path, mmap)?;
+    let ctx = Context::from_args(&args).expect("Cannot build Context from arguments");
+    let obj = load_object!(ctx.path, mmap)?;
 
-    load_dwarf!(&object, cow)
-        .symbolicate(object.vmaddr()?, &context)?
+    load_dwarf!(&obj, cow)
+        .symbolicate(obj.vmaddr()?, &ctx)?
         .iter()
         .for_each(|symbol| println!("{symbol}"));
 
