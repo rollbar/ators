@@ -1,4 +1,6 @@
-use std::{any::Any, fmt};
+use std::{any::Any, fmt, path::PathBuf};
+
+use clap::ArgMatches;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Opt {
@@ -9,6 +11,7 @@ pub enum Opt {
     Address,
     Arch,
     Inline,
+    Delimiter,
 }
 
 impl fmt::Display for Opt {
@@ -23,63 +26,44 @@ impl From<Opt> for clap::Id {
     }
 }
 
-pub trait OptMatching {
-    fn get_one<T: Any + Clone + Send + Sync + 'static>(&self, id: Opt) -> Option<T>;
+pub trait MatchesEither {
     fn get_either<T: Any + Clone + Send + Sync + 'static>(
         &self,
         ids: impl IntoIterator<Item = Opt>,
-    ) -> Option<T>;
-    fn get_flag(&self, id: Opt) -> bool;
-    fn get_many<T: Any + Clone + Send + Sync + 'static>(&self, id: Opt) -> Vec<T>;
+    ) -> Option<&T>;
 }
 
-impl OptMatching for clap::ArgMatches {
-    fn get_one<T>(&self, id: Opt) -> Option<T>
-    where
-        T: Any + Clone + Send + Sync + 'static,
-    {
-        self.get_one(&id.to_string()).map(Clone::clone)
-    }
-
-    fn get_either<T>(&self, ids: impl IntoIterator<Item = Opt>) -> Option<T>
+impl MatchesEither for clap::ArgMatches {
+    fn get_either<T>(&self, ids: impl IntoIterator<Item = Opt>) -> Option<&T>
     where
         T: Any + Clone + Send + Sync + 'static,
     {
         ids.into_iter()
             .find_map(|id| self.get_one(&id.to_string()))
-            .map(Clone::clone)
-    }
-
-    fn get_flag(&self, id: Opt) -> bool {
-        self.get_flag(&id.to_string())
-    }
-
-    fn get_many<T>(&self, id: Opt) -> Vec<T>
-    where
-        T: Any + Clone + Send + Sync + 'static,
-    {
-        self.get_many(&id.to_string())
-            .unwrap()
-            .cloned()
-            .collect()
     }
 }
 
-pub trait FromArgs
+pub trait FromArgs<'a>
 where
     Self: Sized,
 {
-    fn from_args<M: OptMatching>(args: M) -> Option<Self>;
+    fn from_args(args: &'a ArgMatches) -> Option<Self>;
 }
 
-impl FromArgs for atorsl::Context {
-    fn from_args<M: OptMatching>(args: M) -> Option<Self> {
+impl<'a> FromArgs<'a> for atorsl::Context<'a> {
+    fn from_args(args: &'a ArgMatches) -> Option<Self> {
         Some(Self {
-            path: args.get_one(Opt::Object)?,
+            path: args.get_one::<PathBuf>(&Opt::Object.to_string())?,
             loc: args.get_either([Opt::LoadAddr, Opt::SlideAddr, Opt::Offset])?,
-            addrs: args.get_many(Opt::Address),
-            arch: args.get_one(Opt::Arch),
-            include_inlined: args.get_flag(Opt::Inline),
+            addrs: args.get_many(&Opt::Address.to_string())?.collect(),
+            arch: args
+                .get_one(&Opt::Arch.to_string())
+                .map(String::as_str),
+            include_inlined: args.get_flag(&Opt::Inline.to_string()),
+            delimiter: args
+                .get_one::<String>(&Opt::Delimiter.to_string())
+                .map(String::as_str)
+                .unwrap_or("\n"),
         })
     }
 }

@@ -1,5 +1,5 @@
 use crate::Addr;
-use std::path::PathBuf;
+use std::path::Path;
 
 /// The location address of the binary image containing symbol addresses.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -24,19 +24,22 @@ pub enum Loc {
 
 /// The program's context, defines its behavior.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct Context {
+pub struct Context<'ctx> {
     /// The full path to either a binary image, eg. the DWARF file, or a .dSYM.
-    pub path: PathBuf,
+    pub path: &'ctx Path,
 
     /// The location address of the binary image containing the addresses to symbolicate.
-    pub loc: Loc,
+    pub loc: &'ctx Loc,
 
     /// The addresses to symbolicate.
-    pub addrs: Vec<Addr>,
+    pub addrs: Vec<&'ctx Addr>,
 
     /// The particular architecure of a binary image file in which to look up symbols.
-    pub arch: Option<String>,
+    pub arch: Option<&'ctx str>,
 
     /// Whether to expand inlined symbols.
     pub include_inlined: bool,
+
+    /// Output delimiter, defaults to newline
+    pub delimiter: &'ctx str,
 }
