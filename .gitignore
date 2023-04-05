@@ -14,5 +14,5 @@ Cargo.lock
 .DS_Store
 
 /.vscode
-/fixtures
+/fixtures/iosAppSwift.app.dSYM
 /log
