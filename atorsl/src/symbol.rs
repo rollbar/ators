@@ -1,18 +1,19 @@
+#![allow(unstable_name_collisions)]
+
 use crate::demangle::swift;
 use gimli::{EndianSlice, RunTimeEndian};
 use std::{
     fmt,
-    ops::{Add, Deref},
+    ops::{Add, Deref, DerefMut},
     str::FromStr,
 };
 
-/// A 64-bit address.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Symbol(String);
 
 impl Symbol {
     pub fn empty() -> Self {
-        Self("".to_string())
+        Self::from("")
     }
 
     pub fn demangle(self) -> Symbol {
@@ -40,6 +41,22 @@ impl Deref for Symbol {
     }
 }
 
+impl DerefMut for Symbol {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl<T> AsRef<T> for Symbol
+where
+    T: ?Sized,
+    <Self as Deref>::Target: AsRef<T>,
+{
+    fn as_ref(&self) -> &T {
+        self.deref().as_ref()
+    }
+}
+
 impl FromStr for Symbol {
     type Err = <String as FromStr>::Err;
 
@@ -51,6 +68,24 @@ impl FromStr for Symbol {
 impl From<String> for Symbol {
     fn from(value: String) -> Self {
         Self(value)
+    }
+}
+
+impl From<Symbol> for String {
+    fn from(value: Symbol) -> Self {
+        value.0
+    }
+}
+
+impl From<&str> for Symbol {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+
+impl<'a> From<&'a Symbol> for &'a str {
+    fn from(value: &'a Symbol) -> Self {
+        value.0.as_str()
     }
 }
 

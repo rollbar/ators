@@ -9,10 +9,8 @@ pub mod symbolicate;
 pub use addr::Addr;
 pub use context::Context;
 pub use error::Error;
+pub use symbol::Symbol;
 pub use symbolicate::Symbolicate;
-
-pub(crate) use symbol::JoinInlinedSymbols;
-pub(crate) use symbol::Symbol;
 
 /// Loads a binary image file.
 ///

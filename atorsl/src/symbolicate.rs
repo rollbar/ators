@@ -1,9 +1,12 @@
+#![allow(unstable_name_collisions)]
+
 use crate::{
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
     *,
 };
 use fallible_iterator::FallibleIterator;
 use gimli::DebugInfoOffset;
+use itertools::Itertools;
 
 pub trait Symbolicate {
     fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error>;
@@ -11,9 +14,15 @@ pub trait Symbolicate {
 
 impl Symbolicate for Dwarf<'_> {
     fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
-        fallible_iterator::convert(context.addrs.clone().iter().map(|addr| {
-            self.atos(addr - context.loadaddr + vmaddr, context.inline)
-                .map(|symbols| symbols.into_iter().rev().map(Symbol::demangle).join())
+        fallible_iterator::convert(context.addrs.iter().map(|addr| {
+            Ok(self
+                .atos(addr - context.loadaddr + vmaddr, context.inline)?
+                .into_iter()
+                .map(Symbol::demangle)
+                .rev()
+                .map(String::from)
+                .intersperse("\n".to_string())
+                .collect())
         }))
         .collect()
     }
