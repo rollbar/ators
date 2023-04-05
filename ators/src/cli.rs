@@ -46,7 +46,7 @@ impl FromArgs for atorsl::Context {
             arch: args
                 .get_one(&Opt::Architecture.to_string())
                 .map(Clone::clone),
-            inline: args.get_flag(&Opt::Inline.to_string()),
+            include_inlined: args.get_flag(&Opt::Inline.to_string()),
         }
     }
 }

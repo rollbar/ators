@@ -17,5 +17,5 @@ pub struct Context {
     pub arch: Option<String>,
 
     /// Whether to expand inlined symbols.
-    pub inline: bool,
+    pub include_inlined: bool,
 }

@@ -1,5 +1,3 @@
-#![allow(unstable_name_collisions)]
-
 use crate::{
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
     *,
@@ -16,13 +14,11 @@ impl Symbolicate for Dwarf<'_> {
     fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
         fallible_iterator::convert(context.addrs.iter().map(|addr| {
             Ok(self
-                .atos(addr - context.loadaddr + vmaddr, context.inline)?
+                .atos(addr - context.loadaddr + vmaddr, context.include_inlined)?
                 .into_iter()
                 .map(Symbol::demangle)
                 .rev()
-                .map(String::from)
-                .intersperse("\n".to_string())
-                .collect())
+                .join("\n"))
         }))
         .collect()
     }

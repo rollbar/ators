@@ -11,7 +11,7 @@ fn main() -> anyhow::Result<()> {
 
     load_dwarf!(&object, cow)
         .symbolicate(object.vmaddr()?, &context)?
-        .into_iter()
+        .iter()
         .for_each(|symbol| println!("{symbol}"));
 
     Ok(())

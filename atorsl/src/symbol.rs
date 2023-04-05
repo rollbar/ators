@@ -1,5 +1,3 @@
-#![allow(unstable_name_collisions)]
-
 use crate::demangle::swift;
 use gimli::{EndianSlice, RunTimeEndian};
 use std::{
@@ -130,18 +128,5 @@ impl Add<Symbol> for String {
 
     fn add(self, rhs: Symbol) -> Self {
         self + rhs.0.as_ref()
-    }
-}
-
-pub trait JoinInlinedSymbols {
-    fn join(self) -> String;
-}
-
-impl<I> JoinInlinedSymbols for I
-where
-    I: Iterator<Item = Symbol>,
-{
-    fn join(self) -> String {
-        self.fold("".to_string(), |acc, s| acc + "\n" + s)
     }
 }
