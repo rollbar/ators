@@ -1,4 +1,9 @@
-use std::{cmp::Ordering, fmt, str::FromStr};
+use std::{
+    cmp::Ordering,
+    fmt,
+    ops::{Deref, DerefMut},
+    str::FromStr,
+};
 
 /// A 64-bit address.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -17,6 +22,30 @@ impl Addr {
 impl Default for Addr {
     fn default() -> Self {
         Self::nil()
+    }
+}
+
+impl Deref for Addr {
+    type Target = u64;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for Addr {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl<T> AsRef<T> for Addr
+where
+    T: ?Sized,
+    <Self as Deref>::Target: AsRef<T>,
+{
+    fn as_ref(&self) -> &T {
+        self.deref().as_ref()
     }
 }
 
