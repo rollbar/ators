@@ -24,6 +24,9 @@ pub enum Error {
     #[error("No debug offset in address ({0})")]
     AddrNoDebugOffset(Addr),
 
+    #[error("Address {0} overflown by offset {1}")]
+    AddrOffsetOverflow(Addr, Addr),
+
     #[error("Couldn't demangle {0}")]
     CannotDemangleSymbol(Symbol),
 }

@@ -7,13 +7,27 @@ use crate::{
 use fallible_iterator::FallibleIterator;
 
 pub trait Symbolicator {
-    fn atos(&self, addr: Addr, base: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error>;
+    fn atos<'a>(
+        &'a self,
+        addr: &'a Addr,
+        base: &'a Addr,
+        include_inlined: bool,
+    ) -> Result<Vec<Symbol>, Error>;
 }
 
 impl Symbolicator for Dwarf<'_> {
-    fn atos(&self, addr: Addr, base: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error> {
-        let addr = addr - base;
-        let unit = self.unit_from_addr(addr)?;
+    fn atos<'a>(
+        &'a self,
+        addr: &'a Addr,
+        base: &'a Addr,
+        include_inlined: bool,
+    ) -> Result<Vec<Symbol>, Error> {
+        let addr = addr
+            .checked_sub(**base)
+            .map(Addr::from)
+            .ok_or(Error::AddrOffsetOverflow(*addr, *base))?;
+
+        let unit = self.unit_from_addr(&addr)?;
         let mut entries = unit.entries();
 
         let (entry, symbol) = loop {
