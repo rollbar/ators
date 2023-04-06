@@ -5,7 +5,6 @@ use crate::{
     *,
 };
 use fallible_iterator::FallibleIterator;
-use gimli::DebugInfoOffset;
 
 pub trait Symbolicator {
     fn atos(&self, addr: Addr, base: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error>;
@@ -57,9 +56,9 @@ impl Symbolicator for Dwarf<'_> {
 
 trait Lookup {
     fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<Symbol, Error>;
-    fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String>;
-    fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error>;
-    fn debug_info_offset(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
+    fn try_attr_string(&self, unit: &Unit, value: &AttrValue) -> Option<String>;
+    fn unit_from_addr<'a>(&'a self, addr: &'a Addr) -> Result<Unit, Error>;
+    fn debug_info_offset<'a>(&'a self, addr: &'a Addr) -> Result<gimli::DebugInfoOffset, Error>;
 }
 
 impl Lookup for Dwarf<'_> {
@@ -76,19 +75,19 @@ impl Lookup for Dwarf<'_> {
             })
     }
 
-    fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String> {
-        self.attr_string(&unit, value)
+    fn try_attr_string(&self, unit: &Unit, value: &AttrValue) -> Option<String> {
+        self.attr_string(&unit, *value)
             .ok()
             .map(|slice| slice.to_string_lossy().to_string())
     }
 
-    fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error> {
+    fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error> {
         let offset = self.debug_info_offset(addr)?;
         let header = self.debug_info.header_from_offset(offset)?;
         self.unit(header).map_err(Error::Gimli)
     }
 
-    fn debug_info_offset(&self, addr: Addr) -> Result<DebugInfoOffset, Error> {
+    fn debug_info_offset(&self, addr: &Addr) -> Result<gimli::DebugInfoOffset, Error> {
         self.debug_aranges
             .headers()
             .find_map(|header| {
@@ -98,7 +97,7 @@ impl Lookup for Dwarf<'_> {
                     None
                 })
             })?
-            .ok_or(Error::AddrNoDebugOffset(addr))
+            .ok_or(Error::AddrNoDebugOffset(*addr))
     }
 }
 
@@ -111,7 +110,7 @@ fn fmt(entry: &Entry, dwarf: &Dwarf, header: &UnitHeader, unit: &Unit) -> String
         entry.tag(),
         entry
             .symbol()
-            .and_then(|v| dwarf.try_attr_string(&unit, v))
+            .and_then(|v| dwarf.try_attr_string(&unit, &v))
             .unwrap_or_else(String::default),
     )
 }
