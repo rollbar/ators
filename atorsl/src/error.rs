@@ -1,4 +1,4 @@
-use crate::{Addr, Symbol};
+use crate::{symbolicator, Addr};
 
 /// An atorsl error.
 #[derive(thiserror::Error, Debug)]
@@ -19,7 +19,7 @@ pub enum Error {
     AddrNotFound(Addr),
 
     #[error("Address has no a symbols")]
-    AddrHasNoSymbol,
+    EntryHasNoSymbol,
 
     #[error("No debug offset in address ({0})")]
     AddrNoDebugOffset(Addr),
@@ -27,6 +27,6 @@ pub enum Error {
     #[error("Address {0} overflown by offset {1}")]
     AddrOffsetOverflow(Addr, Addr),
 
-    #[error("Couldn't demangle {0}")]
-    CannotDemangleSymbol(Symbol),
+    #[error("An error occurred while building the Symbol")]
+    ErrorBuildingSymbol(#[from] symbolicator::SymbolBuilderError),
 }

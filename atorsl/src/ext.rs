@@ -20,28 +20,17 @@ pub mod object {
 }
 
 pub(crate) mod gimli {
-    use crate::{Addr, AttrValue};
+    use crate::Addr;
     use gimli::{AttributeValue, EndianSlice, RunTimeEndian};
     use std::ops::Range;
 
     pub(crate) trait DebuggingInformationEntry {
-        fn symbol(&self) -> Option<AttrValue>;
         fn pc(&self) -> Option<Range<Addr>>;
     }
 
     impl DebuggingInformationEntry
         for gimli::DebuggingInformationEntry<'_, '_, EndianSlice<'_, RunTimeEndian>, usize>
     {
-        fn symbol(&self) -> Option<AttrValue> {
-            [
-                gimli::DW_AT_linkage_name,
-                gimli::DW_AT_abstract_origin,
-                gimli::DW_AT_name,
-            ]
-            .into_iter()
-            .find_map(|dw_at| self.attr_value(dw_at).ok().flatten())
-        }
-
         fn pc(&self) -> Option<Range<Addr>> {
             let low = match self.attr_value(gimli::DW_AT_low_pc).ok().flatten() {
                 Some(AttributeValue::Addr(addr)) => Some(addr.into()),

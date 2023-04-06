@@ -2,13 +2,15 @@ pub mod addr;
 pub mod demangle;
 pub mod error;
 pub mod ext;
-pub mod symbol;
 pub mod symbolicator;
 
 pub use addr::Addr;
 pub use error::Error;
-pub use symbol::Symbol;
-pub use symbolicator::Symbolicator;
+pub use symbolicator::{Symbol, Symbolicator};
+
+pub(crate) mod prelude;
+
+pub(crate) use prelude::IsSomeAnd;
 
 /// Loads a binary image file.
 ///
@@ -61,15 +63,11 @@ macro_rules! load_dwarf {
 }
 
 /// Commonly used DWARF sections, and other common information.
-pub type Dwarf<'input> = gimli::Dwarf<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
+pub(crate) type Dwarf<'input> = gimli::Dwarf<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
 
 /// Commonly used information for a unit in the `.debug_info` or `.debug_types` sections.
 pub(crate) type Unit<'input> =
     gimli::Unit<gimli::EndianSlice<'input, gimli::RunTimeEndian>, usize>;
-
-/// The common fields for the headers of compilation units and type units.
-pub(crate) type UnitHeader<'input> =
-    gimli::UnitHeader<gimli::EndianSlice<'input, gimli::RunTimeEndian>, usize>;
 
 /// The value of an attribute in a `DebuggingInformationEntry`.
 pub(crate) type AttrValue<'input> =
