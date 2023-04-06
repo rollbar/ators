@@ -44,6 +44,9 @@ pub struct Context<'ctx> {
 
     /// Output delimiter, defaults to newline
     pub delimiter: &'ctx str,
+
+    /// Print the full path of the source files
+    pub show_full_path: bool,
 }
 
 impl<'a> Context<'a> {
@@ -73,6 +76,8 @@ impl<'a> Context<'a> {
                 .get_one(&cli::Opt::Delimiter.to_string())
                 .map(String::as_str)
                 .context("No delimiter")?,
+
+            show_full_path: args.get_flag(&cli::Opt::FullPath.to_string()),
         })
     }
 }

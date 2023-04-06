@@ -9,7 +9,7 @@ use derive_builder::Builder;
 use fallible_iterator::FallibleIterator;
 use gimli::{
     DW_AT_abstract_origin, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line, DW_AT_language,
-    DW_AT_linkage_name, DW_AT_name, DwAt, DwLang,
+    DW_AT_linkage_name, DW_AT_name, DebugInfoOffset, DwAt, DwLang,
 };
 use std::path::PathBuf;
 
@@ -118,7 +118,7 @@ trait DwarfExt {
     ) -> Result<Symbol, Error>;
 
     fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error>;
-    fn debug_info_offset(&self, addr: &Addr) -> Result<gimli::DebugInfoOffset, Error>;
+    fn debug_info_offset(&self, addr: &Addr) -> Result<DebugInfoOffset, Error>;
 }
 
 impl DwarfExt for Dwarf<'_> {
@@ -156,21 +156,17 @@ impl DwarfExt for Dwarf<'_> {
     }
 
     fn entry_path(&self, name: DwAt, entry: &Entry, unit: &Unit) -> Option<PathBuf> {
-        let Some(ref program) = unit.line_program else {
-            return None
-        };
-
         let Some(AttrValue::FileIndex(offset)) = entry.attr_value(name).ok()? else {
             return None
         };
 
-        let header = program.header();
+        let header = unit.line_program.as_ref()?.header();
         let file = header.file(offset)?;
         let dir = match file.directory(header) {
             Some(attr) => self
                 .attr_string(unit, attr)
                 .ok()
-                .map(|dir| "/".to_string() + &dir.to_string_lossy())
+                .map(|dir| dir.to_string_lossy().to_string() + "/")
                 .unwrap_or_default(),
             _ => String::default(),
         };

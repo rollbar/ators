@@ -15,6 +15,7 @@ pub enum Opt {
     Arch,
     Inline,
     Delimiter,
+    FullPath,
 }
 
 impl fmt::Display for Opt {
@@ -113,6 +114,9 @@ pub fn build() -> Command {
                 .default_value("\n"),
             Arg::new(Opt::Inline).short('i').long("inlineFrames")
                 .help("Display inlined symbols")
+                .action(ArgAction::SetTrue),
+            Arg::new(Opt::FullPath).long("fullPath")
+                .help("Print the full path of the source files")
                 .action(ArgAction::SetTrue),
         ])
         .after_long_help(

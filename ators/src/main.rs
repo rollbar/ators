@@ -7,12 +7,21 @@ use atorsl::{ext::object::File, *};
 use context::{Context, Loc};
 use itertools::Itertools;
 
-fn format(symbol: Symbol) -> String {
+fn format(symbol: Symbol, show_full_path: bool) -> String {
     format!(
         "{} (in {}) ({}{}{})",
         symbol.linkage,
         symbol.module,
-        symbol.file.unwrap_or_default().display(),
+        symbol
+            .file
+            .and_then(|file| {
+                if show_full_path {
+                    Some(file.display().to_string())
+                } else {
+                    Some(file.file_name()?.to_string_lossy().to_string())
+                }
+            })
+            .unwrap_or_default(),
         symbol
             .line
             .map(|l| format!(":{}", l))
@@ -36,7 +45,12 @@ fn symbolicate<S: Symbolicator>(symbolicator: &S, vmaddr: &Addr, ctx: &Context) 
         .map(|addr| {
             symbolicator
                 .atos(*addr, &base_addr, ctx.include_inlined)
-                .map(|symbols| symbols.into_iter().map(format).join("\n"))
+                .map(|symbols| {
+                    symbols
+                        .into_iter()
+                        .map(|symbol| format(symbol, ctx.show_full_path))
+                        .join("\n")
+                })
                 .unwrap_or(addr.to_string())
         })
         .intersperse(ctx.delimiter.to_string())
