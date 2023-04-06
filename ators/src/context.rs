@@ -1,5 +1,7 @@
-use crate::Addr;
-use std::path::Path;
+use anyhow::{Context as _, Result};
+
+use crate::{cli, Addr};
+use std::path::{Path, PathBuf};
 
 /// The location address of the binary image containing symbol addresses.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -42,4 +44,35 @@ pub struct Context<'ctx> {
 
     /// Output delimiter, defaults to newline
     pub delimiter: &'ctx str,
+}
+
+impl<'a> Context<'a> {
+    pub fn from_args(args: &'a clap::ArgMatches) -> Result<Self> {
+        Ok(Self {
+            path: args
+                .get_one::<PathBuf>(&cli::Opt::Object.to_string())
+                .context("No binary image path")?,
+
+            loc: [cli::Opt::LoadAddr, cli::Opt::SlideAddr, cli::Opt::Offset]
+                .into_iter()
+                .find_map(|opt| args.get_one(&opt.to_string()))
+                .context("No location address")?,
+
+            addrs: args
+                .get_many(&cli::Opt::Addr.to_string())
+                .context("No address to symbolicate")?
+                .collect(),
+
+            arch: args
+                .get_one(&cli::Opt::Arch.to_string())
+                .map(String::as_str),
+
+            include_inlined: args.get_flag(&cli::Opt::Inline.to_string()),
+
+            delimiter: args
+                .get_one(&cli::Opt::Delimiter.to_string())
+                .map(String::as_str)
+                .context("No delimiter")?,
+        })
+    }
 }

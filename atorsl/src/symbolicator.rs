@@ -1,45 +1,19 @@
+#![allow(unstable_name_collisions)]
+
 use crate::{
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
     *,
 };
 use fallible_iterator::FallibleIterator;
 use gimli::DebugInfoOffset;
-use itertools::Itertools;
 
-pub trait Symbolicate {
-    fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error>;
+pub trait Symbolicator {
+    fn atos(&self, addr: Addr, base: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error>;
 }
 
-impl Symbolicate for Dwarf<'_> {
-    fn symbolicate(&self, vmaddr: Addr, context: &Context) -> Result<Vec<String>, Error> {
-        let offset = match context.loc {
-            Loc::Load(laddr) => laddr - vmaddr,
-            Loc::Slide(saddr) => *saddr,
-            Loc::Offset => Addr::nil(),
-        };
-
-        fallible_iterator::convert(context.addrs.iter().map(|addr| {
-            Ok(self
-                .atos(*addr - offset, context.include_inlined)?
-                .into_iter()
-                .map(Symbol::demangle)
-                .rev()
-                .join("\n"))
-        }))
-        .collect()
-    }
-}
-
-trait Lookup {
-    fn atos(&self, address: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error>;
-    fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<Symbol, Error>;
-    fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String>;
-    fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error>;
-    fn debug_info_offset(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
-}
-
-impl Lookup for Dwarf<'_> {
-    fn atos(&self, addr: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error> {
+impl Symbolicator for Dwarf<'_> {
+    fn atos(&self, addr: Addr, base: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error> {
+        let addr = addr - base;
         let unit = self.unit_from_addr(addr)?;
         let mut entries = unit.entries();
 
@@ -50,7 +24,7 @@ impl Lookup for Dwarf<'_> {
 
             match entry.pc() {
                 Some(pc) if entry.tag() == gimli::DW_TAG_subprogram && pc.contains(&addr) => {
-                    break (Some(entry), self.symbol(entry, &unit))
+                    break (Some(entry), self.symbol(entry, &unit).map(Symbol::demangle))
                 }
                 _ => continue,
             }
@@ -72,14 +46,23 @@ impl Lookup for Dwarf<'_> {
                 }
 
                 if entry.tag() == gimli::DW_TAG_inlined_subroutine {
-                    symbols.push(self.symbol(entry, &unit));
+                    symbols.push(self.symbol(entry, &unit).map(Symbol::demangle));
                 }
             }
         }
 
-        fallible_iterator::convert(symbols.into_iter()).collect()
+        symbols.into_iter().rev().collect()
     }
+}
 
+trait Lookup {
+    fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<Symbol, Error>;
+    fn try_attr_string(&self, unit: &Unit, value: AttrValue) -> Option<String>;
+    fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error>;
+    fn debug_info_offset(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
+}
+
+impl Lookup for Dwarf<'_> {
     fn symbol(&self, entry: &Entry, unit: &Unit) -> Result<Symbol, Error> {
         entry
             .symbol()

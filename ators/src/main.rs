@@ -1,20 +1,43 @@
+#![allow(unstable_name_collisions)]
+
 mod cli;
-mod opt;
+mod context;
 
 use atorsl::{ext::object::File, *};
-use opt::FromArgs;
+use context::{Context, Loc};
+use itertools::Itertools;
+
+fn symbolicate<S: Symbolicator>(symbolicator: S, vmaddr: Addr, ctx: &Context) -> Vec<String> {
+    let base_addr = match ctx.loc {
+        Loc::Load(addr) => addr - vmaddr,
+        Loc::Slide(addr) => *addr,
+        Loc::Offset => Addr::nil(),
+    };
+
+    ctx.addrs
+        .iter()
+        .map(|addr| {
+            symbolicator
+                .atos(**addr, base_addr, ctx.include_inlined)
+                .map(|symbols| symbols.into_iter().join("\n"))
+                .unwrap_or(addr.to_string())
+        })
+        .intersperse(ctx.delimiter.to_string())
+        .collect()
+}
 
 fn main() -> anyhow::Result<()> {
     let (mmap, cow);
 
     let args = cli::build().get_matches();
-    let ctx = Context::from_args(&args).expect("Cannot build Context from arguments");
-    let obj = load_object!(ctx.path, mmap)?;
+    let ctx = Context::from_args(&args)?;
 
-    load_dwarf!(&obj, cow)
-        .symbolicate(obj.vmaddr()?, &ctx)?
+    let obj = load_object!(ctx.path, mmap)?;
+    let dwarf = load_dwarf!(&obj, cow);
+
+    symbolicate(dwarf, obj.vmaddr()?, &ctx)
         .iter()
-        .for_each(|symbol| println!("{symbol}"));
+        .for_each(|symbol| print!("{symbol}"));
 
     Ok(())
 }

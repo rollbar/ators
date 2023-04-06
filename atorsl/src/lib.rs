@@ -1,17 +1,14 @@
 pub mod addr;
-pub mod context;
 pub mod demangle;
 pub mod error;
 pub mod ext;
 pub mod symbol;
-pub mod symbolicate;
+pub mod symbolicator;
 
 pub use addr::Addr;
-pub use context::Context;
-pub use context::Loc;
 pub use error::Error;
 pub use symbol::Symbol;
-pub use symbolicate::Symbolicate;
+pub use symbolicator::Symbolicator;
 
 /// Loads a binary image file.
 ///
@@ -64,7 +61,7 @@ macro_rules! load_dwarf {
 }
 
 /// Commonly used DWARF sections, and other common information.
-pub(crate) type Dwarf<'input> = gimli::Dwarf<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
+pub type Dwarf<'input> = gimli::Dwarf<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
 
 /// Commonly used information for a unit in the `.debug_info` or `.debug_types` sections.
 pub(crate) type Unit<'input> =

@@ -1,10 +1,33 @@
-use crate::opt::Opt;
-use atorsl::Loc;
+use crate::context::Loc;
 use clap::{
     crate_authors, crate_description, crate_name, crate_version, value_parser, Arg, ArgAction,
     ArgGroup, Command, ValueHint,
 };
-use std::path::PathBuf;
+use std::{fmt, path::PathBuf};
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum Opt {
+    Object,
+    LoadAddr,
+    SlideAddr,
+    Offset,
+    Addr,
+    Arch,
+    Inline,
+    Delimiter,
+}
+
+impl fmt::Display for Opt {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Debug::fmt(self, f)
+    }
+}
+
+impl From<Opt> for clap::Id {
+    fn from(value: Opt) -> Self {
+        Self::from(value.to_string())
+    }
+}
 
 pub fn build() -> Command {
     Command::new(crate_name!())
@@ -83,6 +106,11 @@ pub fn build() -> Command {
                     (such as i386 or arm) and pass in a corresponding symbol-rich Mach-O binary\n\
                     image file with a binary image of the corresponding architecture (such as a\n\
                     Universal Binary)."),
+            Arg::new(Opt::Delimiter).short('d')
+                .help("Delimiter when outputting inline frames. Defaults to newline.")
+                .value_name("delimiter")
+                .value_parser(value_parser!(String))
+                .default_value("\n"),
             Arg::new(Opt::Inline).short('i').long("inlineFrames")
                 .help("Display inlined symbols")
                 .action(ArgAction::SetTrue),
