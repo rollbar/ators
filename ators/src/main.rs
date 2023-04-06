@@ -37,7 +37,7 @@ fn main() -> anyhow::Result<()> {
 
     symbolicate(dwarf, obj.vmaddr()?, &ctx)
         .iter()
-        .for_each(|symbol| print!("{symbol}"));
+        .for_each(|symbol| println!("{symbol}"));
 
     Ok(())
 }
