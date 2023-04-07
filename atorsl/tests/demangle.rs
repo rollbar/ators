@@ -1,4 +1,4 @@
-use atorsl::demangle::swift;
+use atorsl::demangler;
 use std::{
     fs::File,
     io::{BufRead, BufReader},
@@ -21,7 +21,9 @@ fn test_demangle() {
     })
     .map(|(mangled, demangled)| {
         (
-            swift::demangle(&mangled).expect(format!("can't demangle: {}", mangled).as_str()),
+            demangler::swift::try_demangle(&mangled)
+                .expect(format!("can't demangle: {}", mangled).as_str())
+                .to_owned(),
             demangled,
         )
     })

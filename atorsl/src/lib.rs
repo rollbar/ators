@@ -1,5 +1,5 @@
 pub mod addr;
-pub mod demangle;
+pub mod demangler;
 pub mod error;
 pub mod ext;
 pub mod symbolicator;
@@ -9,7 +9,6 @@ pub use error::Error;
 pub use symbolicator::{Symbol, Symbolicator};
 
 pub(crate) mod prelude;
-
 pub(crate) use prelude::IsSomeAnd;
 
 /// Loads a binary image file.

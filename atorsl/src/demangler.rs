@@ -1,8 +1,18 @@
+pub fn demangle(symbol: &str) -> &str {
+    if swift::is_mangled(symbol) {
+        swift::try_demangle(symbol).unwrap_or(symbol)
+    } else {
+        symbol
+    }
+}
+
 pub mod swift {
     use std::{
         ffi::{CStr, CString},
         os::raw::{c_char, c_int},
     };
+
+    use crate::Error;
 
     extern "C" {
         fn isMangledSwiftSymbol(sym: *const c_char) -> c_int;
@@ -15,19 +25,16 @@ pub mod swift {
             .unwrap_or(false)
     }
 
-    pub fn demangle(symbol: &str) -> Option<String> {
+    pub fn try_demangle(symbol: &str) -> Result<&str, Error> {
         let mut buffer = vec![0; 4096];
+        let symbol_ptr = CString::new(symbol)?.as_ptr();
 
-        CString::new(symbol).ok().and_then(|symbol| unsafe {
-            if demangleSwiftSymbol(symbol.as_ptr(), buffer.as_mut_ptr(), buffer.len()) != 0 {
-                Some(
-                    CStr::from_ptr(buffer.as_ptr())
-                        .to_string_lossy()
-                        .to_string(),
-                )
+        unsafe {
+            if demangleSwiftSymbol(symbol_ptr, buffer.as_mut_ptr(), buffer.len()) != 0 {
+                Ok(CStr::from_ptr(buffer.as_ptr()).to_str()?)
             } else {
-                None
+                Err(Error::CannotDemangleSymbol(symbol.to_owned()))
             }
-        })
+        }
     }
 }

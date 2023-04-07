@@ -1,7 +1,6 @@
 #![allow(unstable_name_collisions)]
 
 use crate::{
-    demangle::swift,
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
     *,
 };
@@ -134,7 +133,7 @@ impl DwarfExt for Dwarf<'_> {
     ) -> Result<Symbol, Error> {
         let mut symbol = SymbolBuilder::default();
         let linkage = self.entry_linkage(entry, &unit)?;
-        symbol.linkage(swift::demangle(&linkage).unwrap_or(linkage));
+        symbol.linkage(demangler::demangle(&linkage).to_owned());
         symbol.module(module.clone());
         symbol.lang(lang);
         if let Some(true) = self.entry_is_artificial(entry) {
@@ -167,12 +166,12 @@ impl DwarfExt for Dwarf<'_> {
             .ok_or(Error::EntryHasNoSymbol)
             .and_then(|attr| match attr {
                 AttrValue::UnitRef(offset) => self.entry_linkage(&unit.entry(offset)?, &unit),
-                attr @ _ => self
-                    .attr_string(&unit, attr)
-                    .map_err(Error::Gimli)
-                    .map(|value| value.to_string_lossy().to_string())
-                    .map(|value| swift::demangle(&value).unwrap_or(value)),
+                attr @ _ => Ok(self
+                    .attr_string(&unit, attr)?
+                    .to_string_lossy()
+                    .to_string()),
             })
+            .map(|value| demangler::demangle(&value).to_owned())
     }
 
     fn entry_file(&self, entry: &Entry, unit: &Unit) -> Option<PathBuf> {
