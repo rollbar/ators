@@ -1,9 +1,10 @@
 #include "swift/Demangling/Demangle.h"
+#include <cstdio>
 
 using namespace swift::Demangle;
 
 /// Returns the preferred options to pass to the demangler.
-static DemangleOptions DemanglerOptions() {
+static DemangleOptions StandardUIDemangleOptions() {
     auto opts = DemangleOptions();
     opts.SynthesizeSugarOnTypes = true;
     opts.QualifyEntities = true;
@@ -33,20 +34,40 @@ static DemangleOptions DemanglerOptions() {
     return opts;
 }
 
+extern "C" enum class Scope : signed {
+    Compact = -1,
+    Standard = 0,
+    Full = 1,
+};
+
 /// Demangle the given symbol and return the readable name.
 ///
 /// \param symbol The mangled Swift symbol string.
 /// \param buffer A mutable pointer to hold the demangled symbol.
 /// \param buffer_length The size of the buffer.
+/// \param scope the amount of information to display.
 ///
 /// \return whether the operation was successful (1) or not (0).
 extern "C" int demangleSwiftSymbol(
     const char *symbol,
     char *buffer,
-    size_t buffer_length
+    size_t buffer_length,
+    Scope scope
 ) {
-    auto mangled = llvm::StringRef(symbol);
-    auto demangled = demangleSymbolAsString(mangled, DemanglerOptions());
+    DemangleOptions opts;
+    switch (scope) {
+        case Scope::Compact: // atos
+            opts = DemangleOptions::SimplifiedUIDemangleOptions();
+            break;
+        case Scope::Standard: // ators
+            opts = StandardUIDemangleOptions();
+            break;
+        case Scope::Full:
+            opts = DemangleOptions();
+            break;
+    }
+
+    auto demangled = demangleSymbolAsString(llvm::StringRef(symbol), opts);
 
     if (demangled.size() == 0 || demangled.size() >= buffer_length) {
         return false;
