@@ -178,7 +178,6 @@ impl DwarfExt for Dwarf<'_> {
                     .to_string_lossy()
                     .to_string()),
             })
-            .map(|value| demangler::demangle(&value).to_owned())
     }
 
     fn entry_file(&self, entry: &Entry, unit: &Unit) -> Option<PathBuf> {
