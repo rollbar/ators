@@ -8,8 +8,9 @@ use crate::{
 use derive_builder::Builder;
 use fallible_iterator::FallibleIterator;
 use gimli::{
-    DW_AT_abstract_origin, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line, DW_AT_language,
-    DW_AT_linkage_name, DW_AT_name, DebugInfoOffset, DwAt, DwLang,
+    DW_AT_abstract_origin, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line, DW_AT_decl_column,
+    DW_AT_decl_file, DW_AT_decl_line, DW_AT_language, DW_AT_linkage_name, DW_AT_name,
+    DebugInfoOffset, DwAt, DwLang,
 };
 use std::path::PathBuf;
 
@@ -103,8 +104,10 @@ impl Symbolicator for Dwarf<'_> {
 trait DwarfExt {
     fn entry_linkage(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
     fn entry_string(&self, name: DwAt, entry: &Entry, unit: &Unit) -> Option<String>;
-    fn entry_path(&self, name: DwAt, entry: &Entry, unit: &Unit) -> Option<PathBuf>;
-    fn entry_u16(&self, name: DwAt, entry: &Entry) -> Option<u16>;
+    fn entry_file(&self, entry: &Entry, unit: &Unit) -> Option<PathBuf>;
+    fn entry_line(&self, entry: &Entry) -> Option<u16>;
+    fn entry_col(&self, entry: &Entry) -> Option<u16>;
+    fn entry_lang(&self, entry: &Entry) -> Option<DwLang>;
 
     fn symbol_from_entry(
         &self,
@@ -130,11 +133,22 @@ impl DwarfExt for Dwarf<'_> {
         let linkage = self.entry_linkage(entry, &unit)?;
         symbol.linkage(swift::demangle(&linkage).unwrap_or(linkage));
         symbol.module(module.clone());
-        symbol.lang(*lang);
-        symbol.file(self.entry_path(DW_AT_call_file, entry, &unit));
-        symbol.line(self.entry_u16(DW_AT_call_line, entry));
-        symbol.col(self.entry_u16(DW_AT_call_column, entry));
+        symbol.lang(lang);
+        symbol.file(self.entry_file(entry, &unit));
+        symbol.line(self.entry_line(entry));
+        symbol.col(self.entry_col(entry));
         Ok(symbol.build()?)
+    }
+
+    fn entry_string(&self, name: DwAt, entry: &Entry, unit: &Unit) -> Option<String> {
+        entry.attr_value(name).ok()?.and_then(|attr| {
+            Some(
+                self.attr_string(&unit, attr)
+                    .ok()?
+                    .to_string_lossy()
+                    .to_string(),
+            )
+        })
     }
 
     fn entry_linkage(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
@@ -152,19 +166,24 @@ impl DwarfExt for Dwarf<'_> {
             })
     }
 
-    fn entry_path(&self, name: DwAt, entry: &Entry, unit: &Unit) -> Option<PathBuf> {
-        let Some(AttrValue::FileIndex(offset)) = entry.attr_value(name).ok()? else {
+    fn entry_file(&self, entry: &Entry, unit: &Unit) -> Option<PathBuf> {
+        let Some(AttrValue::FileIndex(offset)) = [DW_AT_decl_file, DW_AT_call_file]
+            .into_iter()
+            .find_map(|name| entry.attr_value(name).ok()?)
+        else {
             return None
         };
 
         let header = unit.line_program.as_ref()?.header();
         let file = header.file(offset)?;
         let dir = match file.directory(header) {
-            Some(attr) => self
-                .attr_string(unit, attr)
-                .ok()
-                .map(|dir| dir.to_string_lossy().to_string() + "/")
-                .unwrap_or_default(),
+            Some(attr) => {
+                self.attr_string(unit, attr)
+                    .ok()?
+                    .to_string_lossy()
+                    .to_string()
+                    + "/"
+            }
             _ => String::default(),
         };
 
@@ -174,14 +193,6 @@ impl DwarfExt for Dwarf<'_> {
             .ok()
     }
 
-    fn entry_string(&self, name: DwAt, entry: &Entry, unit: &Unit) -> Option<String> {
-        entry.attr_value(name).ok().flatten().and_then(|attr| {
-            self.attr_string(&unit, attr)
-                .ok()
-                .map(|slice| slice.to_string_lossy().to_string())
-        })
-    }
-
     fn entry_lang(&self, entry: &Entry) -> Option<DwLang> {
         match entry.attr_value(DW_AT_language).ok()?? {
             AttrValue::Language(dw_lang) => Some(dw_lang),
@@ -189,12 +200,16 @@ impl DwarfExt for Dwarf<'_> {
         }
     }
 
-    fn entry_u16(&self, name: DwAt, entry: &Entry) -> Option<u16> {
-        entry
-            .attr_value(name)
-            .ok()
-            .flatten()
-            .and_then(|attr| attr.u16_value())
+    fn entry_line(&self, entry: &Entry) -> Option<u16> {
+        [DW_AT_decl_line, DW_AT_call_line]
+            .into_iter()
+            .find_map(|name| entry.attr_value(name).ok()??.u16_value())
+    }
+
+    fn entry_col(&self, entry: &Entry) -> Option<u16> {
+        [DW_AT_decl_column, DW_AT_call_column]
+            .into_iter()
+            .find_map(|name| entry.attr_value(name).ok()??.u16_value())
     }
 
     fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error> {
