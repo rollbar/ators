@@ -82,7 +82,9 @@ impl Symbolicator for Dwarf<'_> {
                                 break;
                             }
 
-                            if entry.tag() == gimli::DW_TAG_inlined_subroutine {
+                            if entry.tag() == gimli::DW_TAG_inlined_subroutine
+                                && entry.pc().is_some_and(|pc| pc.contains(&addr))
+                            {
                                 symbols.insert(
                                     0,
                                     self.symbol_from_entry(entry, &unit, &module, &lang)?,
