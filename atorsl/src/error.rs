@@ -27,6 +27,6 @@ pub enum Error {
     #[error("Address {0} overflown by offset {1}")]
     AddrOffsetOverflow(Addr, Addr),
 
-    #[error("An error occurred while building the Symbol")]
+    #[error("An error occurred while building the Symbol {0}")]
     ErrorBuildingSymbol(#[from] symbolicator::SymbolBuilderError),
 }
