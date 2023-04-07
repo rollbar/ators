@@ -8,9 +8,9 @@ use crate::{
 use derive_builder::Builder;
 use fallible_iterator::FallibleIterator;
 use gimli::{
-    DW_AT_abstract_origin, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line, DW_AT_decl_column,
-    DW_AT_decl_file, DW_AT_decl_line, DW_AT_language, DW_AT_linkage_name, DW_AT_name,
-    DebugInfoOffset, DwAt, DwLang,
+    DW_AT_abstract_origin, DW_AT_artificial, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line,
+    DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_language, DW_AT_linkage_name,
+    DW_AT_name, DebugInfoOffset, DwAt, DwLang,
 };
 use std::path::PathBuf;
 
@@ -110,6 +110,7 @@ trait DwarfExt {
     fn entry_line(&self, entry: &Entry) -> Option<u16>;
     fn entry_col(&self, entry: &Entry) -> Option<u16>;
     fn entry_lang(&self, entry: &Entry) -> Option<DwLang>;
+    fn entry_is_artificial(&self, entry: &Entry) -> Option<bool>;
 
     fn symbol_from_entry(
         &self,
@@ -136,9 +137,15 @@ impl DwarfExt for Dwarf<'_> {
         symbol.linkage(swift::demangle(&linkage).unwrap_or(linkage));
         symbol.module(module.clone());
         symbol.lang(lang);
-        symbol.file(self.entry_file(entry, &unit));
-        symbol.line(self.entry_line(entry));
-        symbol.col(self.entry_col(entry));
+        if let Some(true) = self.entry_is_artificial(entry) {
+            symbol.file(Some(PathBuf::from("<compile-generated>")));
+            symbol.line(None);
+            symbol.col(None);
+        } else {
+            symbol.file(self.entry_file(entry, &unit));
+            symbol.line(self.entry_line(entry));
+            symbol.col(self.entry_col(entry));
+        }
         Ok(symbol.build()?)
     }
 
@@ -212,6 +219,14 @@ impl DwarfExt for Dwarf<'_> {
         [DW_AT_decl_column, DW_AT_call_column]
             .into_iter()
             .find_map(|name| entry.attr_value(name).ok()??.u16_value())
+    }
+
+    /// Whether the entry is compiler generated
+    fn entry_is_artificial(&self, entry: &Entry) -> Option<bool> {
+        match entry.attr_value(DW_AT_artificial).ok()?? {
+            AttrValue::Flag(is_artificial) => Some(is_artificial),
+            _ => None,
+        }
     }
 
     fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error> {
