@@ -8,10 +8,10 @@ use derive_builder::Builder;
 use fallible_iterator::FallibleIterator;
 use gimli::{
     DW_AT_abstract_origin, DW_AT_artificial, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line,
-    DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_language, DW_AT_linkage_name,
-    DW_AT_name, DebugInfoOffset, DwAt, DwLang,
+    DW_AT_comp_dir, DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_language,
+    DW_AT_linkage_name, DW_AT_name, DebugInfoOffset, DwAt, DwLang,
 };
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Builder)]
 pub struct Symbol {
@@ -42,6 +42,7 @@ impl Symbolicator for Dwarf<'_> {
             .ok_or(Error::AddrOffsetOverflow(*addr, *base))?;
 
         let mut module = String::default();
+        let mut comp_dir = PathBuf::default();
         let mut lang = DwLang(0);
 
         let unit = self.unit_from_addr(&addr)?;
@@ -55,6 +56,10 @@ impl Symbolicator for Dwarf<'_> {
             match entry.tag() {
                 gimli::DW_TAG_compile_unit => {
                     lang = self.entry_lang(entry).unwrap_or(DwLang(0));
+                    comp_dir = self
+                        .entry_string(DW_AT_comp_dir, entry, &unit)
+                        .map(PathBuf::from)
+                        .unwrap_or_default();
                 }
                 gimli::DW_TAG_module => {
                     module = self
@@ -66,7 +71,7 @@ impl Symbolicator for Dwarf<'_> {
                         continue;
                     }
 
-                    symbols.push(self.symbol_from_entry(entry, &unit, &module, &lang)?);
+                    symbols.push(self.symbol_from_entry(entry, &unit, &module, &comp_dir, &lang)?);
 
                     if include_inlined && entry.has_children() {
                         let mut depth = 0;
@@ -86,7 +91,9 @@ impl Symbolicator for Dwarf<'_> {
                             {
                                 symbols.insert(
                                     0,
-                                    self.symbol_from_entry(entry, &unit, &module, &lang)?,
+                                    self.symbol_from_entry(
+                                        entry, &unit, &module, &comp_dir, &lang,
+                                    )?,
                                 );
                             }
                         }
@@ -116,6 +123,7 @@ trait DwarfExt {
         entry: &Entry,
         unit: &Unit,
         module: &String,
+        comp_dir: &Path,
         lang: &DwLang,
     ) -> Result<Symbol, Error>;
 
@@ -129,16 +137,17 @@ impl DwarfExt for Dwarf<'_> {
         entry: &Entry,
         unit: &Unit,
         module: &String,
+        comp_dir: &Path,
         lang: &DwLang,
     ) -> Result<Symbol, Error> {
         let mut symbol = SymbolBuilder::default();
         let linkage = self.entry_linkage(entry, &unit)?;
         symbol.linkage(demangler::demangle(&linkage).to_owned());
         symbol.module(module.clone());
-        symbol.lang(lang);
+        symbol.lang(*lang);
         if let Some(true) = self.entry_is_artificial(entry) {
-            symbol.file(Some(PathBuf::from("<compile-generated>")));
-            symbol.line(None);
+            symbol.file(Some(comp_dir.join("<compile-generated>")));
+            symbol.line(Some(0));
             symbol.col(None);
         } else {
             symbol.file(self.entry_file(entry, &unit));
