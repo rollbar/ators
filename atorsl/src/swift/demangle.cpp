@@ -9,7 +9,7 @@ static DemangleOptions DemanglerOptions() {
     opts.QualifyEntities = true;
     opts.PrintForTypeName = false;
 
-    opts.DisplayModuleNames = true;
+    opts.DisplayModuleNames = false;
     opts.DisplayStdlibModule = false;
     opts.DisplayObjCModule = false;
     opts.DisplayDebuggerGeneratedModule = true;
