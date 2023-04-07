@@ -180,7 +180,7 @@ impl DwarfExt for Dwarf<'_> {
         [DW_AT_linkage_name, DW_AT_abstract_origin, DW_AT_name]
             .into_iter()
             .find_map(|dw_at| entry.attr_value(dw_at).ok().flatten())
-            .ok_or(Error::EntryHasNoSymbol)
+            .ok_or(Error::EntryInAddrNotSymbol)
             .and_then(|attr| match attr {
                 AttrValue::UnitRef(offset) => self.entry_linkage(&unit.entry(offset)?, &unit),
                 attr @ _ => Ok(self

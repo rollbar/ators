@@ -19,8 +19,8 @@ pub enum Error {
     #[error("Address not found: {0}")]
     AddrNotFound(Addr),
 
-    #[error("Address has no a symbols")]
-    EntryHasNoSymbol,
+    #[error("Address found but has no a symbols")]
+    EntryInAddrNotSymbol,
 
     #[error("No debug offset in address: {0}")]
     AddrNoDebugOffset(Addr),

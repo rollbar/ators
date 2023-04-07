@@ -3,29 +3,27 @@
 mod cli;
 mod context;
 
+use anyhow::Result;
 use atorsl::{ext::object::File, *};
 use context::{Context, Loc};
 use itertools::Itertools;
 
-fn format(symbol: Symbol, show_full_path: bool) -> String {
+fn format(symbol: &Symbol, show_full_path: bool) -> String {
     format!(
-        "{} (in {}) ({}{}{})",
+        "{} (in {}) ({}:{}{})",
         symbol.linkage,
         symbol.module,
-        symbol
-            .file
-            .and_then(|file| {
-                if show_full_path {
-                    Some(file.display().to_string())
-                } else {
-                    Some(file.file_name()?.to_string_lossy().to_string())
-                }
-            })
-            .unwrap_or_default(),
-        symbol
-            .line
-            .map(|l| format!(":{}", l))
-            .unwrap_or_default(),
+        if show_full_path {
+            symbol.file.display().to_string()
+        } else {
+            symbol
+                .file
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string()
+        },
+        symbol.line,
         symbol
             .col
             .map(|l| format!(":{}", l))
@@ -43,21 +41,22 @@ fn symbolicate<S: Symbolicator>(symbolicator: &S, vmaddr: &Addr, ctx: &Context) 
     ctx.addrs
         .iter()
         .map(|addr| {
-            symbolicator
-                .atos(*addr, &base_addr, ctx.include_inlined)
-                .map(|symbols| {
-                    symbols
-                        .into_iter()
-                        .map(|symbol| format(symbol, ctx.show_full_path))
-                        .join("\n")
-                })
-                .unwrap_or(addr.to_string())
+            Ok(symbolicator
+                .atos(*addr, &base_addr, ctx.include_inlined)?
+                .iter()
+                .map(|symbol| format(symbol, ctx.show_full_path))
+                .join("\n"))
+        })
+        .map(|symbol| match symbol {
+            Ok(symbol) => symbol.to_owned(),
+            Err(Error::AddrNotFound(addr)) => addr.to_string(),
+            Err(err) => err.to_string(),
         })
         .intersperse(ctx.delimiter.to_string())
         .collect()
 }
 
-fn main() -> anyhow::Result<()> {
+fn main() -> Result<()> {
     let (mmap, cow);
 
     let args = cli::build().get_matches();
