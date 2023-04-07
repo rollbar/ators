@@ -18,8 +18,8 @@ pub struct Symbol {
 
     pub lang: gimli::DwLang,
 
-    pub file: Option<PathBuf>,
-    pub line: Option<u16>,
+    pub file: PathBuf,
+    pub line: u16,
     pub col: Option<u16>,
 }
 
@@ -138,20 +138,30 @@ impl DwarfExt for Dwarf<'_> {
         comp_dir: &Path,
         lang: &DwLang,
     ) -> Result<Symbol, Error> {
-        let mut symbol = SymbolBuilder::default();
         let linkage = self.entry_linkage(entry, &unit)?;
-        symbol.linkage(demangler::demangle(&linkage).to_owned());
-        symbol.module(module.clone());
-        symbol.lang(*lang);
-        if let Some(true) = self.entry_is_artificial(entry) {
-            symbol.file(Some(comp_dir.join("<compile-generated>")));
-            symbol.line(Some(0));
-            symbol.col(None);
-        } else {
-            symbol.file(self.entry_file(entry, &unit));
-            symbol.line(self.entry_line(entry));
-            symbol.col(self.entry_col(entry));
+        let mut symbol = SymbolBuilder::default();
+        symbol
+            .linkage(demangler::demangle(&linkage).to_owned())
+            .module(module.clone())
+            .lang(*lang);
+
+        let file = self.entry_file(entry, &unit);
+        let artificial = self.entry_is_artificial(entry);
+        match (file, artificial) {
+            (None, _) | (_, Some(true)) => {
+                symbol
+                    .file(comp_dir.join("<compile-generated>"))
+                    .line(u16::default())
+                    .col(None);
+            }
+            (Some(file), _) => {
+                symbol
+                    .file(file)
+                    .line(self.entry_line(entry).unwrap_or_default())
+                    .col(self.entry_col(entry));
+            }
         }
+
         Ok(symbol.build()?)
     }
 
