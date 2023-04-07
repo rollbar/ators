@@ -54,10 +54,7 @@ impl Symbolicator for Dwarf<'_> {
             // guarantee: depth order compile_unit > module > subprogram > inlined_subroutine
             match entry.tag() {
                 gimli::DW_TAG_compile_unit => {
-                    lang = DwLang(
-                        self.entry_u16(DW_AT_language, entry)
-                            .unwrap_or_default(),
-                    );
+                    lang = self.entry_lang(entry).unwrap_or(DwLang(0));
                 }
                 gimli::DW_TAG_module => {
                     module = self
@@ -183,6 +180,13 @@ impl DwarfExt for Dwarf<'_> {
                 .ok()
                 .map(|slice| slice.to_string_lossy().to_string())
         })
+    }
+
+    fn entry_lang(&self, entry: &Entry) -> Option<DwLang> {
+        match entry.attr_value(DW_AT_language).ok()?? {
+            AttrValue::Language(dw_lang) => Some(dw_lang),
+            _ => None,
+        }
     }
 
     fn entry_u16(&self, name: DwAt, entry: &Entry) -> Option<u16> {
