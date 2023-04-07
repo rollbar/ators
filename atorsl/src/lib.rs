@@ -11,7 +11,7 @@ pub use error::Error;
 pub use symbolicator::{Symbol, Symbolicator};
 
 pub(crate) mod prelude;
-pub(crate) use prelude::IsSomeAnd;
+pub(crate) use prelude::{IsOkAnd, IsSomeAnd};
 
 /// Loads a binary image file.
 ///
