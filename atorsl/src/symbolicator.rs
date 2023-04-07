@@ -1,5 +1,3 @@
-#![allow(unstable_name_collisions)]
-
 use crate::{
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
     *,

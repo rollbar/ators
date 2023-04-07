@@ -1,3 +1,5 @@
+#![allow(unstable_name_collisions)]
+
 pub mod addr;
 pub mod demangler;
 pub mod error;
