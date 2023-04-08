@@ -25,13 +25,16 @@ pub enum Loc {
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Context<'ctx> {
     /// The full path to either a binary image, eg. the DWARF file, or a .dSYM.
-    pub path: &'ctx Path,
+    pub obj_path: &'ctx Path,
 
     /// The location address of the binary image containing the addresses to symbolicate.
     pub loc: &'ctx Loc,
 
     /// The addresses to symbolicate.
-    pub addrs: Vec<&'ctx Addr>,
+    pub addrs: Option<Vec<Addr>>,
+
+    /// Input file with white-separated numeric addresses.
+    pub input_addr_file: Option<&'ctx Path>,
 
     /// The particular architecure of a binary image file in which to look up symbols.
     pub arch: Option<&'ctx str>,
@@ -49,7 +52,7 @@ pub struct Context<'ctx> {
 impl<'a> Context<'a> {
     pub fn from_args(args: &'a clap::ArgMatches) -> Result<Self> {
         Ok(Self {
-            path: args
+            obj_path: args
                 .get_one::<PathBuf>(&cli::Opt::Object.to_string())
                 .context("No binary image path")?,
 
@@ -60,8 +63,11 @@ impl<'a> Context<'a> {
 
             addrs: args
                 .get_many(&cli::Opt::Addr.to_string())
-                .context("No address to symbolicate")?
-                .collect(),
+                .map(|addrs| addrs.copied().collect()),
+
+            input_addr_file: args
+                .get_one::<PathBuf>(&cli::Opt::AddrFile.to_string())
+                .map(|file| file.as_path()),
 
             arch: args
                 .get_one(&cli::Opt::Arch.to_string())

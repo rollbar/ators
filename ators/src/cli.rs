@@ -12,6 +12,7 @@ pub enum Opt {
     SlideAddr,
     Offset,
     Addr,
+    AddrFile,
     Arch,
     Inline,
     Delimiter,
@@ -43,14 +44,16 @@ pub fn build() -> Command {
         .before_help(TITLE)
         .arg_required_else_help(true)
         .args([
-            Arg::new(Opt::Object).short('o')
+            Arg::new(Opt::Object)
+                .short('o')
                 .help_heading("Arguments")
                 .help("The path to a binary image or dSYM in which to look up symbols")
                 .required(true)
                 .value_hint(ValueHint::FilePath)
                 .value_name("binary|dSYM")
                 .value_parser(value_parser!(PathBuf)),
-            Arg::new(Opt::LoadAddr).short('l')
+            Arg::new(Opt::LoadAddr)
+                .short('l')
                 .help_heading("Arguments")
                 .help("The load address of the binary image")
                 .group("loc")
@@ -62,7 +65,8 @@ pub fn build() -> Command {
                     in a binary image with that load address.  Load addresses for binary images\n\
                     can be found in the \"Binary Images:\" section at the bottom of crash,\n\
                     sample, leaks, and malloc_history reports."),
-            Arg::new(Opt::SlideAddr).short('s')
+            Arg::new(Opt::SlideAddr)
+                .short('s')
                 .help_heading("Arguments")
                 .help("The slide value of the binary image")
                 .group("loc")
@@ -74,18 +78,33 @@ pub fn build() -> Command {
                     was built.  This slide value is subtracted from the input addresses.  It is\n\
                     usually easier to directly specify the load address with the -l argument\n\
                     than to manually calculate a slide value."),
-            Arg::new(Opt::Addr).last(true)
+            Arg::new(Opt::AddrFile)
+                .short('f')
+                .help_heading("Arguments")
+                .help("Input file with white-separated numeric addresses.")
+                .group("input")
+                .value_hint(ValueHint::FilePath)
+                .value_name("address-input-file")
+                .value_parser(value_parser!(PathBuf))
+                .long_help(
+                    "Use this argument to specify the path of an input file containing\n\
+                    whitespace-separated numeric addresses."),
+            Arg::new(Opt::Addr)
+                .last(true)
                 .help_heading("Arguments")
                 .help("\tA list of input addresses at the end of the argument list.")
+                .group("input")
                 .action(ArgAction::Append)
                 .required(true)
                 .num_args(1..)
-                .value_name("address")
-                .value_parser(str::parse::<atorsl::Addr>)
-        ])
+                .value_name("address...")
+                .value_parser(str::parse::<atorsl::Addr>),
+            ])
         .group(ArgGroup::new("loc").required(true))
+        .group(ArgGroup::new("input").required(true))
         .args([
-            Arg::new(Opt::Arch).long("arch")
+            Arg::new(Opt::Arch)
+                .long("arch")
                 .help("The architecure of a binary image in which to look up symbols")
                 .value_name("architecture")
                 .value_parser(value_parser!(String))
@@ -99,15 +118,19 @@ pub fn build() -> Command {
                     (such as i386 or arm) and pass in a corresponding symbol-rich Mach-O binary\n\
                     image file with a binary image of the corresponding architecture (such as a\n\
                     Universal Binary)."),
-            Arg::new(Opt::Delimiter).short('d')
+            Arg::new(Opt::Delimiter)
+                .short('d')
                 .help("Delimiter when outputting inline frames. Defaults to newline.")
                 .value_name("delimiter")
                 .value_parser(value_parser!(String))
                 .default_value("\n"),
-            Arg::new(Opt::Inline).short('i').long("inlineFrames")
+            Arg::new(Opt::Inline)
+                .short('i')
+                .long("inlineFrames")
                 .help("Display inlined symbols")
                 .action(ArgAction::SetTrue),
-            Arg::new(Opt::FullPath).long("fullPath")
+            Arg::new(Opt::FullPath)
+                .long("fullPath")
                 .help("Print the full path of the source files")
                 .action(ArgAction::SetTrue),
         ])
