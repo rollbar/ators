@@ -74,14 +74,6 @@ pub fn build() -> Command {
                     was built.  This slide value is subtracted from the input addresses.  It is\n\
                     usually easier to directly specify the load address with the -l argument\n\
                     than to manually calculate a slide value."),
-            Arg::new(Opt::Offset).long("offset")
-                .help_heading("Arguments")
-                .help("Treat all given addresses as offsets into the binary")
-                .group("loc")
-                .action(ArgAction::SetTrue)
-                .long_help(
-                    "Treat all given addresses as offsets into the binary.  Only one of the\n\
-                    following options can be used at a time: -s , -l or -offset."),
             Arg::new(Opt::Addr).last(true)
                 .help_heading("Arguments")
                 .help("\tA list of input addresses at the end of the argument list.")

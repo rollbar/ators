@@ -29,9 +29,8 @@ fn format(symbol: &Symbol, show_full_path: bool) -> String {
 
 fn symbolicate<S: Symbolicator>(symbolicator: &S, vmaddr: &Addr, ctx: &Context) -> Vec<String> {
     let base_addr = match ctx.loc {
-        Loc::Load(addr) => addr - vmaddr,
-        Loc::Slide(addr) => *addr,
-        Loc::Offset => Addr::nil(),
+        Loc::Load(load_addr) => load_addr - vmaddr,
+        Loc::Slide(slide_addr) => *slide_addr,
     };
 
     ctx.addrs

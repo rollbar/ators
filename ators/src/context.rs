@@ -19,9 +19,6 @@ pub enum Loc {
     ///
     /// This slide value is subtracted from the input addresses.
     Slide(Addr),
-
-    /// Treat all given addresses as offsets into the binary.
-    Offset,
 }
 
 /// The program's context, defines its behavior.
