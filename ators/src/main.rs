@@ -10,7 +10,7 @@ use itertools::Itertools;
 
 fn format(symbol: &Symbol, show_full_path: bool) -> String {
     format!(
-        "{} (in {}) ({}:{}{})",
+        "{} (in {}) ({}:{})",
         symbol.linkage,
         symbol.module,
         if show_full_path {
@@ -24,10 +24,6 @@ fn format(symbol: &Symbol, show_full_path: bool) -> String {
                 .to_string()
         },
         symbol.line,
-        symbol
-            .col
-            .map(|l| format!(":{}", l))
-            .unwrap_or_default(),
     )
 }
 
