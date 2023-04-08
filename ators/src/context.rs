@@ -28,7 +28,7 @@ pub struct Context<'ctx> {
     pub obj_path: &'ctx Path,
 
     /// The location address of the binary image containing the addresses to symbolicate.
-    pub loc: &'ctx Loc,
+    pub base_addr: &'ctx Loc,
 
     /// The addresses to symbolicate.
     pub addrs: Option<Vec<Addr>>,
@@ -56,7 +56,7 @@ impl<'a> Context<'a> {
                 .get_one::<PathBuf>(&cli::Opt::Object.to_string())
                 .context("No binary image path")?,
 
-            loc: [cli::Opt::LoadAddr, cli::Opt::SlideAddr, cli::Opt::Offset]
+            base_addr: [cli::Opt::LoadAddr, cli::Opt::SlideAddr, cli::Opt::Offset]
                 .into_iter()
                 .find_map(|opt| args.get_one(&opt.to_string()))
                 .context("No location address")?,

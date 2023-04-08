@@ -7,11 +7,7 @@ use anyhow::{Context as _, Result};
 use atorsl::{data::*, ext::object::File, *};
 use context::{Context, Loc};
 use itertools::{Either, Itertools};
-use std::{
-    fs,
-    io::{BufRead, BufReader},
-    path::Path,
-};
+use std::{fs, io, io::BufRead, path::Path};
 
 fn main() -> Result<()> {
     let (mmap, cow);
@@ -22,7 +18,9 @@ fn main() -> Result<()> {
     let obj = load_object!(ctx.obj_path, mmap)?;
     let dwarf = load_dwarf!(&obj, cow);
 
-    symbolicate(&dwarf, &obj, &obj.vmaddr()?, &ctx)?
+    let addrs = compute_addrs(&obj, &ctx)?;
+
+    symbolicate(&dwarf, &obj, addrs, &ctx)?
         .iter()
         .for_each(|symbol| println!("{symbol}"));
 
@@ -31,36 +29,24 @@ fn main() -> Result<()> {
 
 fn symbolicate(
     dwarf: &Dwarf,
-    object: &object::File,
-    vmaddr: &Addr,
+    obj: &object::File,
+    addrs: Vec<Addr>,
     ctx: &Context,
 ) -> Result<Vec<String>> {
-    let base_addr = match ctx.loc {
-        Loc::Load(load_addr) => load_addr - vmaddr,
-        Loc::Slide(slide_addr) => *slide_addr,
-    };
-
-    let addrs = if let Some(file) = ctx.input_addr_file {
-        addrs_from_file(file)?
-    } else {
-        ctx.addrs.clone().context("No input address")?
-    };
-
     Ok(addrs
-        .iter()
-        .map(
-            |addr| match atos_dwarf(dwarf, addr, &base_addr, ctx.include_inlined) {
-                Err(Error::AddrNotFound(addr)) => Ok(atos_obj(object, &addr, &base_addr)?),
-                result @ _ => result,
-            },
-        )
-        .map(|result_of_symbol_with_inlines| {
-            Ok(result_of_symbol_with_inlines?
+        .into_iter()
+        .map(|addr| {
+            let symbols = match atos_dwarf(dwarf, addr, ctx.include_inlined) {
+                Err(Error::AddrNotFound(addr)) => atos_obj(obj, addr)?,
+                symbols @ _ => symbols?,
+            };
+
+            Ok(symbols
                 .iter()
                 .map(|symbol| format(symbol, ctx))
                 .join("\n"))
         })
-        .map(|result_of_symbol| match result_of_symbol {
+        .map(|symbol| match symbol {
             Ok(symbol) => symbol,
             Err(Error::AddrNotFound(addr)) => addr.to_string(),
             Err(err) => err.to_string(),
@@ -77,14 +63,9 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
                 symbol.linkage,
                 symbol.module,
                 if ctx.show_full_path {
-                    source_loc.file.display().to_string()
+                    source_loc.file.to_string_lossy().to_string()
                 } else {
-                    source_loc
-                        .file
-                        .file_name()
-                        .unwrap_or_default()
-                        .to_string_lossy()
-                        .to_string()
+                    source_loc.file.lossy_file_name()
                 },
                 source_loc.line,
             )
@@ -93,21 +74,41 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
             format!(
                 "{} (in {}) + {}",
                 symbol.linkage,
-                ctx.obj_path
-                    .file_name()
-                    .unwrap_or_default()
-                    .to_string_lossy()
-                    .to_string(),
+                ctx.obj_path.lossy_file_name(),
                 **offset
             )
         }
     }
 }
 
-fn addrs_from_file(file: &Path) -> Result<Vec<Addr>> {
-    Ok(fs::File::open(file)
-        .map(BufReader::new)?
-        .split(b' ')
-        .flat_map(|buf| Result::<Addr>::Ok(buf?.try_into()?))
-        .collect())
+fn compute_addrs(obj: &object::File, ctx: &Context) -> Result<Vec<Addr>> {
+    let addrs = if let Some(file) = ctx.input_addr_file {
+        fs::File::open(file)
+            .map(io::BufReader::new)?
+            .split(b' ')
+            .flat_map(|buf| Result::<Addr>::Ok(buf?.try_into()?))
+            .collect()
+    } else {
+        ctx.addrs.clone().context("No input address")?
+    };
+
+    let base_addr = match ctx.base_addr {
+        Loc::Load(load_addr) => load_addr - obj.vmaddr()?,
+        Loc::Slide(slide_addr) => *slide_addr,
+    };
+
+    Ok(addrs.iter().map(|addr| addr - base_addr).collect())
+}
+
+trait LossyFileName {
+    fn lossy_file_name(&self) -> String;
+}
+
+impl LossyFileName for Path {
+    fn lossy_file_name(&self) -> String {
+        self.file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string()
+    }
 }

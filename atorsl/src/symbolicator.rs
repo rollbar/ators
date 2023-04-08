@@ -15,15 +15,9 @@ use std::path::{Path, PathBuf};
 
 pub fn atos_dwarf<'a>(
     dwarf: &Dwarf,
-    addr: &Addr,
-    base: &Addr,
+    addr: Addr,
     include_inlined: bool,
 ) -> Result<Vec<Symbol>, Error> {
-    let addr = addr
-        .checked_sub(**base)
-        .map(Addr::from)
-        .ok_or(Error::AddrOffsetOverflow(*addr, *base))?;
-
     let mut module = String::default();
     let mut comp_dir = PathBuf::default();
     let mut lang = DwLang(0);
@@ -109,15 +103,7 @@ pub fn atos_dwarf<'a>(
     Ok(symbols)
 }
 
-pub fn atos_obj<'a>(
-    obj: &'a object::File,
-    addr: &Addr,
-    base: &Addr,
-) -> Result<Vec<Symbol>, Error> {
-    let addr = addr
-        .checked_sub(**base)
-        .map(Addr::from)
-        .ok_or(Error::AddrOffsetOverflow(*addr, *base))?;
+pub fn atos_obj<'a>(obj: &'a object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
     let map = obj.symbol_map();
     let Some(symbol) = map.get(*addr) else {
         return Err(Error::AddrNotFound(addr))
