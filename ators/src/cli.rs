@@ -123,7 +123,7 @@ pub fn build() -> Command {
                 .help("Delimiter when outputting inline frames. Defaults to newline.")
                 .value_name("delimiter")
                 .value_parser(value_parser!(String))
-                .default_value("\n"),
+                .default_value(""),
             Arg::new(Opt::Inline)
                 .short('i')
                 .long("inlineFrames")
