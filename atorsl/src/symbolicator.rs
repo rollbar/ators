@@ -171,16 +171,18 @@ impl DwarfExt for Dwarf<'_> {
         let file = self.entry_file(entry_with_call, &unit);
         match (file, artificial) {
             (None, _) | (_, Some(true)) => {
-                symbol
-                    .file(comp_dir.join("<compile-generated>"))
-                    .line(u16::default())
-                    .col(None);
+                symbol.loc(SourceLoc {
+                    file: comp_dir.join("<compile-generated>"),
+                    line: u16::default(),
+                    col: None,
+                });
             }
             (Some(file), _) => {
-                symbol
-                    .file(file)
-                    .line(self.entry_line(entry_with_call).unwrap_or_default())
-                    .col(self.entry_col(entry_with_call));
+                symbol.loc(SourceLoc {
+                    file: file,
+                    line: self.entry_line(entry_with_call).unwrap_or_default(),
+                    col: self.entry_col(entry_with_call),
+                });
             }
         }
 

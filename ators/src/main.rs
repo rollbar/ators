@@ -19,16 +19,17 @@ fn format(symbol: &Symbol, show_full_path: bool) -> String {
         symbol.linkage,
         symbol.module,
         if show_full_path {
-            symbol.file.display().to_string()
+            symbol.loc.file.display().to_string()
         } else {
             symbol
+                .loc
                 .file
                 .file_name()
                 .unwrap_or_default()
                 .to_string_lossy()
                 .to_string()
         },
-        symbol.line,
+        symbol.loc.line,
     )
 }
 
