@@ -32,6 +32,18 @@ fn format(symbol: &Symbol, show_full_path: bool) -> String {
     )
 }
 
+fn format_offset(symbol: &str, offset: Addr, path: &Path) -> String {
+    format!(
+        "{} (in {}) + {}",
+        symbol,
+        path.file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string(),
+        *offset
+    )
+}
+
 fn addrs_from_file(file: &Path) -> Result<Vec<Addr>> {
     Ok(fs::File::open(file)
         .map(BufReader::new)?
@@ -40,8 +52,9 @@ fn addrs_from_file(file: &Path) -> Result<Vec<Addr>> {
         .collect())
 }
 
-fn symbolicate<S: Symbolicator>(
-    symbolicator: &S,
+fn symbolicate(
+    dwarf: &Dwarf,
+    object: &object::File,
     vmaddr: &Addr,
     ctx: &Context,
 ) -> Result<Vec<String>> {
@@ -65,15 +78,17 @@ fn symbolicate<S: Symbolicator>(
     Ok(addrs
         .iter()
         .map(|addr| {
-            Ok(symbolicator
-                .atos(addr, &base_addr, ctx.include_inlined)?
+            Ok(atos_dwarf(dwarf, addr, &base_addr, ctx.include_inlined)?
                 .iter()
                 .map(|symbol| format(symbol, ctx.show_full_path))
                 .join("\n"))
         })
         .map(|symbol| match symbol {
             Ok(symbol) => symbol.to_owned(),
-            Err(Error::AddrNotFound(addr)) => addr.to_string(),
+            Err(Error::AddrNotFound(addr)) => match atos_obj(object, &addr, &base_addr) {
+                Ok((symbol, offset)) => format_offset(symbol, offset, ctx.obj_path),
+                Err(err) => err.to_string(),
+            },
             Err(err) => err.to_string(),
         })
         .intersperse(ctx.delimiter.to_string())
@@ -89,7 +104,7 @@ fn main() -> Result<()> {
     let obj = load_object!(ctx.obj_path, mmap)?;
     let dwarf = load_dwarf!(&obj, cow);
 
-    symbolicate(&dwarf, &obj.vmaddr()?, &ctx)?
+    symbolicate(&dwarf, &obj, &obj.vmaddr()?, &ctx)?
         .iter()
         .for_each(|symbol| println!("{symbol}"));
 

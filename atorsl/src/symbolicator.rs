@@ -9,6 +9,7 @@ use gimli::{
     DW_AT_comp_dir, DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_language,
     DW_AT_linkage_name, DW_AT_name, DebugInfoOffset, DwAt, DwLang,
 };
+use object::Object;
 use std::path::{Path, PathBuf};
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Builder)]
@@ -23,111 +24,118 @@ pub struct Symbol {
     pub col: Option<u16>,
 }
 
-pub trait Symbolicator {
-    fn atos<'a>(
-        &self,
-        addr: &Addr,
-        base: &Addr,
-        include_inlined: bool,
-    ) -> Result<Vec<Symbol>, Error>;
-}
+pub fn atos_dwarf<'a>(
+    dwarf: &Dwarf,
+    addr: &Addr,
+    base: &Addr,
+    include_inlined: bool,
+) -> Result<Vec<Symbol>, Error> {
+    let addr = addr
+        .checked_sub(**base)
+        .map(Addr::from)
+        .ok_or(Error::AddrOffsetOverflow(*addr, *base))?;
 
-impl Symbolicator for Dwarf<'_> {
-    fn atos<'a>(
-        &self,
-        addr: &Addr,
-        base: &Addr,
-        include_inlined: bool,
-    ) -> Result<Vec<Symbol>, Error> {
-        let addr = addr
-            .checked_sub(**base)
-            .map(Addr::from)
-            .ok_or(Error::AddrOffsetOverflow(*addr, *base))?;
+    let mut module = String::default();
+    let mut comp_dir = PathBuf::default();
+    let mut lang = DwLang(0);
 
-        let mut module = String::default();
-        let mut comp_dir = PathBuf::default();
-        let mut lang = DwLang(0);
+    let unit = dwarf.unit_from_addr(&addr)?;
+    let mut entries = unit.entries();
+    let mut symbols = Vec::<Symbol>::default();
 
-        let unit = self.unit_from_addr(&addr)?;
-        let mut entries = unit.entries();
-        let mut symbols = Vec::<Symbol>::default();
+    loop {
+        let (_, entry) = entries.next_dfs()?.ok_or(Error::AddrNotFound(addr))?;
 
-        loop {
-            let (_, entry) = entries.next_dfs()?.ok_or(Error::AddrNotFound(addr))?;
-
-            // guarantee: depth order compile_unit > module > subprogram > inlined_subroutine
-            match entry.tag() {
-                gimli::DW_TAG_compile_unit => {
-                    lang = self.entry_lang(entry).unwrap_or(DwLang(0));
-                    comp_dir = self
-                        .entry_string(DW_AT_comp_dir, entry, &unit)
-                        .map(PathBuf::from)
-                        .unwrap_or_default();
+        // guarantee: depth order compile_unit > module > subprogram > inlined_subroutine
+        match entry.tag() {
+            gimli::DW_TAG_compile_unit => {
+                lang = dwarf.entry_lang(entry).unwrap_or(DwLang(0));
+                comp_dir = dwarf
+                    .entry_string(DW_AT_comp_dir, entry, &unit)
+                    .map(PathBuf::from)
+                    .unwrap_or_default();
+            }
+            gimli::DW_TAG_module => {
+                module = dwarf
+                    .entry_string(DW_AT_name, entry, &unit)
+                    .unwrap_or_default();
+            }
+            gimli::DW_TAG_subprogram => {
+                if !entry.pc().is_some_and(|pc| pc.contains(&addr)) {
+                    continue;
                 }
-                gimli::DW_TAG_module => {
-                    module = self
-                        .entry_string(DW_AT_name, entry, &unit)
-                        .unwrap_or_default();
-                }
-                gimli::DW_TAG_subprogram => {
-                    if !entry.pc().is_some_and(|pc| pc.contains(&addr)) {
-                        continue;
-                    }
 
-                    symbols.push(self.symbol(entry, None, &unit, &module, &comp_dir, &lang)?);
+                symbols.push(dwarf.symbol(entry, None, &unit, &module, &comp_dir, &lang)?);
 
-                    if include_inlined && entry.has_children() {
-                        let mut parent = None;
-                        let mut depth = 0;
+                if include_inlined && entry.has_children() {
+                    let mut parent = None;
+                    let mut depth = 0;
 
-                        let last = loop {
-                            let Some((step, entry)) = entries.next_dfs()? else {
+                    let last = loop {
+                        let Some((step, entry)) = entries.next_dfs()? else {
                                break parent;
                            };
 
-                            depth += step;
+                        depth += step;
 
-                            if depth.signum() < 1 {
-                                break parent;
-                            }
-
-                            if entry.tag() == gimli::DW_TAG_inlined_subroutine
-                                && entry.pc().is_some_and(|pc| pc.contains(&addr))
-                            {
-                                if let Some(ref parent) = parent {
-                                    symbols.insert(
-                                        0,
-                                        self.symbol(
-                                            parent,
-                                            Some(entry),
-                                            &unit,
-                                            &module,
-                                            &comp_dir,
-                                            &lang,
-                                        )?,
-                                    )
-                                }
-
-                                parent = Some(entry.clone());
-                            }
-                        };
-
-                        if let Some(last) = last {
-                            symbols.insert(
-                                0,
-                                self.symbol(&last, None, &unit, &module, &comp_dir, &lang)?,
-                            )
+                        if depth.signum() < 1 {
+                            break parent;
                         }
+
+                        if entry.tag() == gimli::DW_TAG_inlined_subroutine
+                            && entry.pc().is_some_and(|pc| pc.contains(&addr))
+                        {
+                            if let Some(ref parent) = parent {
+                                symbols.insert(
+                                    0,
+                                    dwarf.symbol(
+                                        parent,
+                                        Some(entry),
+                                        &unit,
+                                        &module,
+                                        &comp_dir,
+                                        &lang,
+                                    )?,
+                                )
+                            }
+
+                            parent = Some(entry.clone());
+                        }
+                    };
+
+                    if let Some(last) = last {
+                        symbols.insert(
+                            0,
+                            dwarf.symbol(&last, None, &unit, &module, &comp_dir, &lang)?,
+                        )
                     }
-
-                    break;
                 }
-                _ => continue,
-            }
-        }
 
-        Ok(symbols)
+                break;
+            }
+            _ => continue,
+        }
     }
+
+    Ok(symbols)
+}
+
+pub fn atos_obj<'a>(
+    obj: &'a object::File,
+    addr: &Addr,
+    base: &Addr,
+) -> Result<(&'a str, Addr), Error> {
+    let addr = addr
+        .checked_sub(**base)
+        .map(Addr::from)
+        .ok_or(Error::AddrOffsetOverflow(*addr, *base))?;
+
+    let map = obj.symbol_map();
+    let Some(symbol) = map.get(*addr) else {
+        return Err(Error::AddrNotFound(addr))
+    };
+
+    Ok((demangler::demangle(symbol.name()), addr - symbol.address()))
 }
 
 trait DwarfExt {

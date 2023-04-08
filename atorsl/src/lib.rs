@@ -8,7 +8,7 @@ pub mod symbolicator;
 
 pub use addr::Addr;
 pub use error::Error;
-pub use symbolicator::{Symbol, Symbolicator};
+pub use symbolicator::{atos_dwarf, atos_obj, Symbol};
 
 pub(crate) mod prelude;
 pub(crate) use prelude::{IsOkAnd, IsSomeAnd};
@@ -64,7 +64,7 @@ macro_rules! load_dwarf {
 }
 
 /// Commonly used DWARF sections, and other common information.
-pub(crate) type Dwarf<'input> = gimli::Dwarf<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
+pub type Dwarf<'input> = gimli::Dwarf<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
 
 /// Commonly used information for a unit in the `.debug_info` or `.debug_types` sections.
 pub(crate) type Unit<'input> =
