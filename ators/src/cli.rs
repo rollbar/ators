@@ -85,7 +85,7 @@ pub fn build() -> Command {
         ])
         .group(ArgGroup::new("loc").required(true))
         .args([
-            Arg::new(Opt::Arch).short('a').long("arch")
+            Arg::new(Opt::Arch).long("arch")
                 .help("The architecure of a binary image in which to look up symbols")
                 .value_name("architecture")
                 .value_parser(value_parser!(String))
