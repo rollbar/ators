@@ -11,7 +11,6 @@ use std::{
     fs,
     io::{BufRead, BufReader},
     path::Path,
-    str::FromStr,
 };
 
 fn format(symbol: &Symbol, show_full_path: bool) -> String {
@@ -37,7 +36,7 @@ fn addrs_from_file(file: &Path) -> Result<Vec<Addr>> {
     Ok(fs::File::open(file)
         .map(BufReader::new)?
         .split(b' ')
-        .flat_map(|buf| -> Result<Addr> { Ok(Addr::from_str(&String::from_utf8(buf?)?)?) })
+        .flat_map(|buf| Result::<Addr>::Ok(buf?.try_into()?))
         .collect())
 }
 
@@ -54,7 +53,13 @@ fn symbolicate<S: Symbolicator>(
     let addrs = if let Some(file) = ctx.input_addr_file {
         addrs_from_file(file)?
     } else {
-        ctx.addrs.clone().context("No input address")?
+        // jfc
+        ctx.addrs
+            .clone()
+            .context("No input address")?
+            .into_iter()
+            .map(|addrs| *addrs)
+            .collect()
     };
 
     Ok(addrs

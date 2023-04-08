@@ -5,6 +5,8 @@ use std::{
     str::FromStr,
 };
 
+use crate::Error;
+
 /// A 64-bit address.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Addr(u64);
@@ -52,6 +54,14 @@ where
 impl From<u64> for Addr {
     fn from(addr: u64) -> Self {
         Self(addr)
+    }
+}
+
+impl TryFrom<Vec<u8>> for Addr {
+    type Error = Error;
+
+    fn try_from(buf: Vec<u8>) -> Result<Self, Self::Error> {
+        Ok(Addr::from_str(&String::from_utf8(buf)?)?)
     }
 }
 

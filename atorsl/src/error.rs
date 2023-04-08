@@ -1,5 +1,5 @@
 use crate::{symbolicator, Addr};
-use std::{ffi, str};
+use std::{ffi, num::ParseIntError, str, string::FromUtf8Error};
 
 /// An atorsl error.
 #[derive(thiserror::Error, Debug)]
@@ -39,4 +39,10 @@ pub enum Error {
 
     #[error("Invalid UTF-8 in C string: {0}")]
     UnrepresentableString(#[from] str::Utf8Error),
+
+    #[error("Invalid UTF-8 in byte vector: {0}")]
+    UnrepresentableStringFromByteVector(#[from] FromUtf8Error),
+
+    #[error("Integer is not a valid address {0}")]
+    UnrepresentableAddress(#[from] ParseIntError),
 }
