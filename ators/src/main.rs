@@ -52,6 +52,7 @@ fn symbolicate(
             Err(err) => err.to_string(),
         })
         .intersperse(ctx.delimiter.to_string())
+        .chain([ctx.delimiter.to_string()])
         .collect())
 }
 
