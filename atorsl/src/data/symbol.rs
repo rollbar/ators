@@ -1,5 +1,6 @@
-use super::SourceLoc;
+use super::{Addr, SourceLoc};
 use derive_builder::Builder;
+use itertools::Either;
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Builder)]
 pub struct Symbol {
@@ -7,5 +8,5 @@ pub struct Symbol {
     pub linkage: String,
     pub lang: gimli::DwLang,
 
-    pub loc: SourceLoc,
+    pub loc: Either<SourceLoc, Addr>,
 }

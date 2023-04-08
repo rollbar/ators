@@ -6,51 +6,27 @@ mod context;
 use anyhow::{Context as _, Result};
 use atorsl::{data::*, ext::object::File, *};
 use context::{Context, Loc};
-use itertools::Itertools;
+use itertools::{Either, Itertools};
 use std::{
     fs,
     io::{BufRead, BufReader},
     path::Path,
 };
 
-fn format(symbol: &Symbol, show_full_path: bool) -> String {
-    format!(
-        "{} (in {}) ({}:{})",
-        symbol.linkage,
-        symbol.module,
-        if show_full_path {
-            symbol.loc.file.display().to_string()
-        } else {
-            symbol
-                .loc
-                .file
-                .file_name()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .to_string()
-        },
-        symbol.loc.line,
-    )
-}
+fn main() -> Result<()> {
+    let (mmap, cow);
 
-fn format_offset(symbol: &str, offset: Addr, path: &Path) -> String {
-    format!(
-        "{} (in {}) + {}",
-        symbol,
-        path.file_name()
-            .unwrap_or_default()
-            .to_string_lossy()
-            .to_string(),
-        *offset
-    )
-}
+    let args = cli::build().get_matches();
+    let ctx = Context::from_args(&args)?;
 
-fn addrs_from_file(file: &Path) -> Result<Vec<Addr>> {
-    Ok(fs::File::open(file)
-        .map(BufReader::new)?
-        .split(b' ')
-        .flat_map(|buf| Result::<Addr>::Ok(buf?.try_into()?))
-        .collect())
+    let obj = load_object!(ctx.obj_path, mmap)?;
+    let dwarf = load_dwarf!(&obj, cow);
+
+    symbolicate(&dwarf, &obj, &obj.vmaddr()?, &ctx)?
+        .iter()
+        .for_each(|symbol| println!("{symbol}"));
+
+    Ok(())
 }
 
 fn symbolicate(
@@ -67,52 +43,71 @@ fn symbolicate(
     let addrs = if let Some(file) = ctx.input_addr_file {
         addrs_from_file(file)?
     } else {
-        // jfc
-        ctx.addrs
-            .clone()
-            .context("No input address")?
-            .into_iter()
-            .map(|addrs| *addrs)
-            .collect()
+        ctx.addrs.clone().context("No input address")?
     };
 
     Ok(addrs
         .iter()
-        .map(|addr| {
-            Ok(atos_dwarf(dwarf, addr, &base_addr, ctx.include_inlined)?
+        .map(
+            |addr| match atos_dwarf(dwarf, addr, &base_addr, ctx.include_inlined) {
+                Err(Error::AddrNotFound(addr)) => Ok(atos_obj(object, &addr, &base_addr)?),
+                result @ _ => result,
+            },
+        )
+        .map(|result_of_symbol_with_inlines| {
+            Ok(result_of_symbol_with_inlines?
                 .iter()
-                .map(|symbol| format(symbol, ctx.show_full_path))
+                .map(|symbol| format(symbol, ctx))
                 .join("\n"))
         })
-        // .map(|symbol| {
-        //     if let Err(Error::AddrNotFound(addr)) = symbol {
-        //     } else {
-        //         symbol
-        //     })
-        .map(|symbol| match symbol {
-            Ok(symbol) => symbol.to_owned(),
-            Err(Error::AddrNotFound(addr)) => match atos_obj(object, &addr, &base_addr) {
-                Ok((symbol, offset)) => format_offset(symbol, offset, ctx.obj_path),
-                Err(err) => err.to_string(),
-            },
+        .map(|result_of_symbol| match result_of_symbol {
+            Ok(symbol) => symbol,
+            Err(Error::AddrNotFound(addr)) => addr.to_string(),
             Err(err) => err.to_string(),
         })
         .intersperse(ctx.delimiter.to_string())
         .collect())
 }
 
-fn main() -> Result<()> {
-    let (mmap, cow);
+fn format(symbol: &Symbol, ctx: &Context) -> String {
+    match symbol.loc.as_ref() {
+        Either::Left(source_loc) => {
+            format!(
+                "{} (in {}) ({}:{})",
+                symbol.linkage,
+                symbol.module,
+                if ctx.show_full_path {
+                    source_loc.file.display().to_string()
+                } else {
+                    source_loc
+                        .file
+                        .file_name()
+                        .unwrap_or_default()
+                        .to_string_lossy()
+                        .to_string()
+                },
+                source_loc.line,
+            )
+        }
+        Either::Right(offset) => {
+            format!(
+                "{} (in {}) + {}",
+                symbol.linkage,
+                ctx.obj_path
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_string(),
+                **offset
+            )
+        }
+    }
+}
 
-    let args = cli::build().get_matches();
-    let ctx = Context::from_args(&args)?;
-
-    let obj = load_object!(ctx.obj_path, mmap)?;
-    let dwarf = load_dwarf!(&obj, cow);
-
-    symbolicate(&dwarf, &obj, &obj.vmaddr()?, &ctx)?
-        .iter()
-        .for_each(|symbol| println!("{symbol}"));
-
-    Ok(())
+fn addrs_from_file(file: &Path) -> Result<Vec<Addr>> {
+    Ok(fs::File::open(file)
+        .map(BufReader::new)?
+        .split(b' ')
+        .flat_map(|buf| Result::<Addr>::Ok(buf?.try_into()?))
+        .collect())
 }

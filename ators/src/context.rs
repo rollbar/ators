@@ -31,7 +31,7 @@ pub struct Context<'ctx> {
     pub loc: &'ctx Loc,
 
     /// The addresses to symbolicate.
-    pub addrs: Option<Vec<&'ctx Addr>>,
+    pub addrs: Option<Vec<Addr>>,
 
     /// Input file with white-separated numeric addresses.
     pub input_addr_file: Option<&'ctx Path>,
@@ -63,7 +63,7 @@ impl<'a> Context<'a> {
 
             addrs: args
                 .get_many(&cli::Opt::Addr.to_string())
-                .map(|addrs| addrs.collect()),
+                .map(|addrs| addrs.copied().collect()),
 
             input_addr_file: args
                 .get_one::<PathBuf>(&cli::Opt::AddrFile.to_string())

@@ -9,6 +9,7 @@ use gimli::{
     DW_AT_comp_dir, DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_language,
     DW_AT_linkage_name, DW_AT_name, DebugInfoOffset, DwAt, DwLang,
 };
+use itertools::Either;
 use object::Object;
 use std::path::{Path, PathBuf};
 
@@ -112,18 +113,22 @@ pub fn atos_obj<'a>(
     obj: &'a object::File,
     addr: &Addr,
     base: &Addr,
-) -> Result<(&'a str, Addr), Error> {
+) -> Result<Vec<Symbol>, Error> {
     let addr = addr
         .checked_sub(**base)
         .map(Addr::from)
         .ok_or(Error::AddrOffsetOverflow(*addr, *base))?;
-
     let map = obj.symbol_map();
     let Some(symbol) = map.get(*addr) else {
         return Err(Error::AddrNotFound(addr))
     };
 
-    Ok((demangler::demangle(symbol.name()), addr - symbol.address()))
+    Ok(vec![SymbolBuilder::default()
+        .module(String::default())
+        .linkage(demangler::demangle(symbol.name()).to_string())
+        .lang(DwLang(0))
+        .loc(Either::Right(addr - symbol.address()))
+        .build()?])
 }
 
 trait DwarfExt {
@@ -140,7 +145,7 @@ trait DwarfExt {
         entry: &Entry,
         child: Option<&Entry>,
         unit: &Unit,
-        module: &String,
+        module: &str,
         comp_dir: &Path,
         lang: &DwLang,
     ) -> Result<Symbol, Error>;
@@ -155,7 +160,7 @@ impl DwarfExt for Dwarf<'_> {
         entry: &Entry,
         child: Option<&Entry>,
         unit: &Unit,
-        module: &String,
+        module: &str,
         comp_dir: &Path,
         lang: &DwLang,
     ) -> Result<Symbol, Error> {
@@ -163,7 +168,7 @@ impl DwarfExt for Dwarf<'_> {
         let mut symbol = SymbolBuilder::default();
         symbol
             .linkage(demangler::demangle(&linkage).to_owned())
-            .module(module.clone())
+            .module(module.to_string())
             .lang(*lang);
 
         let artificial = self.entry_is_artificial(entry);
@@ -171,18 +176,18 @@ impl DwarfExt for Dwarf<'_> {
         let file = self.entry_file(entry_with_call, &unit);
         match (file, artificial) {
             (None, _) | (_, Some(true)) => {
-                symbol.loc(SourceLoc {
+                symbol.loc(Either::Left(SourceLoc {
                     file: comp_dir.join("<compile-generated>"),
                     line: u16::default(),
                     col: None,
-                });
+                }));
             }
             (Some(file), _) => {
-                symbol.loc(SourceLoc {
+                symbol.loc(Either::Left(SourceLoc {
                     file: file,
                     line: self.entry_line(entry_with_call).unwrap_or_default(),
                     col: self.entry_col(entry_with_call),
-                });
+                }));
             }
         }
 
