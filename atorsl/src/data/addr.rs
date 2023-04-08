@@ -69,7 +69,7 @@ impl FromStr for Addr {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         s.parse::<u64>()
-            .or_else(|_| u64::from_str_radix(s.trim_start_matches("0x"), 16))
+            .or_else(|_| u64::from_str_radix(s.trim().trim_start_matches("0x"), 16))
             .map(Addr::from)
     }
 }
