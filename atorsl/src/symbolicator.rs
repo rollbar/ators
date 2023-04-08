@@ -24,7 +24,7 @@ pub fn atos_dwarf<'a>(
 
     let unit = dwarf.unit_from_addr(&addr)?;
     let mut entries = unit.entries();
-    let mut symbols = Vec::<Symbol>::default();
+    let mut symbols = Vec::default();
 
     loop {
         let (_, entry) = entries.next_dfs()?.ok_or(Error::AddrNotFound(addr))?;
