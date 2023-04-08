@@ -1,8 +1,8 @@
 use crate::{
+    data::*,
     ext::gimli::{ArangeEntry, DebuggingInformationEntry},
     *,
 };
-use derive_builder::Builder;
 use fallible_iterator::FallibleIterator;
 use gimli::{
     DW_AT_abstract_origin, DW_AT_artificial, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line,
@@ -11,18 +11,6 @@ use gimli::{
 };
 use object::Object;
 use std::path::{Path, PathBuf};
-
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Builder)]
-pub struct Symbol {
-    pub module: String,
-    pub linkage: String,
-
-    pub lang: gimli::DwLang,
-
-    pub file: PathBuf,
-    pub line: u16,
-    pub col: Option<u16>,
-}
 
 pub fn atos_dwarf<'a>(
     dwarf: &Dwarf,

@@ -11,7 +11,7 @@ pub fn demangle(symbol: &str) -> &str {
 }
 
 pub mod swift {
-    use crate::Error;
+    use crate::data::Error;
     use std::{
         ffi::{CStr, CString},
         os::raw::{c_char, c_int},

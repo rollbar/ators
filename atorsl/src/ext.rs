@@ -1,5 +1,5 @@
 pub mod object {
-    use crate::{Addr, Error};
+    use crate::data::{Addr, Error};
     use object::{Object, ObjectSegment};
 
     pub trait File {
@@ -20,7 +20,7 @@ pub mod object {
 }
 
 pub(crate) mod gimli {
-    use crate::Addr;
+    use crate::data::Addr;
     use gimli::{AttributeValue, EndianSlice, RunTimeEndian};
     use std::ops::Range;
 

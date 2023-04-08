@@ -1,14 +1,11 @@
 #![allow(unstable_name_collisions)]
 
-pub mod addr;
+pub mod data;
 pub mod demangler;
-pub mod error;
 pub mod ext;
 pub mod symbolicator;
 
-pub use addr::Addr;
-pub use error::Error;
-pub use symbolicator::{atos_dwarf, atos_obj, Symbol};
+pub use symbolicator::{atos_dwarf, atos_obj};
 
 pub(crate) mod prelude;
 pub(crate) use prelude::{IsOkAnd, IsSomeAnd};
@@ -32,7 +29,7 @@ macro_rules! load_object {
         // permissions, locks or process-private (e.g. unlinked) files exist but are platform
         // specific and limited.
         $binding = unsafe { memmap2::Mmap::map(&std::fs::File::open(&$path)?) }?;
-        Result::<object::File, atorsl::Error>::Ok(object::File::parse(&*$binding)?)
+        Result::<object::File, atorsl::data::Error>::Ok(object::File::parse(&*$binding)?)
     }};
 }
 

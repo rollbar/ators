@@ -98,7 +98,7 @@ pub fn build() -> Command {
                 .required(true)
                 .num_args(1..)
                 .value_name("address...")
-                .value_parser(str::parse::<atorsl::Addr>),
+                .value_parser(str::parse::<atorsl::data::Addr>),
             ])
         .group(ArgGroup::new("loc").required(true))
         .group(ArgGroup::new("input").required(true))

@@ -4,7 +4,7 @@ mod cli;
 mod context;
 
 use anyhow::{Context as _, Result};
-use atorsl::{ext::object::File, *};
+use atorsl::{data::*, ext::object::File, *};
 use context::{Context, Loc};
 use itertools::Itertools;
 use std::{
@@ -83,6 +83,11 @@ fn symbolicate(
                 .map(|symbol| format(symbol, ctx.show_full_path))
                 .join("\n"))
         })
+        // .map(|symbol| {
+        //     if let Err(Error::AddrNotFound(addr)) = symbol {
+        //     } else {
+        //         symbol
+        //     })
         .map(|symbol| match symbol {
             Ok(symbol) => symbol.to_owned(),
             Err(Error::AddrNotFound(addr)) => match atos_obj(object, &addr, &base_addr) {

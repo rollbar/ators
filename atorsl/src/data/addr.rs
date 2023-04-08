@@ -1,11 +1,10 @@
+use super::Error;
 use std::{
     cmp::Ordering,
     fmt,
     ops::{Deref, DerefMut},
     str::FromStr,
 };
-
-use crate::Error;
 
 /// A 64-bit address.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
