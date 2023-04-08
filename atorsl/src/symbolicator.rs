@@ -51,29 +51,29 @@ pub fn atos_dwarf<'a>(
                 symbols.push(dwarf.symbol(entry, None, &unit, &module, &comp_dir, &lang)?);
 
                 if include_inlined && entry.has_children() {
-                    let mut parent = None;
+                    let mut parent_entry = None;
                     let mut depth = 0;
 
-                    let last = loop {
-                        let Some((step, entry)) = entries.next_dfs()? else {
-                               break parent;
-                           };
+                    let last_child = loop {
+                        let Some((step, child_entry)) = entries.next_dfs()? else {
+                            break parent_entry;
+                        };
 
                         depth += step;
 
-                        if depth.signum() < 1 {
-                            break parent;
+                        if depth == 0 {
+                            break parent_entry;
                         }
 
-                        if entry.tag() == gimli::DW_TAG_inlined_subroutine
-                            && entry.pc().is_some_and(|pc| pc.contains(&addr))
+                        if child_entry.tag() == gimli::DW_TAG_inlined_subroutine
+                            && child_entry.pc().is_some_and(|pc| pc.contains(&addr))
                         {
-                            if let Some(ref parent) = parent {
+                            if let Some(ref parent_entry) = parent_entry {
                                 symbols.insert(
                                     0,
                                     dwarf.symbol(
-                                        parent,
-                                        Some(entry),
+                                        parent_entry,
+                                        Some(child_entry),
                                         &unit,
                                         &module,
                                         &comp_dir,
@@ -82,14 +82,14 @@ pub fn atos_dwarf<'a>(
                                 )
                             }
 
-                            parent = Some(entry.clone());
+                            parent_entry = Some(child_entry.clone());
                         }
                     };
 
-                    if let Some(last) = last {
+                    if let Some(last_child) = last_child {
                         symbols.insert(
                             0,
-                            dwarf.symbol(&last, None, &unit, &module, &comp_dir, &lang)?,
+                            dwarf.symbol(&last_child, None, &unit, &module, &comp_dir, &lang)?,
                         )
                     }
                 }
