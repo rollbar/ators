@@ -33,7 +33,12 @@ pub trait Symbolicator {
 }
 
 impl Symbolicator for Dwarf<'_> {
-    fn atos(&self, addr: &Addr, base: &Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error> {
+    fn atos<'a>(
+        &self,
+        addr: &Addr,
+        base: &Addr,
+        include_inlined: bool,
+    ) -> Result<Vec<Symbol>, Error> {
         let addr = addr
             .checked_sub(**base)
             .map(Addr::from)
@@ -69,31 +74,49 @@ impl Symbolicator for Dwarf<'_> {
                         continue;
                     }
 
-                    symbols.push(self.symbol_from_entry(entry, &unit, &module, &comp_dir, &lang)?);
+                    symbols.push(self.symbol(entry, None, &unit, &module, &comp_dir, &lang)?);
 
                     if include_inlined && entry.has_children() {
+                        let mut parent = None;
                         let mut depth = 0;
-                        loop {
+
+                        let last = loop {
                             let Some((step, entry)) = entries.next_dfs()? else {
-                                break
-                            };
+                               break parent;
+                           };
 
                             depth += step;
 
                             if depth.signum() < 1 {
-                                break;
+                                break parent;
                             }
 
                             if entry.tag() == gimli::DW_TAG_inlined_subroutine
                                 && entry.pc().is_some_and(|pc| pc.contains(&addr))
                             {
-                                symbols.insert(
-                                    0,
-                                    self.symbol_from_entry(
-                                        entry, &unit, &module, &comp_dir, &lang,
-                                    )?,
-                                );
+                                if let Some(ref parent) = parent {
+                                    symbols.insert(
+                                        0,
+                                        self.symbol(
+                                            parent,
+                                            Some(entry),
+                                            &unit,
+                                            &module,
+                                            &comp_dir,
+                                            &lang,
+                                        )?,
+                                    )
+                                }
+
+                                parent = Some(entry.clone());
                             }
+                        };
+
+                        if let Some(last) = last {
+                            symbols.insert(
+                                0,
+                                self.symbol(&last, None, &unit, &module, &comp_dir, &lang)?,
+                            )
                         }
                     }
 
@@ -116,9 +139,10 @@ trait DwarfExt {
     fn entry_lang(&self, entry: &Entry) -> Option<DwLang>;
     fn entry_is_artificial(&self, entry: &Entry) -> Option<bool>;
 
-    fn symbol_from_entry(
+    fn symbol(
         &self,
         entry: &Entry,
+        child: Option<&Entry>,
         unit: &Unit,
         module: &String,
         comp_dir: &Path,
@@ -130,9 +154,10 @@ trait DwarfExt {
 }
 
 impl DwarfExt for Dwarf<'_> {
-    fn symbol_from_entry(
+    fn symbol(
         &self,
         entry: &Entry,
+        child: Option<&Entry>,
         unit: &Unit,
         module: &String,
         comp_dir: &Path,
@@ -145,8 +170,9 @@ impl DwarfExt for Dwarf<'_> {
             .module(module.clone())
             .lang(*lang);
 
-        let file = self.entry_file(entry, &unit);
         let artificial = self.entry_is_artificial(entry);
+        let entry_with_call = child.unwrap_or(entry);
+        let file = self.entry_file(entry_with_call, &unit);
         match (file, artificial) {
             (None, _) | (_, Some(true)) => {
                 symbol
@@ -157,8 +183,8 @@ impl DwarfExt for Dwarf<'_> {
             (Some(file), _) => {
                 symbol
                     .file(file)
-                    .line(self.entry_line(entry).unwrap_or_default())
-                    .col(self.entry_col(entry));
+                    .line(self.entry_line(entry_with_call).unwrap_or_default())
+                    .col(self.entry_col(entry_with_call));
             }
         }
 
