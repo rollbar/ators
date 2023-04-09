@@ -13,6 +13,5 @@ Cargo.lock
 # Used by macOS' file system to track custom attributes of containing folder
 .DS_Store
 
-/.vscode
+# Some internal fixtures that are too big for version control such as dwarfdump dumps
 /fixtures/rollbar**
-/log

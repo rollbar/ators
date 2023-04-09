@@ -13,7 +13,7 @@ COPY atorsl/Cargo.toml ./atorsl/
 COPY atorsl/build.rs ./atorsl
 COPY atorsl/src ./atorsl/src
 
-COPY fixtures/iosAppSwift.app.dSYM/Contents/Resources/DWARF/iosAppSwift ./
+COPY fixtures/rollbar ./
 
 # Build the application
 RUN cargo build --release
@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y libssl-dev && rm -rf /var/lib/apt/lists
 
 # Copy the binary from the builder
 COPY --from=builder /usr/src/ators/target/release/ators /usr/local/bin
-COPY --from=builder /usr/src/ators/iosAppSwift /usr/src
+COPY --from=builder /usr/src/ators/rollbar /usr/src
 
 # Set the entrypoint to run your app
 ENTRYPOINT ["ators"]

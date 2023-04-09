@@ -2,7 +2,7 @@ docker-build:
 	docker build -t ators .
 
 docker-run:
-	docker run --rm ators -i -o=/usr/src/iosAppSwift -l=0x0100360000 -- 0x0100369e4c
+	docker run --rm ators -i -o=/usr/src/rollbar -l=0x0100360000 -- 0x0100369e4c
 
 release-mac:
 	strip target/release/ators
