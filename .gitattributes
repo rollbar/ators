@@ -1,3 +1,6 @@
 * text=auto eol=lf
 *.{cmd,[cC][mM][dD]} text eol=crlf
 *.{bat,[bB][aA][tT]} text eol=crlf
+
+atorsl/src/swift/include/** linguist-vendored
+atorsl/src/swift/lib/** linguist-vendored
