@@ -10,14 +10,14 @@ static DemangleOptions StandardUIDemangleOptions() {
     opts.QualifyEntities = true;
     opts.PrintForTypeName = false;
 
-    opts.DisplayModuleNames = false;
+    opts.DisplayModuleNames = true;
     opts.DisplayStdlibModule = false;
     opts.DisplayObjCModule = false;
     opts.DisplayDebuggerGeneratedModule = true;
 
     opts.DisplayEntityTypes = true;
     opts.DisplayExtensionContexts = true;
-    opts.DisplayGenericSpecializations = false;
+    opts.DisplayGenericSpecializations = true;
     opts.DisplayLocalNameContexts = true;
     opts.DisplayProtocolConformances = true;
     opts.DisplayUnmangledSuffix = true;
@@ -29,7 +29,7 @@ static DemangleOptions StandardUIDemangleOptions() {
     opts.ShortenValueWitness = false;
 
     opts.ShowPrivateDiscriminators = true;
-    opts.ShowFunctionArgumentTypes = false;
+    opts.ShowFunctionArgumentTypes = true;
     opts.ShowAsyncResumePartial = true;
     return opts;
 }
