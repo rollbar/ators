@@ -1,6 +1,5 @@
-fn main() {
+fn main() -> Result<(), cc::Error> {
     cc::Build::new()
-        .cpp(true)
         .files(&[
             "src/swift/demangle.cpp",
             "src/swift/lib/Demangler.cpp",
@@ -12,12 +11,15 @@ fn main() {
             "src/swift/lib/OldDemangler.cpp",
             "src/swift/lib/Punycode.cpp",
         ])
-        .flag_if_supported("-std=c++17")
-        .flag_if_supported("-fpermissive")
-        .flag("-DLLVM_DISABLE_ABI_BREAKING_CHECKS_ENFORCING=1")
-        .flag("-DSWIFT_STDLIB_HAS_TYPE_PRINTING")
-        .flag("-DSWIFT_SUPPORT_OLD_MANGLING")
-        .warnings(false)
         .include("src/swift/include")
-        .compile("demangle");
+        .define("LLVM_DISABLE_ABI_BREAKING_CHECKS_ENFORCING", "1")
+        .define("SWIFT_STDLIB_HAS_TYPE_PRINTING", None)
+        .define("SWIFT_SUPPORT_OLD_MANGLING", None)
+        .flag_if_supported("-fpermissive")
+        .flag_if_supported("-Wno-changes-meaning")
+        .flag_if_supported("-w")
+        .flag("-std=c++17")
+        .warnings(false)
+        .cpp(true)
+        .try_compile("log")
 }
