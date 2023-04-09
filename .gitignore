@@ -15,3 +15,5 @@ Cargo.lock
 
 # Some internal fixtures that are too big for version control such as dwarfdump dumps
 /fixtures/rollbar**
+
+*.profraw
