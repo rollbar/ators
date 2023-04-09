@@ -1,0 +1,23 @@
+name: Feature request 🎨
+description: Suggest an idea for this project
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for contributing by creating an issue! ❤️
+  - type: textarea
+    attributes:
+      label: Summary 🖌️
+      description: Describe how it should work.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Motivation 🎭
+      description: >
+        What are you trying to accomplish?
+        How has the lack of this feature affected you?
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
