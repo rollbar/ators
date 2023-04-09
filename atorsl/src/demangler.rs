@@ -4,7 +4,7 @@ use swift::Scope;
 
 pub fn demangle(symbol: &str) -> String {
     if swift::is_mangled(symbol).is_ok_and(identity) {
-        swift::try_demangle(symbol, Scope::Standard).unwrap_or(symbol.to_string())
+        swift::try_demangle(symbol, Scope::Compact).unwrap_or(symbol.to_string())
     } else {
         symbol.to_string()
     }

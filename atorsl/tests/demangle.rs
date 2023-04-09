@@ -10,7 +10,7 @@ fn test_demangle() {
         "{}/../fixtures/manglings",
         env!("CARGO_MANIFEST_DIR")
     ))
-    .map(|f| BufReader::new(f).lines())
+    .map(|file| BufReader::new(file).lines())
     .expect("Buffer reader to be added to manglings reader")
     .map(|result| result.expect("Buffer reader line to be ok"))
     .filter(|line| !line.is_empty() && !line.starts_with("//")) // Remove empties and comments
