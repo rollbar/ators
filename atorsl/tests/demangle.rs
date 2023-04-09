@@ -17,13 +17,12 @@ fn test_demangle() {
     .map(|line| {
         line.split_once(" ---> ")
             .map(|p| (p.0.to_string(), p.1.to_string()))
-            .expect(format!("Line be splitted at '--->': {:?}", line).as_str())
+            .unwrap_or_else(|| panic!("Line be splitted at '--->': {:?}", line))
     })
     .map(|(mangled, demangled)| {
         (
             demangler::swift::try_demangle(&mangled, demangler::swift::Scope::Standard)
-                .expect(format!("can't demangle: {}", mangled).as_str())
-                .to_owned(),
+                .unwrap_or_else(|e| panic!("can't demangle: {}\n\terror: {}", mangled, e)),
             demangled,
         )
     })

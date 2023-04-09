@@ -1,3 +1,6 @@
+// https://github.com/rust-lang/rust/issues/93050
+#![allow(clippy::wrong_self_convention)]
+
 pub(crate) trait IsSomeAnd<T> {
     #[must_use]
     fn is_some_and(self, f: impl FnOnce(T) -> bool) -> bool;

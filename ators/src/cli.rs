@@ -153,6 +153,8 @@ pub fn build() -> Command {
             -[SKTGraphic drawHandleInView:atPoint:] (in Sketch) (SKTGraphic.m:490)")
 }
 
+// The invisible character prevents Rust from triming first line's starting whitespaces.
+#[allow(clippy::invisible_characters)]
 const TITLE: &str = r#"
 ​           .
          .o8

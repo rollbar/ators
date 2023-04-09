@@ -38,7 +38,7 @@ fn symbolicate(
         .map(|addr| {
             let symbols = match atos_dwarf(dwarf, addr, ctx.include_inlined) {
                 Err(Error::AddrNotFound(addr)) => atos_obj(obj, addr)?,
-                symbols @ _ => symbols?,
+                symbols => symbols?,
             };
 
             Ok(symbols

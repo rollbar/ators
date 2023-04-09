@@ -13,11 +13,7 @@ use itertools::Either;
 use object::Object;
 use std::path::{Path, PathBuf};
 
-pub fn atos_dwarf<'a>(
-    dwarf: &Dwarf,
-    addr: Addr,
-    include_inlined: bool,
-) -> Result<Vec<Symbol>, Error> {
+pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error> {
     let mut module = String::default();
     let mut comp_dir = PathBuf::default();
     let mut lang = DwLang(0);
@@ -103,7 +99,7 @@ pub fn atos_dwarf<'a>(
     Ok(symbols)
 }
 
-pub fn atos_obj<'a>(obj: &'a object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
+pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
     let map = obj.symbol_map();
     let Some(symbol) = map.get(*addr) else {
         return Err(Error::AddrNotFound(addr))
@@ -111,7 +107,7 @@ pub fn atos_obj<'a>(obj: &'a object::File, addr: Addr) -> Result<Vec<Symbol>, Er
 
     Ok(vec![SymbolBuilder::default()
         .module(String::default())
-        .linkage(demangler::demangle(symbol.name()).to_string())
+        .linkage(demangler::demangle(symbol.name()))
         .lang(DwLang(0))
         .loc(Either::Right(addr - symbol.address()))
         .build()?])
@@ -150,16 +146,16 @@ impl DwarfExt for Dwarf<'_> {
         comp_dir: &Path,
         lang: &DwLang,
     ) -> Result<Symbol, Error> {
-        let linkage = self.entry_linkage(entry, &unit)?;
+        let linkage = self.entry_linkage(entry, unit)?;
         let mut symbol = SymbolBuilder::default();
         symbol
-            .linkage(demangler::demangle(&linkage).to_owned())
+            .linkage(demangler::demangle(&linkage))
             .module(module.to_string())
             .lang(*lang);
 
         let artificial = self.entry_is_artificial(entry);
         let entry_with_call = child.unwrap_or(entry);
-        let file = self.entry_file(entry_with_call, &unit);
+        let file = self.entry_file(entry_with_call, unit);
         match (file, artificial) {
             (None, _) | (_, Some(true)) => {
                 symbol.loc(Either::Left(SourceLoc {
@@ -170,7 +166,7 @@ impl DwarfExt for Dwarf<'_> {
             }
             (Some(file), _) => {
                 symbol.loc(Either::Left(SourceLoc {
-                    file: file,
+                    file,
                     line: self.entry_line(entry_with_call).unwrap_or_default(),
                     col: self.entry_col(entry_with_call),
                 }));
@@ -183,7 +179,7 @@ impl DwarfExt for Dwarf<'_> {
     fn entry_string(&self, name: DwAt, entry: &Entry, unit: &Unit) -> Option<String> {
         entry.attr_value(name).ok()?.and_then(|attr| {
             Some(
-                self.attr_string(&unit, attr)
+                self.attr_string(unit, attr)
                     .ok()?
                     .to_string_lossy()
                     .to_string(),
@@ -197,9 +193,9 @@ impl DwarfExt for Dwarf<'_> {
             .find_map(|dw_at| entry.attr_value(dw_at).ok().flatten())
             .ok_or(Error::EntryInAddrNotSymbol)
             .and_then(|attr| match attr {
-                AttrValue::UnitRef(offset) => self.entry_linkage(&unit.entry(offset)?, &unit),
-                attr @ _ => Ok(self
-                    .attr_string(&unit, attr)?
+                AttrValue::UnitRef(offset) => self.entry_linkage(&unit.entry(offset)?, unit),
+                attr => Ok(self
+                    .attr_string(unit, attr)?
                     .to_string_lossy()
                     .to_string()),
             })
@@ -226,7 +222,7 @@ impl DwarfExt for Dwarf<'_> {
             _ => String::default(),
         };
 
-        self.attr_string(&unit, file.path_name())
+        self.attr_string(unit, file.path_name())
             .map(|file| dir + &file.to_string_lossy())
             .map(PathBuf::from)
             .ok()
