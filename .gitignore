@@ -14,5 +14,5 @@ Cargo.lock
 .DS_Store
 
 /.vscode
-/fixtures/iosAppSwift.app.dSYM
+/fixtures/rollbar**
 /log
