@@ -2,11 +2,11 @@ use crate::IsOkAnd;
 use std::convert::identity;
 use swift::Scope;
 
-pub fn demangle(symbol: &str) -> &str {
+pub fn demangle(symbol: &str) -> String {
     if swift::is_mangled(symbol).is_ok_and(identity) {
-        swift::try_demangle(symbol, Scope::Standard).unwrap_or(symbol)
+        swift::try_demangle(symbol, Scope::Standard).unwrap_or(symbol.to_string())
     } else {
-        symbol
+        symbol.to_string()
     }
 }
 
@@ -39,13 +39,13 @@ pub mod swift {
         unsafe { Ok(isMangledSwiftSymbol(CString::new(symbol)?.as_ptr()) != 0) }
     }
 
-    pub fn try_demangle(symbol: &str, scope: Scope) -> Result<&str, Error> {
+    pub fn try_demangle(symbol: &str, scope: Scope) -> Result<String, Error> {
         let mut buf = vec![0; 4096];
         let c_sym = CString::new(symbol)?;
 
         unsafe {
             if demangleSwiftSymbol(c_sym.as_ptr(), buf.as_mut_ptr(), buf.len(), scope) != 0 {
-                Ok(CStr::from_ptr(buf.as_ptr()).to_str()?)
+                Ok(CStr::from_ptr(buf.as_ptr()).to_str()?.to_string())
             } else {
                 Err(Error::CannotDemangleSymbol(symbol.to_owned()))
             }
