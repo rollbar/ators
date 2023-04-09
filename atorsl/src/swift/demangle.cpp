@@ -35,9 +35,10 @@ static DemangleOptions StandardUIDemangleOptions() {
 }
 
 extern "C" enum class Scope : signed {
-    Compact = -1,
-    Standard = 0,
-    Full = 1,
+    None = 0,
+    Compact = 1,
+    Standard = 2,
+    Full = 3,
 };
 
 /// Demangle the given symbol and return the readable name.

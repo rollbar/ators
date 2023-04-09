@@ -15,6 +15,7 @@ pub enum Opt {
     AddrFile,
     Arch,
     Inline,
+    Scope,
     Delimiter,
     FullPath,
 }
@@ -118,6 +119,16 @@ pub fn build() -> Command {
                     (such as i386 or arm) and pass in a corresponding symbol-rich Mach-O binary\n\
                     image file with a binary image of the corresponding architecture (such as a\n\
                     Universal Binary)."),
+            Arg::new(Opt::Scope).long("scope")
+                .help("The scope of demangled information to display for mangled symbols.")
+                .num_args(1)
+                .value_name("scope")
+                .value_parser(["none", "compact", "std", "full"])
+                .default_value("std")
+                .long_help(
+                    "The scope of demangled information to display for mangled symbols.  Use
+                    'none' to avoid demangling mangled symbols."
+                ),
             Arg::new(Opt::Delimiter)
                 .short('d')
                 .help("Delimiter when outputting inline frames. Defaults to newline.")

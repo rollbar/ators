@@ -151,6 +151,24 @@ impl DwarfExt for Dwarf<'_> {
         lang: &DwLang,
     ) -> Result<Symbol, Error> {
         let linkage = self.entry_linkage(entry, &unit)?;
+        println!("\n***********************************************************");
+        println!("linkage: {}", linkage);
+        println!("module: {}", module.clone());
+        println!("comp_dir: {:?}", comp_dir);
+        println!("artificial: {:?}", self.entry_is_artificial(entry));
+        println!("lang: {}", lang.clone());
+        if let Some(true) = self.entry_is_artificial(entry) {
+            println!("file: {:?}", Some(comp_dir.join("<compile-generated>")));
+            println!("line: {:?}", Some(0));
+            println!("col: {:?}", Option::<u16>::None);
+        } else {
+            println!("file: {:?}", self.entry_file(entry, &unit));
+            println!("line: {:?}", self.entry_line(entry));
+            println!("col: {:?}", self.entry_col(entry));
+        }
+        println!("***********************************************************\n");
+
+        let linkage = self.entry_linkage(entry, &unit)?;
         let mut symbol = SymbolBuilder::default();
         symbol
             .linkage(demangler::demangle(&linkage).to_owned())

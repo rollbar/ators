@@ -1,6 +1,13 @@
 use crate::IsOkAnd;
 use std::convert::identity;
-use swift::Scope;
+
+#[repr(C)]
+pub enum Scope {
+    None,
+    Compact,
+    Standard,
+    Full,
+}
 
 pub fn demangle(symbol: &str) -> &str {
     if swift::is_mangled(symbol).is_ok_and(identity) {
@@ -11,18 +18,12 @@ pub fn demangle(symbol: &str) -> &str {
 }
 
 pub mod swift {
+    use super::Scope;
     use crate::data::Error;
     use std::{
         ffi::{CStr, CString},
         os::raw::{c_char, c_int},
     };
-
-    #[repr(C)]
-    pub enum Scope {
-        Compact = -1,
-        Standard = 0,
-        Full = 1,
-    }
 
     extern "C" {
         fn isMangledSwiftSymbol(sym: *const c_char) -> c_int;

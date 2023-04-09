@@ -21,7 +21,7 @@ fn test_demangle() {
     })
     .map(|(mangled, demangled)| {
         (
-            demangler::swift::try_demangle(&mangled, demangler::swift::Scope::Standard)
+            demangler::swift::try_demangle(&mangled, demangler::Scope::Standard)
                 .expect(format!("can't demangle: {}", mangled).as_str())
                 .to_owned(),
             demangled,
