@@ -5,21 +5,6 @@ pub(crate) trait IsSomeAnd<T> {
 
 impl<T> IsSomeAnd<T> for Option<T> {
     /// Returns `true` if the option is a [`Some`] and the value inside of it matches a predicate.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// #![feature(is_some_and)]
-    ///
-    /// let x: Option<u32> = Some(2);
-    /// assert_eq!(x.is_some_and(|x| x > 1), true);
-    ///
-    /// let x: Option<u32> = Some(0);
-    /// assert_eq!(x.is_some_and(|x| x > 1), false);
-    ///
-    /// let x: Option<u32> = None;
-    /// assert_eq!(x.is_some_and(|x| x > 1), false);
-    /// ```
     #[must_use]
     #[inline]
     fn is_some_and(self, f: impl FnOnce(T) -> bool) -> bool {
@@ -40,21 +25,6 @@ pub(crate) trait IsOkAnd<T, E> {
 
 impl<T, E> IsOkAnd<T, E> for Result<T, E> {
     /// Returns `true` if the result is [`Ok`] and the value inside of it matches a predicate.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// #![feature(is_some_and)]
-    ///
-    /// let x: Result<u32, &str> = Ok(2);
-    /// assert_eq!(x.is_ok_and(|x| x > 1), true);
-    ///
-    /// let x: Result<u32, &str> = Ok(0);
-    /// assert_eq!(x.is_ok_and(|x| x > 1), false);
-    ///
-    /// let x: Result<u32, &str> = Err("hey");
-    /// assert_eq!(x.is_ok_and(|x| x > 1), false);
-    /// ```
     #[must_use]
     #[inline]
     fn is_ok_and(self, f: impl FnOnce(T) -> bool) -> bool {
@@ -65,22 +35,6 @@ impl<T, E> IsOkAnd<T, E> for Result<T, E> {
     }
 
     /// Returns `true` if the result is [`Err`] and the value inside of it matches a predicate.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// #![feature(is_some_and)]
-    /// use std::io::{Error, ErrorKind};
-    ///
-    /// let x: Result<u32, Error> = Err(Error::new(ErrorKind::NotFound, "!"));
-    /// assert_eq!(x.is_err_and(|x| x.kind() == ErrorKind::NotFound), true);
-    ///
-    /// let x: Result<u32, Error> = Err(Error::new(ErrorKind::PermissionDenied, "!"));
-    /// assert_eq!(x.is_err_and(|x| x.kind() == ErrorKind::NotFound), false);
-    ///
-    /// let x: Result<u32, Error> = Ok(123);
-    /// assert_eq!(x.is_err_and(|x| x.kind() == ErrorKind::NotFound), false);
-    /// ```
     #[must_use]
     #[inline]
     fn is_err_and(self, f: impl FnOnce(E) -> bool) -> bool {
