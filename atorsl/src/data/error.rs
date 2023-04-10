@@ -19,7 +19,7 @@ pub enum Error {
     #[error("Address not found: {0}")]
     AddrNotFound(Addr),
 
-    #[error("Address found but has no a symbols")]
+    #[error("Address does not point to a symbol")]
     EntryInAddrNotSymbol,
 
     #[error("No debug offset in address: {0}")]
