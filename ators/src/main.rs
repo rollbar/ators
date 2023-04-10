@@ -61,7 +61,7 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
         Either::Left(source_loc) => {
             format!(
                 "{} (in {}) ({}:{})",
-                symbol.linkage,
+                symbol.name,
                 symbol.module,
                 if ctx.show_full_path {
                     source_loc.file.to_string_lossy().to_string()
@@ -74,7 +74,7 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
         Either::Right(offset) => {
             format!(
                 "{} (in {}) + {}",
-                symbol.linkage,
+                symbol.name,
                 ctx.obj_path.lossy_file_name(),
                 **offset
             )

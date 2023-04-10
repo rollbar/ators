@@ -13,7 +13,7 @@ pub struct SourceLoc {
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Builder)]
 pub struct Symbol {
     pub module: String,
-    pub linkage: String,
+    pub name: String,
     pub lang: gimli::DwLang,
     pub loc: Either<SourceLoc, Addr>,
 }
