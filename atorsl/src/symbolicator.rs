@@ -107,7 +107,10 @@ pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
 
     Ok(vec![SymbolBuilder::default()
         .module(String::default())
-        .linkage(demangler::demangle(symbol.name()))
+        .linkage(demangler::demangle(
+            symbol.name(),
+            demangler::language_of(symbol.name()),
+        ))
         .lang(DwLang(0))
         .loc(Either::Right(addr - symbol.address()))
         .build()?])
@@ -149,7 +152,7 @@ impl DwarfExt for Dwarf<'_> {
         let linkage = self.entry_linkage(entry, unit)?;
         let mut symbol = SymbolBuilder::default();
         symbol
-            .linkage(demangler::demangle(&linkage))
+            .linkage(demangler::demangle(&linkage, *lang))
             .module(module.to_string())
             .lang(*lang);
 

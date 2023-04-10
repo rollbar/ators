@@ -1,13 +1,69 @@
 use crate::IsOkAnd;
+use gimli::DwLang;
 use std::convert::identity;
 use swift::Scope;
 
-pub fn demangle(symbol: &str) -> String {
-    if swift::is_mangled(symbol).is_ok_and(identity) {
-        swift::try_demangle(symbol, Scope::Compact).unwrap_or(symbol.to_string())
+pub fn language_of(s: &str) -> DwLang {
+    if (s.starts_with("-[") || s.starts_with("+[")) && s.ends_with(']') {
+        gimli::DW_LANG_ObjC
+    } else if s.starts_with("_Z")
+        || s.starts_with("__Z")
+        || s.starts_with("___Z")
+        || s.starts_with("____Z")
+        || s.starts_with('?')
+        || s.starts_with("@?")
+    {
+        gimli::DW_LANG_C_plus_plus
+    } else if s.starts_with("_R") {
+        gimli::DW_LANG_Rust
+    } else if swift::is_mangled(s).is_ok_and(identity) {
+        gimli::DW_LANG_Swift
     } else {
-        symbol.to_string()
+        DwLang(0)
     }
+}
+
+pub fn demangle(sym: &str, lang: DwLang) -> String {
+    match lang {
+        gimli::DW_LANG_C
+        | gimli::DW_LANG_C89
+        | gimli::DW_LANG_C99
+        | gimli::DW_LANG_C11
+        | gimli::DW_LANG_C17
+        | gimli::DW_LANG_C_plus_plus
+        | gimli::DW_LANG_C_plus_plus_03
+        | gimli::DW_LANG_C_plus_plus_11
+        | gimli::DW_LANG_C_plus_plus_14
+        | gimli::DW_LANG_C_plus_plus_17
+        | gimli::DW_LANG_C_plus_plus_20 => {
+            if sym.starts_with('?') || sym.starts_with("@?") {
+                msvc_demangler::demangle(sym, msvc_demangler::DemangleFlags::llvm()).ok()
+            } else {
+                cpp_demangle::Symbol::new(sym)
+                    .ok()
+                    .map(|s| s.to_string())
+            }
+        }
+
+        gimli::DW_LANG_ObjC | gimli::DW_LANG_ObjC_plus_plus => {
+            if (sym.starts_with("-[") || sym.starts_with("+[")) && sym.ends_with(']') {
+                None
+            } else {
+                cpp_demangle::Symbol::new(sym)
+                    .ok()
+                    .map(|s| s.to_string())
+            }
+        }
+
+        gimli::DW_LANG_Swift => swift::try_demangle(sym, Scope::Compact).ok(),
+
+        gimli::DW_LANG_Rust => rustc_demangle::try_demangle(sym)
+            .ok()
+            .map(|s| s.to_string()),
+
+        _ => None,
+    }
+    .unwrap_or_else(|| sym.to_string())
 }
 
 pub mod swift {
