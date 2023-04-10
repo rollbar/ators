@@ -7,7 +7,7 @@ use std::{
 #[test]
 fn test_demangle() {
     File::open(format!(
-        "{}/../fixtures/manglings",
+        "{}/../fixtures/manglings.txt",
         env!("CARGO_MANIFEST_DIR")
     ))
     .map(|file| BufReader::new(file).lines())
