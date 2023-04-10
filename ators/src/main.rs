@@ -94,11 +94,21 @@ fn compute_addrs(obj: &object::File, ctx: &Context) -> Result<Vec<Addr>> {
     };
 
     let base_addr = match ctx.base_addr {
-        Loc::Load(load_addr) => load_addr - obj.vmaddr()?,
-        Loc::Slide(slide_addr) => *slide_addr,
+        Loc::Load(load_addr) => load_addr
+            .checked_sub(*obj.vmaddr()?)
+            .context(format!("Invalid load address: {}", load_addr))?,
+        Loc::Slide(slide_addr) => **slide_addr,
     };
 
-    Ok(addrs.iter().map(|addr| addr - base_addr).collect())
+    addrs
+        .iter()
+        .map(|addr| {
+            Ok(addr
+                .checked_sub(base_addr)
+                .context(format!("Invalid address: {}", addr))?
+                .into())
+        })
+        .collect()
 }
 
 trait LossyFileName {

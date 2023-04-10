@@ -25,8 +25,8 @@ pub enum Error {
     #[error("No debug offset in address: {0}")]
     AddrNoDebugOffset(Addr),
 
-    #[error("Address {0} overflown by offset {1}")]
-    AddrOffsetOverflow(Addr, Addr),
+    #[error("Invalid address {0}")]
+    AddrInvalid(Addr),
 
     #[error("Cannot demangle symbol: {0}")]
     CannotDemangleSymbol(String),
@@ -43,6 +43,6 @@ pub enum Error {
     #[error("Invalid UTF-8 in byte vector: {0}")]
     UnrepresentableStringFromByteVector(#[from] FromUtf8Error),
 
-    #[error("Integer is not a valid address {0}")]
+    #[error("Integer is not a valid address: {0}")]
     UnrepresentableAddress(#[from] ParseIntError),
 }
