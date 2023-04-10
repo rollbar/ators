@@ -20,7 +20,7 @@ fn main() -> Result<()> {
 
     let addrs = compute_addrs(&obj, &ctx)?;
 
-    symbolicate(&dwarf, &obj, addrs, &ctx)?
+    symbolicate(&dwarf, &obj, &addrs, &ctx)?
         .iter()
         .for_each(|symbol| println!("{symbol}"));
 
@@ -30,11 +30,11 @@ fn main() -> Result<()> {
 fn symbolicate(
     dwarf: &Dwarf,
     obj: &object::File,
-    addrs: Vec<Addr>,
+    addrs: &[Addr],
     ctx: &Context,
 ) -> Result<Vec<String>> {
     Ok(addrs
-        .into_iter()
+        .iter()
         .map(|addr| {
             let symbols = match atos_dwarf(dwarf, addr, ctx.include_inlined) {
                 Err(Error::AddrNotFound(addr)) => atos_obj(obj, addr)?,

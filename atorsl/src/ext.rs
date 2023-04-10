@@ -32,18 +32,18 @@ pub(crate) mod gimli {
         for gimli::DebuggingInformationEntry<'_, '_, EndianSlice<'_, RunTimeEndian>, usize>
     {
         fn pc(&self) -> Option<Range<Addr>> {
-            let low = match self.attr_value(gimli::DW_AT_low_pc).ok().flatten() {
+            let low: Addr = match self.attr_value(gimli::DW_AT_low_pc).ok()? {
                 Some(AttributeValue::Addr(addr)) => Some(addr.into()),
                 _ => None,
-            };
+            }?;
 
-            let high = match self.attr_value(gimli::DW_AT_high_pc).ok().flatten() {
+            let high = match self.attr_value(gimli::DW_AT_high_pc).ok()? {
                 Some(AttributeValue::Addr(addr)) => Some(addr.into()),
-                Some(AttributeValue::Udata(len)) if low.is_some() => Some(low.unwrap() + len),
+                Some(AttributeValue::Udata(len)) => Some(low + len),
                 _ => None,
-            };
+            }?;
 
-            low.zip(high).map(|pc| pc.0..pc.1)
+            Some(low..high)
         }
     }
 

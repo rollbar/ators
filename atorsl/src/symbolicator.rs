@@ -13,17 +13,24 @@ use itertools::Either;
 use object::Object;
 use std::path::{Path, PathBuf};
 
-pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error> {
+pub fn atos_dwarf(
+    dwarf: &Dwarf,
+    addr: &Addr,
+    include_inlined: bool,
+) -> Result<Vec<Symbol>, Error> {
     let mut module = String::default();
     let mut comp_dir = PathBuf::default();
     let mut lang = DwLang(0);
 
-    let unit = dwarf.unit_from_addr(&addr)?;
+    let unit = dwarf.unit_from_addr(addr)?;
     let mut entries = unit.entries();
     let mut symbols = Vec::default();
 
     loop {
-        let (_, entry) = entries.next_dfs()?.ok_or(Error::AddrNotFound(addr))?;
+        let entry = entries
+            .next_dfs()?
+            .ok_or_else(|| Error::AddrNotFound(*addr))?
+            .1;
 
         // guarantee: depth order compile_unit > module > subprogram > inlined_subroutine
         match entry.tag() {
@@ -40,7 +47,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
                     .unwrap_or_default();
             }
             gimli::DW_TAG_subprogram => {
-                if !entry.pc().is_some_and(|pc| pc.contains(&addr)) {
+                if !entry.pc().is_some_and(|pc| pc.contains(addr)) {
                     continue;
                 }
 
@@ -62,7 +69,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
                         }
 
                         if child_entry.tag() == gimli::DW_TAG_inlined_subroutine
-                            && child_entry.pc().is_some_and(|pc| pc.contains(&addr))
+                            && child_entry.pc().is_some_and(|pc| pc.contains(addr))
                         {
                             if let Some(ref parent_entry) = parent_entry {
                                 symbols.insert(

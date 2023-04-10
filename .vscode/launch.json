@@ -18,10 +18,11 @@
         }
       },
       "args": [
-        "-v",
         "-i",
-        "-o=./fixtures/iosAppSwift.app.dSYM/Contents/Resources/DWARF/iosAppSwift",
-        "-l=0x0100360000",
+        "-o",
+        "./fixtures/rollbar",
+        "-l",
+        "0x0100360000",
         "--",
         "0x0100369e4c"
       ],
