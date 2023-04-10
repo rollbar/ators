@@ -22,4 +22,4 @@ cargo build --release
 hyperfine --warmup 3 \
     "./target/release/ators -i -o ./fixtures/rollbar -l 0x0100360000 -f ./fixtures/many_addrs.txt" \
     "atos -i -o ./fixtures/rollbar -l 0x0100360000 -f ./fixtures/many_addrs.txt" \
-    "atosl -o ./fixtures/rollbar -l 0 $(cat ./fixtures/many_addrs_short.txt)"
+    "atosl -o ./fixtures/rollbar -l 0x0100360000 $(cat ./fixtures/many_addrs.txt)"
