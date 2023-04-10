@@ -25,7 +25,10 @@ pub enum Loc {
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Context<'ctx> {
     /// The full path to either a binary image, eg. the DWARF file, or a .dSYM.
-    pub obj_path: &'ctx Path,
+    ///
+    /// When provided with a .dSYM, the _first file in alphabetical descending order_ in
+    /// `Contents/Resources/DWARF` is loaded. This emulates `atos` behavior.
+    pub obj_path: PathBuf,
 
     /// The location address of the binary image containing the addresses to symbolicate.
     pub base_addr: &'ctx Loc,
@@ -52,9 +55,20 @@ pub struct Context<'ctx> {
 impl<'a> Context<'a> {
     pub fn from_args(args: &'a clap::ArgMatches) -> Result<Self> {
         Ok(Self {
-            obj_path: args
-                .get_one::<PathBuf>(&cli::Opt::Object.to_string())
-                .context("No binary image path")?,
+            obj_path: {
+                let path = args
+                    .get_one::<PathBuf>(&cli::Opt::Object.to_string())
+                    .context("No binary image path")?;
+
+                if path.extension().map(|ext| ext == "dSYM") == Some(true) {
+                    std::fs::read_dir(path.as_path().join("Contents/Resources/DWARF"))?
+                        .next()
+                        .context("No binary image path")??
+                        .path()
+                } else {
+                    path.clone()
+                }
+            },
 
             base_addr: [cli::Opt::LoadAddr, cli::Opt::SlideAddr, cli::Opt::Offset]
                 .into_iter()
