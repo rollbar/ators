@@ -5,6 +5,7 @@ pub mod demangler;
 pub mod ext;
 pub mod symbolicator;
 
+pub use data::Error;
 pub use symbolicator::{atos_dwarf, atos_obj};
 
 pub(crate) mod prelude;
@@ -21,7 +22,7 @@ pub(crate) use prelude::{IsOkAnd, IsSomeAnd};
 /// Modifications to the loaded object file is undefined behavior.
 #[macro_export]
 macro_rules! load_object {
-    ($path:expr, $binding:ident) => {{
+    ($path:expr, $arch:expr, $binding:ident) => {{
         // SAFETY: All file-backed memory map constructors are marked `unsafe` because of the
         // potential for *Undefined Behavior* (UB) using the map if the underlying file is
         // subsequently modified, in or out of process. Applications must consider the risk and
@@ -29,7 +30,7 @@ macro_rules! load_object {
         // permissions, locks or process-private (e.g. unlinked) files exist but are platform
         // specific and limited.
         $binding = unsafe { memmap2::Mmap::map(&std::fs::File::open(&$path)?) }?;
-        Result::<object::File, atorsl::data::Error>::Ok(object::File::parse(&*$binding)?)
+        <object::File as atorsl::ext::object::File>::parse(&*$binding, $arch)
     }};
 }
 
@@ -37,11 +38,12 @@ macro_rules! load_object {
 #[macro_export]
 macro_rules! load_dwarf {
     ($object:expr, $binding:ident) => {{
-        $binding = gimli::Dwarf::load(|sid| -> gimli::Result<std::borrow::Cow<[u8]>> {
+        $binding = gimli::Dwarf::load(|section_id| -> gimli::Result<std::borrow::Cow<[u8]>> {
             Ok(
-                <object::File as object::Object>::section_by_name(&$object, sid.name())
-                    .and_then(|s| {
-                        <object::Section as object::ObjectSection>::uncompressed_data(&s).ok()
+                <object::File as object::Object>::section_by_name(&$object, section_id.name())
+                    .and_then(|section| {
+                        <object::Section as object::ObjectSection>::uncompressed_data(&section)
+                            .ok()
                     })
                     .unwrap_or(std::borrow::Cow::Borrowed(&[][..])),
             )

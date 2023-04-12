@@ -7,7 +7,7 @@ use std::{
 };
 
 /// A 64-bit address.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash)]
 pub struct Addr(u64);
 
 impl Addr {
@@ -17,12 +17,6 @@ impl Addr {
 
     pub fn is_nil(&self) -> bool {
         self == 0
-    }
-}
-
-impl Default for Addr {
-    fn default() -> Self {
-        Self::nil()
     }
 }
 

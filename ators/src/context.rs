@@ -1,6 +1,7 @@
-use anyhow::{Context as _, Result};
-
 use crate::{cli, Addr};
+use anyhow::{Context as _, Result};
+use atorsl::ext::object::FromArchitectureName;
+use object::Architecture;
 use std::path::{Path, PathBuf};
 
 /// The location address of the binary image containing symbol addresses.
@@ -40,7 +41,7 @@ pub struct Context<'ctx> {
     pub input_addr_file: Option<&'ctx Path>,
 
     /// The particular architecure of a binary image file in which to look up symbols.
-    pub arch: Option<&'ctx str>,
+    pub arch: Option<Architecture>,
 
     /// Whether to expand inlined symbols.
     pub include_inlined: bool,
@@ -71,7 +72,7 @@ impl<'a> Context<'a> {
             },
 
             base_addr: [cli::Opt::LoadAddr, cli::Opt::SlideAddr, cli::Opt::Offset]
-                .into_iter()
+                .iter()
                 .find_map(|opt| args.get_one(&opt.to_string()))
                 .context("No location address")?,
 
@@ -81,18 +82,19 @@ impl<'a> Context<'a> {
 
             input_addr_file: args
                 .get_one::<PathBuf>(&cli::Opt::AddrFile.to_string())
-                .map(|file| file.as_path()),
+                .map(PathBuf::as_path),
 
             arch: args
                 .get_one(&cli::Opt::Arch.to_string())
-                .map(String::as_str),
+                .map(String::as_str)
+                .map(Architecture::from_architecture_name),
 
             include_inlined: args.get_flag(&cli::Opt::Inline.to_string()),
 
             delimiter: args
                 .get_one(&cli::Opt::Delimiter.to_string())
                 .map(String::as_str)
-                .context("No delimiter")?,
+                .unwrap_or(""),
 
             show_full_path: args.get_flag(&cli::Opt::FullPath.to_string()),
         })

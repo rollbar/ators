@@ -4,7 +4,11 @@ mod cli;
 mod context;
 
 use anyhow::{Context as _, Result};
-use atorsl::{data::*, ext::object::File, *};
+use atorsl::{
+    data::{Addr, Symbol},
+    ext::object::File as _,
+    *,
+};
 use context::{Context, Loc};
 use itertools::{Either, Itertools};
 use std::{fs, io, io::BufRead, path::Path};
@@ -15,7 +19,7 @@ fn main() -> Result<()> {
     let args = cli::build().get_matches();
     let ctx = Context::from_args(&args)?;
 
-    let obj = load_object!(ctx.obj_path, mmap)?;
+    let obj = load_object!(ctx.obj_path, ctx.arch, mmap)?;
     let dwarf = load_dwarf!(&obj, cow);
 
     let addrs = compute_addrs(&obj, &ctx)?;

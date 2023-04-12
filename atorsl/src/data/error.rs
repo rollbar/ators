@@ -45,4 +45,7 @@ pub enum Error {
 
     #[error("Integer is not a valid address: {0}")]
     UnrepresentableAddress(#[from] ParseIntError),
+
+    #[error("Cannot load symbols for architecture {0:?}")]
+    CannotLoadSymbolsForArch(object::Architecture),
 }
