@@ -21,8 +21,8 @@ pub mod object {
             selected_arch: Option<object::Architecture>,
         ) -> Result<object::File, Error> {
             let Some(selected_arch) = selected_arch else {
-                    return Ok(object::File::parse(data)?);
-                };
+                return Ok(object::File::parse(data)?);
+            };
 
             let object = if let Ok(arches) = macho::FatHeader::parse_arch32(data) {
                 object::File::parse(read::macho::FatArch::data(
@@ -100,16 +100,16 @@ pub mod object {
 pub(crate) mod gimli {
     use crate::data::Addr;
     use gimli::{AttributeValue, EndianSlice, RunTimeEndian};
-    use std::ops::Range;
+    use std::ops;
 
     pub(crate) trait DebuggingInformationEntry {
-        fn pc(&self) -> Option<Range<Addr>>;
+        fn pc(&self) -> Option<ops::Range<Addr>>;
     }
 
     impl DebuggingInformationEntry
         for gimli::DebuggingInformationEntry<'_, '_, EndianSlice<'_, RunTimeEndian>, usize>
     {
-        fn pc(&self) -> Option<Range<Addr>> {
+        fn pc(&self) -> Option<ops::Range<Addr>> {
             let low: Addr = match self.attr_value(gimli::DW_AT_low_pc).ok()? {
                 Some(AttributeValue::Addr(addr)) => Some(addr.into()),
                 _ => None,
@@ -135,6 +135,16 @@ pub(crate) mod gimli {
                 .checked_add(self.length())
                 .map(|address_end| (self.address()..address_end).contains(addr))
                 .ok_or(gimli::Error::InvalidAddressRange)
+        }
+    }
+
+    pub(crate) trait Range {
+        fn contains(&self, addr: &Addr) -> bool;
+    }
+
+    impl Range for gimli::Range {
+        fn contains(&self, addr: &Addr) -> bool {
+            (self.begin..self.end).contains(addr)
         }
     }
 }

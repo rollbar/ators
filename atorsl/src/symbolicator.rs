@@ -1,17 +1,20 @@
 use crate::{
     data::*,
-    ext::gimli::{ArangeEntry, DebuggingInformationEntry},
+    ext::gimli::{ArangeEntry, DebuggingInformationEntry, Range},
     *,
 };
 use fallible_iterator::FallibleIterator;
 use gimli::{
     DW_AT_abstract_origin, DW_AT_artificial, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line,
     DW_AT_comp_dir, DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_language,
-    DW_AT_linkage_name, DW_AT_name, DebugInfoOffset, DwAt, DwLang,
+    DW_AT_linkage_name, DW_AT_name, DW_AT_ranges, DebugInfoOffset, DwAt, DwLang,
 };
 use itertools::Either;
 use object::Object;
-use std::path::{Path, PathBuf};
+use std::{
+    convert::identity,
+    path::{Path, PathBuf},
+};
 
 pub fn atos_dwarf(
     dwarf: &Dwarf,
@@ -69,7 +72,10 @@ pub fn atos_dwarf(
                         }
 
                         if child_entry.tag() == gimli::DW_TAG_inlined_subroutine
-                            && child_entry.pc().is_some_and(|pc| pc.contains(addr))
+                            && (child_entry.pc().is_some_and(|pc| pc.contains(addr))
+                                || dwarf
+                                    .entry_ranges_contain(addr, child_entry, &unit)
+                                    .is_some_and(identity))
                         {
                             if let Some(ref parent_entry) = parent_entry {
                                 symbols.insert(
@@ -131,6 +137,7 @@ trait DwarfExt {
     fn entry_col(&self, entry: &Entry) -> Option<u16>;
     fn entry_lang(&self, entry: &Entry) -> Option<DwLang>;
     fn entry_is_artificial(&self, entry: &Entry) -> Option<bool>;
+    fn entry_ranges_contain(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> Option<bool>;
 
     fn symbol(
         &self,
@@ -265,17 +272,27 @@ impl DwarfExt for Dwarf<'_> {
         }
     }
 
+    fn entry_ranges_contain(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> Option<bool> {
+        match entry.attr_value(DW_AT_ranges).ok()?? {
+            AttrValue::RangeListsRef(offset) => self
+                .ranges(unit, self.ranges_offset_from_raw(unit, offset))
+                .and_then(|mut ranges| ranges.any(|range| Ok(range.contains(addr))))
+                .ok(),
+            _ => None,
+        }
+    }
+
     fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error> {
         let offset = self.debug_info_offset(addr)?;
         let header = self.debug_info.header_from_offset(offset)?;
-        self.unit(header).map_err(Error::Gimli)
+        Ok(self.unit(header)?)
     }
 
     fn debug_info_offset(&self, addr: &Addr) -> Result<gimli::DebugInfoOffset, Error> {
         self.debug_aranges
             .headers()
             .find_map(|header| {
-                Ok(if header.entries().any(|entry| entry.contains(addr))? {
+                Ok(if header.entries().any(|arange| arange.contains(addr))? {
                     Some(header.debug_info_offset())
                 } else {
                     None

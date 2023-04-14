@@ -96,12 +96,6 @@ impl PartialEq<u64> for &Addr {
     }
 }
 
-impl PartialEq<Addr> for u64 {
-    fn eq(&self, other: &Addr) -> bool {
-        other.0 == *self
-    }
-}
-
 impl PartialOrd<u64> for Addr {
     fn partial_cmp(&self, other: &u64) -> Option<Ordering> {
         self.0.partial_cmp(other)
@@ -111,12 +105,6 @@ impl PartialOrd<u64> for Addr {
 impl PartialOrd<u64> for &Addr {
     fn partial_cmp(&self, other: &u64) -> Option<Ordering> {
         self.0.partial_cmp(other)
-    }
-}
-
-impl PartialOrd<Addr> for u64 {
-    fn partial_cmp(&self, other: &Addr) -> Option<Ordering> {
-        other.0.partial_cmp(self)
     }
 }
 

@@ -49,7 +49,7 @@ pub struct Context<'ctx> {
     /// Whether to expand inlined symbols.
     pub include_inlined: bool,
 
-    /// Output delimiter, defaults to newline
+    /// Output delimiter when expanding inlined frames, defaults to newline
     pub delimiter: Option<&'ctx str>,
 
     /// Print the full path of the source files
