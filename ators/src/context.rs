@@ -50,7 +50,7 @@ pub struct Context<'ctx> {
     pub include_inlined: bool,
 
     /// Output delimiter, defaults to newline
-    pub delimiter: &'ctx str,
+    pub delimiter: Option<&'ctx str>,
 
     /// Print the full path of the source files
     pub show_full_path: bool,
@@ -96,8 +96,7 @@ impl<'a> Context<'a> {
 
             delimiter: args
                 .get_one(&cli::Opt::Delimiter.to_string())
-                .map(String::as_str)
-                .unwrap_or(""),
+                .map(String::as_str),
 
             show_full_path: args.get_flag(&cli::Opt::FullPath.to_string()),
         })

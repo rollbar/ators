@@ -24,20 +24,15 @@ fn main() -> Result<()> {
 
     let addrs = compute_addrs(&obj, &ctx)?;
 
-    symbolicate(&dwarf, &obj, &addrs, &ctx)?
+    symbolicate(&dwarf, &obj, &addrs, &ctx)
         .iter()
         .for_each(|symbol| println!("{symbol}"));
 
     Ok(())
 }
 
-fn symbolicate(
-    dwarf: &Dwarf,
-    obj: &object::File,
-    addrs: &[Addr],
-    ctx: &Context,
-) -> Result<Vec<String>> {
-    Ok(addrs
+fn symbolicate(dwarf: &Dwarf, obj: &object::File, addrs: &[Addr], ctx: &Context) -> Vec<String> {
+    let iter_symbols = addrs
         .iter()
         .map(|addr| {
             let symbols = match atos_dwarf(dwarf, addr, ctx.include_inlined) {
@@ -47,19 +42,27 @@ fn symbolicate(
                 symbols => symbols?,
             };
 
-            Ok(symbols
+            let symbol = symbols
                 .iter()
                 .map(|symbol| format(symbol, ctx))
-                .join("\n"))
+                .join("\n");
+
+            Ok(symbol)
         })
         .map(|symbol| match symbol {
             Ok(symbol) => symbol,
             Err(Error::AddrNotFound(addr)) => addr.to_string(),
             Err(err) => err.to_string(),
-        })
-        .intersperse(ctx.delimiter.to_string())
-        .chain([ctx.delimiter.to_string()])
-        .collect())
+        });
+
+    match ctx.delimiter {
+        Some(delimiter) if ctx.include_inlined => iter_symbols
+            .intersperse(delimiter.to_string())
+            .chain([delimiter.to_string()])
+            .collect(),
+
+        _ => iter_symbols.collect(),
+    }
 }
 
 fn format(symbol: &Symbol, ctx: &Context) -> String {
