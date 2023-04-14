@@ -20,6 +20,9 @@ pub enum Loc {
     ///
     /// This slide value is subtracted from the input addresses.
     Slide(Addr),
+
+    /// Treat all given addresses as offsets into the binary.
+    Offset,
 }
 
 /// The program's context, defines its behavior.
@@ -71,10 +74,10 @@ impl<'a> Context<'a> {
                 }
             },
 
-            base_addr: [cli::Opt::LoadAddr, cli::Opt::SlideAddr, cli::Opt::Offset]
+            base_addr: [cli::Opt::LoadAddr, cli::Opt::SlideAddr]
                 .iter()
                 .find_map(|opt| args.get_one(&opt.to_string()))
-                .context("No location address")?,
+                .unwrap_or(&Loc::Offset),
 
             addrs: args
                 .get_many(&cli::Opt::Addr.to_string())

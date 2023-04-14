@@ -99,18 +99,21 @@ fn compute_addrs(obj: &object::File, ctx: &Context) -> Result<Vec<Addr>> {
         ctx.addrs.clone().context("No input address")?
     };
 
-    let base_addr = match ctx.base_addr {
-        Loc::Load(load_addr) => load_addr
-            .checked_sub(*obj.vmaddr()?)
-            .context(format!("Invalid load address: {}", load_addr))?,
-        Loc::Slide(slide_addr) => **slide_addr,
+    let offset_addr = match ctx.base_addr {
+        Loc::Load(load_addr) => {
+            -(load_addr
+                .checked_sub(*obj.vmaddr()?)
+                .context(format!("Invalid load address: {}", load_addr))? as i64)
+        }
+        Loc::Slide(slide) => -(**slide as i64),
+        Loc::Offset => *obj.vmaddr()? as i64,
     };
 
     addrs
         .iter()
         .map(|addr| {
             Ok(addr
-                .checked_sub(base_addr)
+                .checked_add_signed(offset_addr)
                 .context(format!("Invalid address: {}", addr))?
                 .into())
         })

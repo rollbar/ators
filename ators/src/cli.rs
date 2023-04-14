@@ -47,7 +47,7 @@ pub fn build() -> Command {
             Arg::new(Opt::Object)
                 .short('o')
                 .help_heading("Arguments")
-                .help("The path to a binary image or dSYM in which to look up symbols")
+                .help("The path to a binary image or dSYM in which to look up symbols.")
                 .required(true)
                 .value_hint(ValueHint::FilePath)
                 .value_name("binary|dSYM")
@@ -55,7 +55,7 @@ pub fn build() -> Command {
             Arg::new(Opt::LoadAddr)
                 .short('l')
                 .help_heading("Arguments")
-                .help("The load address of the binary image")
+                .help("The load address of the binary image.")
                 .group("loc")
                 .value_name("load-address")
                 .value_parser(|addr: &str| addr.parse().map(Loc::Load))
@@ -68,7 +68,7 @@ pub fn build() -> Command {
             Arg::new(Opt::SlideAddr)
                 .short('s')
                 .help_heading("Arguments")
-                .help("The slide value of the binary image")
+                .help("The slide value of the binary image.")
                 .group("loc")
                 .value_name("slide")
                 .value_parser(|addr: &str| addr.parse().map(Loc::Slide))
@@ -78,6 +78,15 @@ pub fn build() -> Command {
                     was built.  This slide value is subtracted from the input addresses.  It is\n\
                     usually easier to directly specify the load address with the -l argument\n\
                     than to manually calculate a slide value."),
+            Arg::new(Opt::Offset)
+                .long("offset")
+                .help_heading("Arguments")
+                .help("Treat all given addresses as offsets into the binary.")
+                .group("loc")
+                .action(ArgAction::SetTrue)
+                .long_help(
+                    "Treat all given addresses as offsets into the binary. Only one of the\n\
+                    following options can be used at a time: -s , -l or -offset."),
             Arg::new(Opt::AddrFile)
                 .short('f')
                 .help_heading("Arguments")
@@ -95,7 +104,6 @@ pub fn build() -> Command {
                 .help("\tA list of input addresses at the end of the argument list.")
                 .group("input")
                 .action(ArgAction::Append)
-                .required(true)
                 .num_args(1..)
                 .value_name("address...")
                 .value_parser(str::parse::<atorsl::data::Addr>),
