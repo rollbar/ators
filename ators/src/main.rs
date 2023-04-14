@@ -55,13 +55,13 @@ fn symbolicate(dwarf: &Dwarf, obj: &object::File, addrs: &[Addr], ctx: &Context)
             Err(err) => err.to_string(),
         });
 
-    match ctx.delimiter {
-        Some(delimiter) if ctx.include_inlined => iter_symbols
-            .intersperse(delimiter.to_string())
-            .chain([delimiter.to_string()])
-            .collect(),
-
-        _ => iter_symbols.collect(),
+    if ctx.include_inlined {
+        iter_symbols
+            .intersperse(ctx.delimiter.to_string())
+            .chain([ctx.delimiter.to_string()])
+            .collect()
+    } else {
+        iter_symbols.collect()
     }
 }
 
