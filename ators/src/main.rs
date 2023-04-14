@@ -71,7 +71,7 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
             format!(
                 "{} (in {}) ({}:{})",
                 symbol.name,
-                symbol.module,
+                ctx.obj_path.lossy_file_name(),
                 if ctx.show_full_path {
                     source_loc.file.to_string_lossy().to_string()
                 } else {

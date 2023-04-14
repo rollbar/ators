@@ -21,7 +21,6 @@ pub fn atos_dwarf(
     addr: &Addr,
     include_inlined: bool,
 ) -> Result<Vec<Symbol>, Error> {
-    let mut module = String::default();
     let mut comp_dir = PathBuf::default();
     let mut lang = DwLang(0);
 
@@ -44,17 +43,12 @@ pub fn atos_dwarf(
                     .map(PathBuf::from)
                     .unwrap_or_default();
             }
-            gimli::DW_TAG_module => {
-                module = dwarf
-                    .entry_string(DW_AT_name, entry, &unit)
-                    .unwrap_or_default();
-            }
             gimli::DW_TAG_subprogram => {
                 if !entry.pc().is_some_and(|pc| pc.contains(addr)) {
                     continue;
                 }
 
-                symbols.push(dwarf.symbol(entry, None, &unit, &module, &comp_dir, &lang)?);
+                symbols.push(dwarf.symbol(entry, None, &unit, &comp_dir, &lang)?);
 
                 if include_inlined && entry.has_children() {
                     let mut parent_entry = None;
@@ -84,7 +78,6 @@ pub fn atos_dwarf(
                                         parent_entry,
                                         Some(child_entry),
                                         &unit,
-                                        &module,
                                         &comp_dir,
                                         &lang,
                                     )?,
@@ -96,10 +89,8 @@ pub fn atos_dwarf(
                     };
 
                     if let Some(last_child) = last_child {
-                        symbols.insert(
-                            0,
-                            dwarf.symbol(&last_child, None, &unit, &module, &comp_dir, &lang)?,
-                        )
+                        symbols
+                            .insert(0, dwarf.symbol(&last_child, None, &unit, &comp_dir, &lang)?)
                     }
                 }
 
@@ -119,7 +110,6 @@ pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
     };
 
     Ok(vec![SymbolBuilder::default()
-        .module(String::default())
         .name(demangler::demangle(
             symbol.name(),
             demangler::language_of(symbol.name()),
@@ -144,7 +134,6 @@ trait DwarfExt {
         entry: &Entry,
         child: Option<&Entry>,
         unit: &Unit,
-        module: &str,
         comp_dir: &Path,
         lang: &DwLang,
     ) -> Result<Symbol, Error>;
@@ -159,7 +148,6 @@ impl DwarfExt for Dwarf<'_> {
         entry: &Entry,
         child: Option<&Entry>,
         unit: &Unit,
-        module: &str,
         comp_dir: &Path,
         lang: &DwLang,
     ) -> Result<Symbol, Error> {
@@ -167,7 +155,6 @@ impl DwarfExt for Dwarf<'_> {
         let mut symbol = SymbolBuilder::default();
         symbol
             .name(demangler::demangle(&linkage, *lang))
-            .module(module.to_string())
             .lang(*lang);
 
         let artificial = self.entry_is_artificial(entry);
