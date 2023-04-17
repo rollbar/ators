@@ -19,7 +19,9 @@
 
 cargo build --release
 
+OBJ="./fixtures/objects/rollbar60.dwarf"
+
 hyperfine --warmup 3 \
-    "./target/release/ators -i -o ./fixtures/rollbar -l 0x0100360000 -f ./fixtures/many_addrs.txt" \
-    "atos -i -o ./fixtures/rollbar -l 0x0100360000 -f ./fixtures/many_addrs.txt" \
-    "atosl -o ./fixtures/rollbar -l 0x0100360000 $(cat ./fixtures/many_addrs.txt)"
+    "./target/release/ators -i -o $OBJ -l 0x0100360000 -f ./fixtures/many_addrs.txt" \
+    "atos -i -o $OBJ -l 0x0100360000 -f ./fixtures/many_addrs.txt"
+    #"atosl -o $OBJ -l 0x0100360000 $(cat ./fixtures/many_addrs.txt)"
