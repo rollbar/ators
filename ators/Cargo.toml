@@ -20,6 +20,6 @@ itertools = "0.10.5"
 
 # object
 memmap2 = "0.5.10"
-object = "0.30.3"
+object = "0.31.0"
 gimli = "0.27.2"
 fallible-iterator = "0.2.0"
