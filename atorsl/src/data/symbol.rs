@@ -1,5 +1,4 @@
 use super::Addr;
-use derive_builder::Builder;
 use itertools::Either;
 use std::path::PathBuf;
 
@@ -10,9 +9,8 @@ pub struct SourceLoc {
     pub col: Option<u16>,
 }
 
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Builder)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub struct Symbol {
     pub name: String,
-    pub lang: gimli::DwLang,
     pub loc: Either<SourceLoc, Addr>,
 }

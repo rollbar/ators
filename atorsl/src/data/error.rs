@@ -1,4 +1,4 @@
-use super::{symbol::SymbolBuilderError, Addr};
+use super::Addr;
 use std::{ffi, num::ParseIntError, str, string::FromUtf8Error};
 
 /// An atorsl error.
@@ -30,9 +30,6 @@ pub enum Error {
 
     #[error("Cannot demangle symbol: {0}")]
     CannotDemangleSymbol(String),
-
-    #[error("An error occurred while building the Symbol: {0}")]
-    ErrorBuildingSymbol(#[from] SymbolBuilderError),
 
     #[error("A string passed had an interior nul byte: {0}")]
     InteriorNul(#[from] ffi::NulError),

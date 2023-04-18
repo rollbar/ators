@@ -11,7 +11,7 @@ use atorsl::{
 };
 use context::{Context, Loc};
 use itertools::{Either, Itertools};
-use std::{fs, io, io::BufRead, path::Path};
+use std::{borrow::Cow, fs, io, io::BufRead, path::Path};
 
 fn main() -> Result<()> {
     let (mmap, cow);
@@ -73,7 +73,7 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
                 symbol.name,
                 ctx.obj_path.lossy_file_name(),
                 if ctx.show_full_path {
-                    source_loc.file.to_string_lossy().to_string()
+                    source_loc.file.to_string_lossy()
                 } else {
                     source_loc.file.lossy_file_name()
                 },
@@ -124,14 +124,11 @@ fn compute_addrs(obj: &object::File, ctx: &Context) -> Result<Vec<Addr>> {
 }
 
 trait LossyFileName {
-    fn lossy_file_name(&self) -> String;
+    fn lossy_file_name(&self) -> Cow<'_, str>;
 }
 
 impl LossyFileName for Path {
-    fn lossy_file_name(&self) -> String {
-        self.file_name()
-            .unwrap_or_default()
-            .to_string_lossy()
-            .to_string()
+    fn lossy_file_name(&self) -> Cow<'_, str> {
+        self.file_name().unwrap_or_default().to_string_lossy()
     }
 }

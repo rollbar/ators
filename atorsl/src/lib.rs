@@ -73,6 +73,9 @@ pub(crate) type Unit<'input> =
 pub(crate) type AttrValue<'input> =
     gimli::AttributeValue<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
 
+pub(crate) type EntriesCursor<'abbrev, 'unit, 'input> =
+    gimli::EntriesCursor<'abbrev, 'unit, gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
+
 /// A Debugging Information Entry (DIE).
 ///
 /// DIEs have a set of attributes and optionally have children DIEs as well.

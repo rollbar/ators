@@ -23,8 +23,8 @@ pub fn language_of(s: &str) -> DwLang {
     }
 }
 
-pub fn demangle(sym: &str, lang: DwLang) -> String {
-    match lang {
+pub fn demangle(sym: &str, lang: &DwLang) -> String {
+    match *lang {
         gimli::DW_LANG_C
         | gimli::DW_LANG_C89
         | gimli::DW_LANG_C99
