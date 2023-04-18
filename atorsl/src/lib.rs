@@ -41,10 +41,7 @@ macro_rules! load_dwarf {
         $binding = gimli::Dwarf::load(|section_id| -> gimli::Result<std::borrow::Cow<[u8]>> {
             Ok(
                 <object::File as object::Object>::section_by_name(&$object, section_id.name())
-                    .and_then(|section| {
-                        <object::Section as object::ObjectSection>::uncompressed_data(&section)
-                            .ok()
-                    })
+                    .and_then(|section| object::ObjectSection::uncompressed_data(&section).ok())
                     .unwrap_or(std::borrow::Cow::Borrowed(&[][..])),
             )
         })?;
@@ -52,7 +49,7 @@ macro_rules! load_dwarf {
         $binding.borrow(|section| {
             gimli::EndianSlice::new(
                 &*section,
-                if <object::File as object::Object>::is_little_endian($object) {
+                if object::Object::is_little_endian($object) {
                     gimli::RunTimeEndian::Little
                 } else {
                     gimli::RunTimeEndian::Big
@@ -72,9 +69,6 @@ pub(crate) type Unit<'input> =
 /// The value of an attribute in a `DebuggingInformationEntry`.
 pub(crate) type AttrValue<'input> =
     gimli::AttributeValue<gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
-
-pub(crate) type EntriesCursor<'abbrev, 'unit, 'input> =
-    gimli::EntriesCursor<'abbrev, 'unit, gimli::EndianSlice<'input, gimli::RunTimeEndian>>;
 
 /// A Debugging Information Entry (DIE).
 ///
