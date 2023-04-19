@@ -3,7 +3,7 @@ pub mod object {
     use object::{
         macho,
         read::{self, macho::FatArch},
-        Architecture, Object, ObjectSegment,
+        Object, ObjectSegment,
     };
 
     pub trait File {
@@ -11,6 +11,12 @@ pub mod object {
             data: &[u8],
             selected_arch: Option<object::Architecture>,
         ) -> Result<object::File, Error>;
+
+        fn parse_macho<'a, T: FatArch>(
+            data: &'a [u8],
+            fat_arches: &[T],
+            selected_arch: Option<object::Architecture>,
+        ) -> Result<object::File<'a>, Error>;
 
         fn vmaddr(&self) -> Result<Addr, Error>;
     }
@@ -20,31 +26,31 @@ pub mod object {
             data: &[u8],
             selected_arch: Option<object::Architecture>,
         ) -> Result<object::File, Error> {
-            let Some(selected_arch) = selected_arch else {
-                return Ok(object::File::parse(data)?);
-            };
-
-            let object = if let Ok(arches) = macho::FatHeader::parse_arch32(data) {
-                object::File::parse(read::macho::FatArch::data(
-                    arches
-                        .iter()
-                        .find(|fat_arch| selected_arch == fat_arch.architecture())
-                        .ok_or(Error::CannotLoadSymbolsForArch(selected_arch))?,
-                    data,
-                )?)
-            } else if let Ok(arches) = macho::FatHeader::parse_arch64(data) {
-                object::File::parse(read::macho::FatArch::data(
-                    arches
-                        .iter()
-                        .find(|fat_arch| selected_arch == fat_arch.architecture())
-                        .ok_or(Error::CannotLoadSymbolsForArch(selected_arch))?,
-                    data,
-                )?)
+            if let Ok(fat_arches) = macho::FatHeader::parse_arch32(data) {
+                object::File::parse_macho(data, fat_arches, selected_arch)
+            } else if let Ok(fat_arches) = macho::FatHeader::parse_arch64(data) {
+                object::File::parse_macho(data, fat_arches, selected_arch)
             } else {
-                object::File::parse(data)
-            };
+                Ok(object::File::parse(data)?)
+            }
+        }
 
-            Ok(object?)
+        fn parse_macho<'a, T: FatArch>(
+            data: &'a [u8],
+            fat_arches: &[T],
+            selected_arch: Option<object::Architecture>,
+        ) -> Result<object::File<'a>, Error> {
+            Ok(object::File::parse(read::macho::FatArch::data(
+                if let Some(selected_arch) = selected_arch {
+                    fat_arches
+                        .iter()
+                        .find(|fat_arch| selected_arch == fat_arch.architecture())
+                        .ok_or(Error::CannotLoadSymbolsForArch(selected_arch))?
+                } else {
+                    fat_arches.first().ok_or(Error::CannotLoadSymbols)?
+                },
+                data,
+            )?)?)
         }
 
         fn vmaddr(&self) -> Result<Addr, Error> {
@@ -58,16 +64,18 @@ pub mod object {
         }
     }
 
-    pub trait FromArchitectureName {
-        fn from_architecture_name(architecture: &str) -> Self;
+    pub trait Architecture {
+        fn from_name(name: &str) -> Self;
+
+        fn name(&self) -> String;
     }
 
-    impl FromArchitectureName for Architecture {
-        fn from_architecture_name(architecture: &str) -> Self {
-            match architecture {
+    impl Architecture for object::Architecture {
+        fn from_name(name: &str) -> Self {
+            match name {
                 "i386" | "x86" => Self::I386,
                 "x86_64" | "x86_64h" => Self::X86_64,
-                "x86-64-x32" => Self::X86_64_X32,
+                "x86_64_x32" => Self::X86_64_X32,
                 "arm" | "aarch32" => Self::Arm,
                 "armv4" | "armv4t" | "armv5tej" => Self::Arm,
                 "armv6" | "armv6m" => Self::Arm,
@@ -92,6 +100,14 @@ pub mod object {
                 "wasm32" => Self::Wasm32,
                 "xtensa" => Self::Xtensa,
                 _ => Self::Unknown,
+            }
+        }
+
+        fn name(&self) -> String {
+            match self {
+                Self::Aarch64 => String::from("arm64"),
+                Self::Aarch64_Ilp32 => String::from("arm64_32"),
+                _ => format!("{:?}", self).to_lowercase(),
             }
         }
     }

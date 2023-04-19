@@ -1,7 +1,7 @@
 use crate::context::Loc;
 use clap::{
     crate_authors, crate_description, crate_name, crate_version, value_parser, Arg, ArgAction,
-    ArgGroup, Command, ValueHint,
+    Command, ValueHint,
 };
 use std::{fmt, path::PathBuf};
 
@@ -17,6 +17,7 @@ pub enum Opt {
     Inline,
     Delimiter,
     FullPath,
+    Uuid,
 }
 
 impl fmt::Display for Opt {
@@ -43,6 +44,7 @@ pub fn build() -> Command {
         .version(crate_version!())
         .before_help(TITLE)
         .arg_required_else_help(true)
+        .override_usage("[OPTIONS] -o <binary|dSYM> <-l <load-address>|-s <slide>|--offset> <-f <address-input-file>|-- address...>")
         .args([
             Arg::new(Opt::Object)
                 .short('o')
@@ -56,7 +58,7 @@ pub fn build() -> Command {
                 .short('l')
                 .help_heading("Arguments")
                 .help("The load address of the binary image.")
-                .group("loc")
+                .required_unless_present_any([Opt::Uuid, Opt::SlideAddr, Opt::Offset])
                 .value_name("load-address")
                 .value_parser(|addr: &str| addr.parse().map(Loc::Load))
                 .long_help(
@@ -69,7 +71,7 @@ pub fn build() -> Command {
                 .short('s')
                 .help_heading("Arguments")
                 .help("The slide value of the binary image.")
-                .group("loc")
+                .required_unless_present_any([Opt::Uuid, Opt::LoadAddr, Opt::Offset])
                 .value_name("slide")
                 .value_parser(|addr: &str| addr.parse().map(Loc::Slide))
                 .long_help(
@@ -82,7 +84,7 @@ pub fn build() -> Command {
                 .long("offset")
                 .help_heading("Arguments")
                 .help("Treat all given addresses as offsets into the binary.")
-                .group("loc")
+                .required_unless_present_any([Opt::Uuid, Opt::LoadAddr, Opt::SlideAddr])
                 .action(ArgAction::SetTrue)
                 .long_help(
                     "Treat all given addresses as offsets into the binary. Only one of the\n\
@@ -91,7 +93,7 @@ pub fn build() -> Command {
                 .short('f')
                 .help_heading("Arguments")
                 .help("Input file with white-separated numeric addresses.")
-                .group("input")
+                .required_unless_present_any([Opt::Uuid, Opt::Addr])
                 .value_hint(ValueHint::FilePath)
                 .value_name("address-input-file")
                 .value_parser(value_parser!(PathBuf))
@@ -102,14 +104,12 @@ pub fn build() -> Command {
                 .last(true)
                 .help_heading("Arguments")
                 .help("\tA list of input addresses at the end of the argument list.")
-                .group("input")
+                .required_unless_present_any([Opt::Uuid, Opt::AddrFile])
                 .action(ArgAction::Append)
                 .num_args(1..)
-                .value_name("address...")
+                .value_name("address")
                 .value_parser(str::parse::<atorsl::data::Addr>),
-            ])
-        .group(ArgGroup::new("loc").required(true))
-        .group(ArgGroup::new("input").required(true))
+        ])
         .args([
             Arg::new(Opt::Arch)
                 .long("arch")
@@ -126,12 +126,22 @@ pub fn build() -> Command {
                     (such as i386 or arm) and pass in a corresponding symbol-rich Mach-O binary\n\
                     image file with a binary image of the corresponding architecture (such as a\n\
                     Universal Binary)."),
+            Arg::new(Opt::Uuid)
+                .long("uuid")
+                .help("Print the UUID of the binary image and exit.")
+                .requires(Opt::Object)
+                .conflicts_with_all([Opt::LoadAddr, Opt::SlideAddr, Opt::Offset, Opt::AddrFile, Opt::Addr])
+                .action(ArgAction::SetTrue)
+                .long_help(
+                    "Print the UUID of the binary image and exit.  This will produce the same\n\
+                    output as the symbols program when passing the -uuid argument along with\n\
+                    the path of the object."),
             Arg::new(Opt::Delimiter)
                 .short('d')
-                .help("Delimiter when outputting inline frames. Defaults to newline.")
+                .help("Delimiter when outputting inline frames.")
                 .value_name("delimiter")
                 .value_parser(value_parser!(String))
-                .default_value(String::default()),
+                .default_value("newline"),
             Arg::new(Opt::Inline)
                 .short('i')
                 .long("inlineFrames")

@@ -6,12 +6,14 @@ mod context;
 use anyhow::{Context as _, Result};
 use atorsl::{
     data::{Addr, Symbol},
-    ext::object::File as _,
+    ext::object::{Architecture as _, File as _},
     *,
 };
-use context::{Context, Loc};
+use context::{Context, Loc, Mode};
 use itertools::{Either, Itertools};
-use std::{borrow::Cow, fs, io, io::BufRead, path::Path};
+use object::Object;
+use std::{borrow::Cow, fs, io, io::BufRead, path::Path, str};
+use uuid::Uuid;
 
 fn main() -> Result<()> {
     let (mmap, cow);
@@ -19,14 +21,28 @@ fn main() -> Result<()> {
     let args = cli::build().get_matches();
     let ctx = Context::from_args(&args)?;
 
-    let obj = load_object!(ctx.obj_path, ctx.arch, mmap)?;
-    let dwarf = load_dwarf!(&obj, cow);
+    match ctx.mode {
+        Mode::Symbolicate => {
+            let obj = load_object!(ctx.obj_path, ctx.arch, mmap)?;
+            let dwarf = load_dwarf!(&obj, cow);
+            let addrs = compute_addrs(&obj, &ctx)?;
 
-    let addrs = compute_addrs(&obj, &ctx)?;
+            symbolicate(&dwarf, &obj, &addrs, &ctx)
+                .iter()
+                .for_each(|symbol| println!("{symbol}"));
+        }
 
-    symbolicate(&dwarf, &obj, &addrs, &ctx)
-        .iter()
-        .for_each(|symbol| println!("{symbol}"));
+        Mode::PrintUuid => {
+            let obj = load_object!(ctx.obj_path, ctx.arch, mmap)?;
+
+            println!(
+                "    {:X} {:#8} {}",
+                Uuid::from_bytes(obj.mach_uuid()?.ok_or(Error::ObjectHasNoUuid)?).hyphenated(),
+                obj.architecture().name(),
+                ctx.obj_path.to_string_lossy(),
+            );
+        }
+    }
 
     Ok(())
 }

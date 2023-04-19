@@ -1,8 +1,11 @@
 use crate::{cli, Addr};
 use anyhow::{Context as _, Result};
-use atorsl::ext::object::FromArchitectureName;
+use atorsl::ext::object::Architecture as _;
 use object::Architecture;
-use std::path::{Path, PathBuf};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 /// The location address of the binary image containing symbol addresses.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -25,9 +28,18 @@ pub enum Loc {
     Offset,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Mode {
+    Symbolicate,
+    PrintUuid,
+}
+
 /// The program's context, defines its behavior.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Context<'ctx> {
+    /// Whether we want to symbolicate or print uuid of the binary
+    pub mode: Mode,
+
     /// The full path to either a binary image, eg. the DWARF file, or a .dSYM.
     ///
     /// When provided with a .dSYM, the _first file in alphabetical descending order_ in
@@ -59,13 +71,19 @@ pub struct Context<'ctx> {
 impl<'a> Context<'a> {
     pub fn from_args(args: &'a clap::ArgMatches) -> Result<Self> {
         Ok(Self {
+            mode: if args.get_flag(&cli::Opt::Uuid.to_string()) {
+                Mode::PrintUuid
+            } else {
+                Mode::Symbolicate
+            },
+
             obj_path: {
                 let path = args
                     .get_one::<PathBuf>(&cli::Opt::Object.to_string())
                     .context("No binary image path")?;
 
-                if path.extension().map(|ext| ext == "dSYM") == Some(true) {
-                    std::fs::read_dir(path.as_path().join("Contents/Resources/DWARF"))?
+                if let Some(true) = path.extension().map(|ext| ext == "dSYM") {
+                    fs::read_dir(path.as_path().join("Contents/Resources/DWARF"))?
                         .next()
                         .context("No binary image path")??
                         .path()
@@ -90,7 +108,7 @@ impl<'a> Context<'a> {
             arch: args
                 .get_one(&cli::Opt::Arch.to_string())
                 .map(String::as_str)
-                .map(Architecture::from_architecture_name),
+                .map(Architecture::from_name),
 
             include_inlined: args.get_flag(&cli::Opt::Inline.to_string()),
 
