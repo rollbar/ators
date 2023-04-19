@@ -11,19 +11,21 @@ use atorsl::{
 };
 use context::{Context, Loc, Mode};
 use itertools::{Either, Itertools};
+use memmap2::Mmap;
 use object::Object;
 use std::{borrow::Cow, fs, io, io::BufRead, path::Path, str};
 use uuid::Uuid;
 
 fn main() -> Result<()> {
-    let (mmap, cow);
-
     let args = cli::build().get_matches();
     let ctx = Context::from_args(&args)?;
 
+    let mmap = unsafe { Mmap::map(&fs::File::open(&ctx.obj_path)?) }?;
+    let obj = object::File::parse_data(&mmap, ctx.arch)?;
+
     match ctx.mode {
         Mode::Symbolicate => {
-            let obj = load_object!(ctx.obj_path, ctx.arch, mmap)?;
+            let cow;
             let dwarf = load_dwarf!(&obj, cow);
             let addrs = compute_addrs(&obj, &ctx)?;
 
@@ -33,8 +35,6 @@ fn main() -> Result<()> {
         }
 
         Mode::PrintUuid => {
-            let obj = load_object!(ctx.obj_path, ctx.arch, mmap)?;
-
             println!(
                 "    {:X} {:#8} {}",
                 Uuid::from_bytes(obj.mach_uuid()?.ok_or(Error::ObjectHasNoUuid)?).hyphenated(),

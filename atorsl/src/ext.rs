@@ -7,7 +7,7 @@ pub mod object {
     };
 
     pub trait File {
-        fn parse(
+        fn parse_data(
             data: &[u8],
             selected_arch: Option<object::Architecture>,
         ) -> Result<object::File, Error>;
@@ -22,7 +22,7 @@ pub mod object {
     }
 
     impl File for object::File<'_> {
-        fn parse(
+        fn parse_data(
             data: &[u8],
             selected_arch: Option<object::Architecture>,
         ) -> Result<object::File, Error> {

@@ -11,29 +11,6 @@ pub use symbolicator::{atos_dwarf, atos_obj};
 pub(crate) mod prelude;
 pub(crate) use prelude::{IsOkAnd, IsSomeAnd};
 
-/// Loads a binary image file.
-///
-/// # Safety
-///
-/// The caller must ensure that the object file loaded isn't subsequently modified, applications
-/// must consider the risk and take appropriate precautions such as file permissions, locks or
-/// process-private (e.g. unlinked) files.
-///
-/// Modifications to the loaded object file is undefined behavior.
-#[macro_export]
-macro_rules! load_object {
-    ($path:expr, $arch:expr, $binding:ident) => {{
-        // SAFETY: All file-backed memory map constructors are marked `unsafe` because of the
-        // potential for *Undefined Behavior* (UB) using the map if the underlying file is
-        // subsequently modified, in or out of process. Applications must consider the risk and
-        // take appropriate precautions when using file-backed maps. Solutions such as file
-        // permissions, locks or process-private (e.g. unlinked) files exist but are platform
-        // specific and limited.
-        $binding = unsafe { memmap2::Mmap::map(&std::fs::File::open(&$path)?) }?;
-        <object::File as atorsl::ext::object::File>::parse(&*$binding, $arch)
-    }};
-}
-
 /// Loads a binary image object as DWARF.
 #[macro_export]
 macro_rules! load_dwarf {
