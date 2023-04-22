@@ -17,4 +17,5 @@ Cargo.lock
 /fixtures/objects/rollbar**
 /fixtures/*DeviceSupport*/**
 *.log
+*.dump
 *.profraw
