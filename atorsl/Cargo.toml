@@ -1,6 +1,6 @@
 [package]
 name = "atorsl"
-version = "0.1.0"
+version = "0.2.0"
 description = "convert numeric addresses to symbols of binary images"
 authors.workspace = true
 license.workspace = true
