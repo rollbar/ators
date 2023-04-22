@@ -9,7 +9,7 @@ pub use data::Error;
 pub use symbolicator::{atos_dwarf, atos_obj};
 
 pub(crate) mod prelude;
-pub(crate) use prelude::{IsOkAnd, IsSomeAnd};
+pub(crate) use prelude::*;
 
 /// Loads a binary image object as DWARF.
 #[macro_export]

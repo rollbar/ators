@@ -5,9 +5,8 @@ use crate::{
 };
 use fallible_iterator::FallibleIterator;
 use gimli::{
-    DW_AT_abstract_origin, DW_AT_artificial, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line,
-    DW_AT_comp_dir, DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_language,
-    DW_AT_linkage_name, DW_AT_name, DW_AT_ranges, DebugInfoOffset, DwLang,
+    DW_AT_artificial, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line, DW_AT_decl_column,
+    DW_AT_decl_file, DW_AT_decl_line, DW_AT_ranges, DebugInfoOffset,
 };
 use itertools::Either;
 use object::Object;
@@ -18,86 +17,120 @@ pub fn atos_dwarf(
     addr: &Addr,
     include_inlined: bool,
 ) -> Result<Vec<Symbol>, Error> {
-    let mut path = PathBuf::default();
-    let mut lang = DwLang(0);
-
     let unit = dwarf.unit_from_addr(addr)?;
     let mut entries = unit.entries();
     let mut symbols = Vec::default();
 
-    loop {
+    let comp_unit = entries
+        .next_dfs()?
+        .ok_or_else(|| Error::AddrNotFound(*addr))?
+        .1;
+
+    let comp_unit = comp_unit
+        .attrs()
+        .fold(
+            &mut CompilationUnitBuilder::default(),
+            |builder, attr| match attr.name() {
+                gimli::DW_AT_name => {
+                    let value = attr.value();
+                    Ok(builder.name((value, dwarf.attr_string(&unit, value)?.to_string_lossy())))
+                }
+                gimli::DW_AT_comp_dir => {
+                    let value = attr.value();
+                    Ok(builder.dir((
+                        value,
+                        PathBuf::from(&*dwarf.attr_string(&unit, value)?.to_string_lossy()),
+                    )))
+                }
+                gimli::DW_AT_language => match attr.value() {
+                    AttrValue::Language(dw_lang) => Ok(builder.lang(dw_lang)),
+                    _ => Ok(builder),
+                },
+                _ => Ok(builder),
+            },
+        )?
+        .build()?;
+
+    let subprogram = loop {
         let entry = entries
             .next_dfs()?
             .ok_or_else(|| Error::AddrNotFound(*addr))?
             .1;
 
-        // guarantee: depth order compile_unit > module > subprogram > inlined_subroutine
         match entry.tag() {
-            gimli::DW_TAG_compile_unit => {
-                lang = dwarf.entry_lang(entry).unwrap_or(DwLang(0));
-                path = entry
-                    .attr_value(DW_AT_comp_dir)
-                    .ok()
-                    .and_then(|attr| Some(dwarf.attr_string(&unit, attr?).ok()?.to_string_lossy()))
-                    .map(|comp_dir| PathBuf::from(&*comp_dir))
-                    .unwrap_or_default();
-            }
-
-            gimli::DW_TAG_subprogram if dwarf.entry_contains(addr, entry, &unit) => {
+            gimli::DW_TAG_subprogram if entry.pc().is_some_and(|pc| pc.contains(addr)) => {
                 symbols.push(Symbol {
-                    name: dwarf.entry_demangled_name(entry, &lang, &unit)?,
-                    loc: Either::Left(dwarf.entry_loc(entry, &path, &unit)),
+                    name: demangler::demangle(&entry.symbol_name(dwarf, &unit)?, comp_unit.lang),
+                    loc: Either::Left(dwarf.entry_loc(entry, Path::new(&*comp_unit.dir.1), &unit)),
                 });
 
-                if include_inlined && entry.has_children() {
-                    let mut parent = None;
-                    let mut depth = 0;
-
-                    let last_child = loop {
-                        let Some((step, child)) = entries.next_dfs()? else {
-                            break parent
-                        };
-
-                        depth += step;
-
-                        if depth <= 0 {
-                            break parent;
-                        }
-
-                        if child.tag() == gimli::DW_TAG_inlined_subroutine
-                            && dwarf.entry_contains(addr, child, &unit)
-                        {
-                            if let Some(ref parent) = parent {
-                                symbols.insert(
-                                    0,
-                                    Symbol {
-                                        name: dwarf.entry_demangled_name(parent, &lang, &unit)?,
-                                        loc: Either::Left(dwarf.entry_loc(child, &path, &unit)),
-                                    },
-                                );
-                            }
-
-                            parent = Some(child.clone());
-                        }
-                    };
-
-                    if let Some(last_child) = last_child {
-                        symbols.insert(
-                            0,
-                            Symbol {
-                                name: dwarf.entry_demangled_name(&last_child, &lang, &unit)?,
-                                loc: Either::Left(dwarf.entry_loc(&last_child, &path, &unit)),
-                            },
-                        );
-                    }
-                }
-
-                break Ok(symbols);
+                break entry;
             }
-
             _ => continue,
         }
+    };
+
+    if include_inlined && subprogram.has_children() {
+        let mut parent = Option::<Entry>::None;
+        let mut depth = 0;
+
+        let last_child = loop {
+            let Some((step, child)) = entries.next_dfs()? else {
+                break parent
+            };
+
+            depth += step;
+
+            if depth <= 0 {
+                break parent;
+            }
+
+            if child.tag() == gimli::DW_TAG_inlined_subroutine
+                && dwarf.entry_contains(addr, child, &unit)
+            {
+                if let Some(ref parent) = parent {
+                    symbols.insert(
+                        0,
+                        Symbol {
+                            name: demangler::demangle(
+                                &parent.symbol_name(dwarf, &unit)?,
+                                comp_unit.lang,
+                            ),
+                            loc: Either::Left(dwarf.entry_loc(
+                                child,
+                                Path::new(&*comp_unit.dir.1),
+                                &unit,
+                            )),
+                        },
+                    );
+                }
+
+                parent = Some(child.clone());
+            }
+        };
+
+        // Gotta search for the addr in debug-line
+        if let Some(last_child) = last_child {
+            //dwarf.debug_line.program(offset, address_size, comp_dir, comp_name)
+
+            symbols.insert(
+                0,
+                Symbol {
+                    name: demangler::demangle(
+                        &last_child.symbol_name(dwarf, &unit)?,
+                        comp_unit.lang,
+                    ),
+                    loc: Either::Left(dwarf.entry_loc(
+                        &last_child,
+                        Path::new(&*comp_unit.dir.1),
+                        &unit,
+                    )),
+                },
+            );
+        }
     }
+
+    Ok(symbols)
 }
 
 pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
@@ -107,25 +140,15 @@ pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
     };
 
     Ok(vec![Symbol {
-        name: demangler::demangle(symbol.name(), &demangler::language_of(symbol.name())),
+        name: demangler::demangle(symbol.name(), None),
         loc: Either::Right(addr - symbol.address()),
     }])
 }
 
 trait DwarfExt {
-    fn entry_name(&self, entry: &Entry, unit: &Unit) -> Result<String, Error>;
-    fn entry_demangled_name(
-        &self,
-        entry: &Entry,
-        lang: &DwLang,
-        unit: &Unit,
-    ) -> Result<String, Error>;
-
-    //fn entry_string(&self, name: DwAt, entry: &Entry, unit: &Unit) -> Option<String>;
     fn entry_file(&self, entry: &Entry, unit: &Unit) -> Option<PathBuf>;
     fn entry_line(&self, entry: &Entry) -> Option<u16>;
     fn entry_col(&self, entry: &Entry) -> Option<u16>;
-    fn entry_lang(&self, entry: &Entry) -> Option<DwLang>;
     fn entry_is_artificial(&self, entry: &Entry) -> Option<bool>;
     fn entry_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> SourceLoc;
 
@@ -142,7 +165,7 @@ impl DwarfExt for Dwarf<'_> {
         let file = self.entry_file(entry, unit);
         match (file, artificial) {
             (None, _) | (_, Some(true)) => SourceLoc {
-                file: path.join("<compile-generated>"),
+                file: path.join("<compiler-generated>"),
                 line: u16::default(),
                 col: None,
             },
@@ -152,29 +175,6 @@ impl DwarfExt for Dwarf<'_> {
                 col: self.entry_col(entry),
             },
         }
-    }
-
-    fn entry_demangled_name(
-        &self,
-        entry: &Entry,
-        lang: &DwLang,
-        unit: &Unit,
-    ) -> Result<String, Error> {
-        Ok(demangler::demangle(&self.entry_name(entry, unit)?, lang))
-    }
-
-    fn entry_name(&self, entry: &Entry, unit: &Unit) -> Result<String, Error> {
-        [DW_AT_linkage_name, DW_AT_abstract_origin, DW_AT_name]
-            .into_iter()
-            .find_map(|dw_at| entry.attr_value(dw_at).ok().flatten())
-            .ok_or(Error::EntryInAddrNotSymbol)
-            .and_then(|attr| match attr {
-                AttrValue::UnitRef(offset) => self.entry_name(&unit.entry(offset)?, unit),
-                attr => Ok(self
-                    .attr_string(unit, attr)?
-                    .to_string_lossy()
-                    .to_string()),
-            })
     }
 
     fn entry_file(&self, entry: &Entry, unit: &Unit) -> Option<PathBuf> {
@@ -202,13 +202,6 @@ impl DwarfExt for Dwarf<'_> {
             .map(|file| dir + &file.to_string_lossy())
             .map(PathBuf::from)
             .ok()
-    }
-
-    fn entry_lang(&self, entry: &Entry) -> Option<DwLang> {
-        match entry.attr_value(DW_AT_language).ok()?? {
-            AttrValue::Language(dw_lang) => Some(dw_lang),
-            _ => None,
-        }
     }
 
     fn entry_line(&self, entry: &Entry) -> Option<u16> {

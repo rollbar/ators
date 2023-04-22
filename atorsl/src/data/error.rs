@@ -13,19 +13,31 @@ pub enum Error {
     #[error("Error reading binary image object: {0}")]
     Object(#[from] object::read::Error),
 
+    #[error("Error building structure: {0}")]
+    Builder(#[from] derive_builder::UninitializedFieldError),
+
     #[error("vmaddr: __TEXT segment not found")]
     VmAddrTextSegmentNotFound,
+
+    #[error("Compilation unit for address has no path: {0}")]
+    CompUnitDirMissing(Addr),
+
+    #[error("Compilation unit for address has no name: {0}")]
+    CompUnitNameMissing(Addr),
 
     #[error("Address not found: {0}")]
     AddrNotFound(Addr),
 
     #[error("Address does not point to a symbol")]
-    EntryInAddrNotSymbol,
+    AddrNotSymbol,
+
+    #[error("Address does not point to a named entry")]
+    AddrNotNamed,
 
     #[error("No debug offset in address: {0}")]
     AddrNoDebugOffset(Addr),
 
-    #[error("Invalid address {0}")]
+    #[error("Invalid address: {0}")]
     AddrInvalid(Addr),
 
     #[error("Cannot demangle symbol: {0}")]
