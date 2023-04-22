@@ -1,3 +1,5 @@
+pub(crate) mod gimli;
+
 pub mod object {
     use crate::data::{Addr, Error};
     use object::{
@@ -109,58 +111,6 @@ pub mod object {
                 Self::Aarch64_Ilp32 => String::from("arm64_32"),
                 _ => format!("{:?}", self).to_lowercase(),
             }
-        }
-    }
-}
-
-pub(crate) mod gimli {
-    use crate::data::Addr;
-    use gimli::{AttributeValue, EndianSlice, RunTimeEndian};
-    use std::ops;
-
-    pub(crate) trait DebuggingInformationEntry {
-        fn pc(&self) -> Option<ops::Range<Addr>>;
-    }
-
-    impl DebuggingInformationEntry
-        for gimli::DebuggingInformationEntry<'_, '_, EndianSlice<'_, RunTimeEndian>, usize>
-    {
-        fn pc(&self) -> Option<ops::Range<Addr>> {
-            let low: Addr = match self.attr_value(gimli::DW_AT_low_pc).ok()? {
-                Some(AttributeValue::Addr(addr)) => Some(addr.into()),
-                _ => None,
-            }?;
-
-            let high = match self.attr_value(gimli::DW_AT_high_pc).ok()? {
-                Some(AttributeValue::Addr(addr)) => Some(addr.into()),
-                Some(AttributeValue::Udata(len)) => Some(low + len),
-                _ => None,
-            }?;
-
-            Some(low..high)
-        }
-    }
-
-    pub(crate) trait ArangeEntry {
-        fn contains(&self, addr: &Addr) -> Result<bool, gimli::Error>;
-    }
-
-    impl ArangeEntry for gimli::ArangeEntry {
-        fn contains(&self, addr: &Addr) -> Result<bool, gimli::Error> {
-            self.address()
-                .checked_add(self.length())
-                .map(|address_end| (self.address()..address_end).contains(addr))
-                .ok_or(gimli::Error::InvalidAddressRange)
-        }
-    }
-
-    pub(crate) trait Range {
-        fn contains(&self, addr: &Addr) -> bool;
-    }
-
-    impl Range for gimli::Range {
-        fn contains(&self, addr: &Addr) -> bool {
-            (self.begin..self.end).contains(addr)
         }
     }
 }
