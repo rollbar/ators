@@ -5,8 +5,8 @@ use crate::{
 };
 use fallible_iterator::FallibleIterator;
 use gimli::{
-    DW_AT_artificial, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line, DW_AT_decl_column,
-    DW_AT_decl_file, DW_AT_decl_line, DW_AT_ranges, DebugInfoOffset,
+    ColumnType, DW_AT_artificial, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line,
+    DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_ranges, DebugInfoOffset,
 };
 use itertools::Either;
 use object::Object;
@@ -21,10 +21,9 @@ pub fn atos_dwarf(
     let mut entries = unit.entries();
     let mut symbols = Vec::default();
 
-    let comp_unit = entries
+    let (_, comp_unit) = entries
         .next_dfs()?
-        .ok_or_else(|| Error::AddrNotFound(*addr))?
-        .1;
+        .ok_or_else(|| Error::AddrNotFound(*addr))?;
 
     let comp_unit = comp_unit
         .attrs()
@@ -52,10 +51,9 @@ pub fn atos_dwarf(
         .build()?;
 
     let subprogram = loop {
-        let entry = entries
+        let (_, entry) = entries
             .next_dfs()?
-            .ok_or_else(|| Error::AddrNotFound(*addr))?
-            .1;
+            .ok_or_else(|| Error::AddrNotFound(*addr))?;
 
         match entry.tag() {
             gimli::DW_TAG_subprogram if entry.pc().is_some_and(|pc| pc.contains(addr)) => {
@@ -107,7 +105,48 @@ pub fn atos_dwarf(
 
         // Gotta search for the addr in debug-line
         if let Some(last_child) = last_child {
-            //dwarf.debug_line.program(offset, address_size, comp_dir, comp_name)
+            let mut rows = unit
+                .line_program
+                .clone()
+                .ok_or_else(|| Error::CompUnitLineProgramMissing(*addr))?
+                .rows();
+
+            let source_loc = loop {
+                let (header, row) = rows
+                    .next_row()?
+                    .ok_or_else(|| Error::AddrLineInfoMissing(*addr))?;
+
+                if row.address() == addr {
+                    let path = row
+                        .file(header)
+                        .ok_or_else(|| Error::AddrFileInfoMissing(*addr))
+                        .and_then(|file| {
+                            let mut path = match file.directory(header) {
+                                Some(dir) if file.directory_index() != 0 => PathBuf::from(
+                                    &*dwarf.attr_string(&unit, dir)?.to_string_lossy(),
+                                ),
+                                _ => comp_unit.dir.1.clone(),
+                            };
+
+                            path.push(
+                                &*dwarf
+                                    .attr_string(&unit, file.path_name())?
+                                    .to_string_lossy(),
+                            );
+
+                            Ok(path)
+                        })?;
+
+                    break SourceLoc {
+                        file: path,
+                        line: row.line().map(|l| l.get()).unwrap_or_default() as u16,
+                        col: match row.column() {
+                            ColumnType::LeftEdge => Some(0),
+                            ColumnType::Column(c) => Some(c.get() as u16),
+                        },
+                    };
+                }
+            };
 
             symbols.insert(
                 0,
@@ -116,7 +155,7 @@ pub fn atos_dwarf(
                         &last_child.symbol_name(dwarf, &unit)?,
                         comp_unit.lang,
                     ),
-                    loc: Either::Left(dwarf.entry_loc(&last_child, &comp_unit.dir.1, &unit)),
+                    loc: Either::Left(source_loc),
                 },
             );
         }

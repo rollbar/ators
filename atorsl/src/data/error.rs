@@ -19,11 +19,14 @@ pub enum Error {
     #[error("vmaddr: __TEXT segment not found")]
     VmAddrTextSegmentNotFound,
 
+    #[error("Compilation unit for address has no name: {0}")]
+    CompUnitNameMissing(Addr),
+
     #[error("Compilation unit for address has no path: {0}")]
     CompUnitDirMissing(Addr),
 
-    #[error("Compilation unit for address has no name: {0}")]
-    CompUnitNameMissing(Addr),
+    #[error("Compilation unit for address has no line program: {0}")]
+    CompUnitLineProgramMissing(Addr),
 
     #[error("Address not found: {0}")]
     AddrNotFound(Addr),
@@ -33,6 +36,12 @@ pub enum Error {
 
     #[error("Address does not point to a named entry")]
     AddrNotNamed,
+
+    #[error("Address has no line information: {0}")]
+    AddrLineInfoMissing(Addr),
+
+    #[error("Address has no file information: {0}")]
+    AddrFileInfoMissing(Addr),
 
     #[error("No debug offset in address: {0}")]
     AddrNoDebugOffset(Addr),
