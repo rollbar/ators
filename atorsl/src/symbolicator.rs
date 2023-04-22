@@ -61,7 +61,7 @@ pub fn atos_dwarf(
             gimli::DW_TAG_subprogram if entry.pc().is_some_and(|pc| pc.contains(addr)) => {
                 symbols.push(Symbol {
                     name: demangler::demangle(&entry.symbol_name(dwarf, &unit)?, comp_unit.lang),
-                    loc: Either::Left(dwarf.entry_loc(entry, Path::new(&*comp_unit.dir.1), &unit)),
+                    loc: Either::Left(dwarf.entry_loc(entry, &comp_unit.dir.1, &unit)),
                 });
 
                 break entry;
@@ -96,11 +96,7 @@ pub fn atos_dwarf(
                                 &parent.symbol_name(dwarf, &unit)?,
                                 comp_unit.lang,
                             ),
-                            loc: Either::Left(dwarf.entry_loc(
-                                child,
-                                Path::new(&*comp_unit.dir.1),
-                                &unit,
-                            )),
+                            loc: Either::Left(dwarf.entry_loc(child, &comp_unit.dir.1, &unit)),
                         },
                     );
                 }
@@ -120,11 +116,7 @@ pub fn atos_dwarf(
                         &last_child.symbol_name(dwarf, &unit)?,
                         comp_unit.lang,
                     ),
-                    loc: Either::Left(dwarf.entry_loc(
-                        &last_child,
-                        Path::new(&*comp_unit.dir.1),
-                        &unit,
-                    )),
+                    loc: Either::Left(dwarf.entry_loc(&last_child, &comp_unit.dir.1, &unit)),
                 },
             );
         }
