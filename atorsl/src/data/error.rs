@@ -32,10 +32,10 @@ pub enum Error {
     AddrNotFound(Addr),
 
     #[error("Address does not point to a symbol")]
-    AddrNotSymbol,
+    AddrSymbolMissing,
 
     #[error("Address does not point to a named entry")]
-    AddrNotNamed,
+    AddrNameMissing,
 
     #[error("Address has no line information: {0}")]
     AddrLineInfoMissing(Addr),
@@ -44,7 +44,7 @@ pub enum Error {
     AddrFileInfoMissing(Addr),
 
     #[error("No debug offset in address: {0}")]
-    AddrNoDebugOffset(Addr),
+    AddrDebugInfoOffsetMissing(Addr),
 
     #[error("Invalid address: {0}")]
     AddrInvalid(Addr),

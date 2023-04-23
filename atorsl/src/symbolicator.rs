@@ -5,8 +5,9 @@ use crate::{
 };
 use fallible_iterator::FallibleIterator;
 use gimli::{
-    ColumnType, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line, DW_AT_decl_column,
-    DW_AT_decl_file, DW_AT_decl_line, DW_AT_ranges, DebugInfoOffset,
+    ColumnType, DW_AT_abstract_origin, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line,
+    DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_linkage_name, DW_AT_name,
+    DW_AT_ranges, DebugInfoOffset,
 };
 use itertools::Either;
 use object::Object;
@@ -19,7 +20,8 @@ pub fn atos_dwarf(
 ) -> Result<Vec<Symbol>, Error> {
     let unit = dwarf.unit_from_addr(addr)?;
     let mut entries = unit.entries();
-    let mut symbols = Vec::default();
+
+    let builder = &mut CompilationUnitBuilder::default();
 
     let (_, comp_unit) = entries
         .next_dfs()?
@@ -27,28 +29,26 @@ pub fn atos_dwarf(
 
     let comp_unit = comp_unit
         .attrs()
-        .fold(
-            &mut CompilationUnitBuilder::default(),
-            |builder, attr| match attr.name() {
-                gimli::DW_AT_name => {
-                    let value = attr.value();
-                    Ok(builder.name((value, dwarf.attr_string(&unit, value)?.to_string_lossy())))
-                }
-                gimli::DW_AT_comp_dir => {
-                    let value = attr.value();
-                    Ok(builder.dir((
-                        value,
-                        PathBuf::from(&*dwarf.attr_string(&unit, value)?.to_string_lossy()),
-                    )))
-                }
+        .fold(builder, |builder, attr| {
+            Ok(match attr.name() {
+                gimli::DW_AT_name => builder.name(
+                    dwarf
+                        .attr_lossy_string(&unit, attr.value())?
+                        .into_owned(),
+                ),
+                gimli::DW_AT_comp_dir => builder.dir(PathBuf::from(
+                    &*dwarf.attr_lossy_string(&unit, attr.value())?,
+                )),
                 gimli::DW_AT_language => match attr.value() {
-                    AttrValue::Language(dw_lang) => Ok(builder.lang(dw_lang)),
-                    _ => Ok(builder),
+                    AttrValue::Language(dw_lang) => builder.lang(dw_lang),
+                    _ => builder,
                 },
-                _ => Ok(builder),
-            },
-        )?
+                _ => builder,
+            })
+        })?
         .build()?;
+
+    let mut symbols = Vec::default();
 
     let subprogram = loop {
         let (_, entry) = entries
@@ -58,7 +58,7 @@ pub fn atos_dwarf(
         match entry.tag() {
             gimli::DW_TAG_subprogram if entry.pc().is_some_and(|pc| pc.contains(addr)) => {
                 symbols.push(Symbol {
-                    name: demangler::demangle(&entry.symbol_name(dwarf, &unit)?, comp_unit.lang),
+                    name: demangler::demangle(&dwarf.entry_symbol(entry, &unit)?, comp_unit.lang),
                     loc: Either::Left(dwarf.entry_source_loc(entry, &unit)),
                 });
 
@@ -91,7 +91,7 @@ pub fn atos_dwarf(
                         0,
                         Symbol {
                             name: demangler::demangle(
-                                &parent.symbol_name(dwarf, &unit)?,
+                                &dwarf.entry_symbol(parent, &unit)?,
                                 comp_unit.lang,
                             ),
                             loc: Either::Left(dwarf.entry_source_loc(child, &unit)),
@@ -121,17 +121,13 @@ pub fn atos_dwarf(
                         .ok_or_else(|| Error::AddrFileInfoMissing(*addr))
                         .and_then(|file| {
                             let mut path = match file.directory(header) {
-                                Some(dir) if file.directory_index() != 0 => PathBuf::from(
-                                    &*dwarf.attr_string(&unit, dir)?.to_string_lossy(),
-                                ),
-                                _ => comp_unit.dir.1.clone(),
+                                Some(dir) if file.directory_index() != 0 => {
+                                    PathBuf::from(&*dwarf.attr_lossy_string(&unit, dir)?)
+                                }
+                                _ => comp_unit.dir,
                             };
 
-                            path.push(
-                                &*dwarf
-                                    .attr_string(&unit, file.path_name())?
-                                    .to_string_lossy(),
-                            );
+                            path.push(&*dwarf.attr_lossy_string(&unit, file.path_name())?);
 
                             Ok(path)
                         })?;
@@ -151,7 +147,7 @@ pub fn atos_dwarf(
                 0,
                 Symbol {
                     name: demangler::demangle(
-                        &last_child.symbol_name(dwarf, &unit)?,
+                        &dwarf.entry_symbol(&last_child, &unit)?,
                         comp_unit.lang,
                     ),
                     loc: Either::Left(Some(source_loc)),
@@ -176,17 +172,48 @@ pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
 }
 
 trait DwarfExt {
+    fn entry_name<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error>;
+    fn entry_symbol<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error>;
     fn entry_source_loc(&self, entry: &Entry, unit: &Unit) -> Option<SourceLoc>;
 
     fn entry_contains(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> bool;
     fn entry_ranges_contain(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> Option<bool>;
 
-    fn attr_lossy_string<'a>(&'a self, unit: &Unit<'a>, attr: AttrValue<'a>) -> Option<Cow<str>>;
+    fn attr_lossy_string<'a>(
+        &'a self,
+        unit: &Unit<'a>,
+        attr: AttrValue<'a>,
+    ) -> Result<Cow<str>, gimli::Error>;
     fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error>;
     fn debug_info_offset(&self, addr: &Addr) -> Result<DebugInfoOffset, Error>;
 }
 
 impl DwarfExt for Dwarf<'_> {
+    fn entry_name<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error> {
+        Ok(match entry.attr_value(DW_AT_name)? {
+            Some(AttrValue::UnitRef(offset)) => Cow::Owned(
+                self.entry_name(&unit.entry(offset)?, unit)?
+                    .into_owned(),
+            ),
+            Some(attr) => self.attr_lossy_string(unit, attr)?,
+            None => Err(Error::AddrNameMissing)?,
+        })
+    }
+
+    fn entry_symbol<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error> {
+        [DW_AT_linkage_name, DW_AT_abstract_origin, DW_AT_name]
+            .into_iter()
+            .find_map(|dw_at| entry.attr_value(dw_at).ok()?)
+            .ok_or(Error::AddrSymbolMissing)
+            .and_then(|attr| match attr {
+                AttrValue::UnitRef(offset) => Ok(Cow::Owned(
+                    self.entry_symbol(&unit.entry(offset)?, unit)?
+                        .into_owned(),
+                )),
+                attr => Ok(self.attr_lossy_string(unit, attr)?),
+            })
+    }
+
     fn entry_source_loc(&self, entry: &Entry, unit: &Unit) -> Option<SourceLoc> {
         let AttrValue::FileIndex(offset) = [DW_AT_decl_file, DW_AT_call_file]
             .into_iter()
@@ -199,8 +226,12 @@ impl DwarfExt for Dwarf<'_> {
         let file = header.file(offset)?;
 
         Some(SourceLoc {
-            file: PathBuf::from(&*self.attr_lossy_string(unit, file.directory(header)?)?)
-                .join(&*self.attr_lossy_string(unit, file.path_name())?),
+            file: PathBuf::from(
+                &*self
+                    .attr_lossy_string(unit, file.directory(header)?)
+                    .ok()?,
+            )
+            .join(&*self.attr_lossy_string(unit, file.path_name()).ok()?),
 
             line: [DW_AT_decl_line, DW_AT_call_line]
                 .into_iter()
@@ -227,8 +258,12 @@ impl DwarfExt for Dwarf<'_> {
             .ok()
     }
 
-    fn attr_lossy_string<'a>(&'a self, unit: &Unit<'a>, attr: AttrValue<'a>) -> Option<Cow<str>> {
-        Some(self.attr_string(unit, attr).ok()?.to_string_lossy())
+    fn attr_lossy_string<'a>(
+        &'a self,
+        unit: &Unit<'a>,
+        attr: AttrValue<'a>,
+    ) -> Result<Cow<str>, gimli::Error> {
+        Ok(self.attr_string(unit, attr)?.to_string_lossy())
     }
 
     fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error> {
@@ -237,7 +272,7 @@ impl DwarfExt for Dwarf<'_> {
         Ok(self.unit(header)?)
     }
 
-    fn debug_info_offset(&self, addr: &Addr) -> Result<gimli::DebugInfoOffset, Error> {
+    fn debug_info_offset(&self, addr: &Addr) -> Result<DebugInfoOffset, Error> {
         self.debug_aranges
             .headers()
             .find_map(|header| {
@@ -247,6 +282,6 @@ impl DwarfExt for Dwarf<'_> {
                     None
                 })
             })?
-            .ok_or(Error::AddrNoDebugOffset(*addr))
+            .ok_or(Error::AddrDebugInfoOffsetMissing(*addr))
     }
 }
