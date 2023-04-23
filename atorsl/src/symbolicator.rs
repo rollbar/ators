@@ -5,12 +5,12 @@ use crate::{
 };
 use fallible_iterator::FallibleIterator;
 use gimli::{
-    ColumnType, DW_AT_artificial, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line,
-    DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_ranges, DebugInfoOffset,
+    ColumnType, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line, DW_AT_decl_column,
+    DW_AT_decl_file, DW_AT_decl_line, DW_AT_ranges, DebugInfoOffset,
 };
 use itertools::Either;
 use object::Object;
-use std::path::{Path, PathBuf};
+use std::{borrow::Cow, path::PathBuf};
 
 pub fn atos_dwarf(
     dwarf: &Dwarf,
@@ -59,7 +59,7 @@ pub fn atos_dwarf(
             gimli::DW_TAG_subprogram if entry.pc().is_some_and(|pc| pc.contains(addr)) => {
                 symbols.push(Symbol {
                     name: demangler::demangle(&entry.symbol_name(dwarf, &unit)?, comp_unit.lang),
-                    loc: Either::Left(dwarf.entry_loc(entry, &comp_unit.dir.1, &unit)),
+                    loc: Either::Left(dwarf.entry_source_loc(entry, &unit)),
                 });
 
                 break entry;
@@ -94,7 +94,7 @@ pub fn atos_dwarf(
                                 &parent.symbol_name(dwarf, &unit)?,
                                 comp_unit.lang,
                             ),
-                            loc: Either::Left(dwarf.entry_loc(child, &comp_unit.dir.1, &unit)),
+                            loc: Either::Left(dwarf.entry_source_loc(child, &unit)),
                         },
                     );
                 }
@@ -103,7 +103,6 @@ pub fn atos_dwarf(
             }
         };
 
-        // Gotta search for the addr in debug-line
         if let Some(last_child) = last_child {
             let mut rows = unit
                 .line_program
@@ -155,7 +154,7 @@ pub fn atos_dwarf(
                         &last_child.symbol_name(dwarf, &unit)?,
                         comp_unit.lang,
                     ),
-                    loc: Either::Left(source_loc),
+                    loc: Either::Left(Some(source_loc)),
                 },
             );
         }
@@ -167,7 +166,7 @@ pub fn atos_dwarf(
 pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
     let map = obj.symbol_map();
     let Some(symbol) = map.get(*addr) else {
-        return Err(Error::AddrNotFound(addr))
+        Err(Error::AddrNotFound(addr))?
     };
 
     Ok(vec![Symbol {
@@ -177,82 +176,40 @@ pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
 }
 
 trait DwarfExt {
-    fn entry_file(&self, entry: &Entry, unit: &Unit) -> Option<PathBuf>;
-    fn entry_line(&self, entry: &Entry) -> Option<u16>;
-    fn entry_col(&self, entry: &Entry) -> Option<u16>;
-    fn entry_is_artificial(&self, entry: &Entry) -> Option<bool>;
-    fn entry_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> SourceLoc;
+    fn entry_source_loc(&self, entry: &Entry, unit: &Unit) -> Option<SourceLoc>;
 
     fn entry_contains(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> bool;
     fn entry_ranges_contain(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> Option<bool>;
 
+    fn attr_lossy_string<'a>(&'a self, unit: &Unit<'a>, attr: AttrValue<'a>) -> Option<Cow<str>>;
     fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error>;
     fn debug_info_offset(&self, addr: &Addr) -> Result<DebugInfoOffset, Error>;
 }
 
 impl DwarfExt for Dwarf<'_> {
-    fn entry_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> SourceLoc {
-        let artificial = self.entry_is_artificial(entry);
-        let file = self.entry_file(entry, unit);
-        match (file, artificial) {
-            (None, _) | (_, Some(true)) => SourceLoc {
-                file: path.join("<compiler-generated>"),
-                line: u16::default(),
-                col: None,
-            },
-            (Some(file), _) => SourceLoc {
-                file,
-                line: self.entry_line(entry).unwrap_or_default(),
-                col: self.entry_col(entry),
-            },
-        }
-    }
-
-    fn entry_file(&self, entry: &Entry, unit: &Unit) -> Option<PathBuf> {
-        let Some(AttrValue::FileIndex(offset)) = [DW_AT_decl_file, DW_AT_call_file]
+    fn entry_source_loc(&self, entry: &Entry, unit: &Unit) -> Option<SourceLoc> {
+        let AttrValue::FileIndex(offset) = [DW_AT_decl_file, DW_AT_call_file]
             .into_iter()
-            .find_map(|name| entry.attr_value(name).ok()?)
+            .find_map(|name| entry.attr_value(name).ok()?)?
         else {
-            return None
+            None?
         };
 
         let header = unit.line_program.as_ref()?.header();
         let file = header.file(offset)?;
-        let dir = match file.directory(header) {
-            Some(attr) => {
-                self.attr_string(unit, attr)
-                    .ok()?
-                    .to_string_lossy()
-                    .to_string()
-                    + "/"
-            }
-            _ => String::default(),
-        };
 
-        self.attr_string(unit, file.path_name())
-            .map(|file| dir + &file.to_string_lossy())
-            .map(PathBuf::from)
-            .ok()
-    }
+        Some(SourceLoc {
+            file: PathBuf::from(&*self.attr_lossy_string(unit, file.directory(header)?)?)
+                .join(&*self.attr_lossy_string(unit, file.path_name())?),
 
-    fn entry_line(&self, entry: &Entry) -> Option<u16> {
-        [DW_AT_decl_line, DW_AT_call_line]
-            .into_iter()
-            .find_map(|name| entry.attr_value(name).ok()??.u16_value())
-    }
+            line: [DW_AT_decl_line, DW_AT_call_line]
+                .into_iter()
+                .find_map(|name| entry.attr_value(name).ok()??.u16_value())?,
 
-    fn entry_col(&self, entry: &Entry) -> Option<u16> {
-        [DW_AT_decl_column, DW_AT_call_column]
-            .into_iter()
-            .find_map(|name| entry.attr_value(name).ok()??.u16_value())
-    }
-
-    /// Whether the entry is compiler generated
-    fn entry_is_artificial(&self, entry: &Entry) -> Option<bool> {
-        match entry.attr_value(DW_AT_artificial).ok()?? {
-            AttrValue::Flag(is_artificial) => Some(is_artificial),
-            _ => None,
-        }
+            col: [DW_AT_decl_column, DW_AT_call_column]
+                .into_iter()
+                .find_map(|name| entry.attr_value(name).ok()??.u16_value()),
+        })
     }
 
     fn entry_contains(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> bool {
@@ -261,13 +218,17 @@ impl DwarfExt for Dwarf<'_> {
     }
 
     fn entry_ranges_contain(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> Option<bool> {
-        match entry.attr_value(DW_AT_ranges).ok()?? {
-            AttrValue::RangeListsRef(offset) => self
-                .ranges(unit, self.ranges_offset_from_raw(unit, offset))
-                .and_then(|mut ranges| ranges.any(|range| Ok(range.contains(addr))))
-                .ok(),
-            _ => None,
-        }
+        let AttrValue::RangeListsRef(offset) = entry.attr_value(DW_AT_ranges).ok()?? else {
+            None?
+        };
+
+        self.ranges(unit, self.ranges_offset_from_raw(unit, offset))
+            .and_then(|mut ranges| ranges.any(|range| Ok(range.contains(addr))))
+            .ok()
+    }
+
+    fn attr_lossy_string<'a>(&'a self, unit: &Unit<'a>, attr: AttrValue<'a>) -> Option<Cow<str>> {
+        Some(self.attr_string(unit, attr).ok()?.to_string_lossy())
     }
 
     fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error> {

@@ -12,5 +12,5 @@ pub struct SourceLoc {
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Symbol {
     pub name: String,
-    pub loc: Either<SourceLoc, Addr>,
+    pub loc: Either<Option<SourceLoc>, Addr>,
 }

@@ -83,7 +83,7 @@ fn symbolicate(dwarf: &Dwarf, obj: &object::File, addrs: &[Addr], ctx: &Context)
 
 fn format(symbol: &Symbol, ctx: &Context) -> String {
     match symbol.loc.as_ref() {
-        Either::Left(source_loc) => {
+        Either::Left(Some(source_loc)) => {
             format!(
                 "{} (in {}) ({}:{})",
                 symbol.name,
@@ -94,6 +94,13 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
                     source_loc.file.lossy_file_name()
                 },
                 source_loc.line,
+            )
+        }
+        Either::Left(None) => {
+            format!(
+                "{} (in {}) (?)",
+                symbol.name,
+                ctx.obj_path.lossy_file_name(),
             )
         }
         Either::Right(offset) => {
