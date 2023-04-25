@@ -89,10 +89,17 @@ fn symbolicate(dwarf: &Dwarf, obj: &object::File, addrs: &[Addr], ctx: &Context)
 }
 
 fn format(symbol: &Symbol, ctx: &Context) -> String {
+    let symbol_addr_fmt = if ctx.show_addrs {
+        format!("{}: ", symbol.addr)
+    } else {
+        String::default()
+    };
+
     match symbol.loc.as_ref() {
         Either::Left(Some(source_loc)) => {
             format!(
-                "{} (in {}) ({}:{})",
+                "{}{} (in {}) ({}:{})",
+                symbol_addr_fmt,
                 symbol.name,
                 ctx.obj_path.lossy_file_name(),
                 if ctx.show_full_path {
@@ -105,14 +112,16 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
         }
         Either::Left(None) => {
             format!(
-                "{} (in {}) (?)",
+                "{}{} (in {}) (?)",
+                symbol_addr_fmt,
                 symbol.name,
                 ctx.obj_path.lossy_file_name(),
             )
         }
         Either::Right(offset) => {
             format!(
-                "{} (in {}) + {}",
+                "{}{} (in {}) + {}",
+                symbol_addr_fmt,
                 symbol.name,
                 ctx.obj_path.lossy_file_name(),
                 **offset

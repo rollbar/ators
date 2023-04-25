@@ -65,6 +65,9 @@ pub struct Context<'ctx> {
 
     /// Print the full path of the source files
     pub show_full_path: bool,
+
+    /// Prefix all symbols with their respective address
+    pub show_addrs: bool,
 }
 
 impl<'a> Context<'a> {
@@ -120,6 +123,8 @@ impl<'a> Context<'a> {
                 .unwrap_or_default(),
 
             show_full_path: args.get_flag(&cli::Opt::FullPath.to_string()),
+
+            show_addrs: false,
         })
     }
 }
