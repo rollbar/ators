@@ -114,21 +114,21 @@ impl PartialOrd<u64> for Addr {
     }
 }
 
-impl PartialOrd<Addr> for u64 {
-    fn partial_cmp(&self, other: &Addr) -> Option<Ordering> {
-        other.0.partial_cmp(self)
-    }
-}
-
 impl PartialOrd<u64> for &Addr {
     fn partial_cmp(&self, other: &u64) -> Option<Ordering> {
         self.0.partial_cmp(other)
     }
 }
 
+impl PartialOrd<Addr> for u64 {
+    fn partial_cmp(&self, other: &Addr) -> Option<Ordering> {
+        self.partial_cmp(&other.0)
+    }
+}
+
 impl PartialOrd<&Addr> for u64 {
     fn partial_cmp(&self, other: &&Addr) -> Option<Ordering> {
-        other.0.partial_cmp(self)
+        self.partial_cmp(&other.0)
     }
 }
 
