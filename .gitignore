@@ -14,9 +14,7 @@ Cargo.lock
 .DS_Store
 
 # Some internal fixtures that are too big for version control such as dwarfdump dumps
-/fixtures/objects/rollbar**
-/fixtures/objects/isowords**
-/fixtures/*DeviceSupport*/**
+/fixtures/objects/**
 *.log
 *.dump
 *.profraw

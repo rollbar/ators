@@ -13,7 +13,13 @@ use context::{Context, Loc, Mode};
 use itertools::{Either, Itertools};
 use memmap2::Mmap;
 use object::Object;
-use std::{borrow::Cow, fs, io, io::BufRead, path::Path, str};
+use std::{
+    borrow::Cow,
+    fs,
+    io::{self, BufRead},
+    path::Path,
+    str,
+};
 use uuid::Uuid;
 
 fn main() -> Result<()> {
