@@ -1,8 +1,4 @@
-use crate::{
-    data::*,
-    ext::gimli::{ArangeEntry, DebuggingInformationEntry, Range},
-    *,
-};
+use crate::{data::*, ext::gimli::DebuggingInformationEntry, *};
 use fallible_iterator::FallibleIterator;
 use gimli::{
     ColumnType, DW_AT_abstract_origin, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line,
@@ -254,7 +250,7 @@ impl DwarfExt for Dwarf<'_> {
         };
 
         self.ranges(unit, self.ranges_offset_from_raw(unit, offset))
-            .and_then(|mut ranges| ranges.any(|range| Ok(range.contains(addr))))
+            .and_then(|mut rs| rs.any(|r| Ok((r.begin..r.end).contains(addr))))
             .ok()
     }
 
@@ -273,14 +269,23 @@ impl DwarfExt for Dwarf<'_> {
     }
 
     fn debug_info_offset(&self, addr: &Addr) -> Result<DebugInfoOffset, Error> {
+        let contains = |addr| {
+            move |arange: gimli::ArangeEntry| {
+                arange
+                    .address()
+                    .checked_add(arange.length())
+                    .map(|address_end| (arange.address()..address_end).contains(addr))
+                    .ok_or(gimli::Error::InvalidAddressRange)
+            }
+        };
+
         self.debug_aranges
             .headers()
             .find_map(|header| {
-                Ok(if header.entries().any(|arange| arange.contains(addr))? {
-                    Some(header.debug_info_offset())
-                } else {
-                    None
-                })
+                Ok(header
+                    .entries()
+                    .any(contains(addr))?
+                    .then(|| header.debug_info_offset()))
             })?
             .ok_or(Error::AddrDebugInfoOffsetMissing(*addr))
     }
