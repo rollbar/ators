@@ -56,3 +56,9 @@ pub(crate) type Entry<'abbrev, 'unit, 'input> = gimli::DebuggingInformationEntry
     gimli::EndianSlice<'input, gimli::RunTimeEndian>,
     usize,
 >;
+
+pub(crate) type IncompleteLineProgramRows<'input> = gimli::LineRows<
+    gimli::EndianSlice<'input, gimli::RunTimeEndian>,
+    gimli::IncompleteLineProgram<gimli::EndianSlice<'input, gimli::RunTimeEndian>, usize>,
+    usize,
+>;

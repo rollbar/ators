@@ -58,7 +58,7 @@ fn symbolicate(dwarf: &Dwarf, obj: &object::File, addrs: &[Addr], ctx: &Context)
     let iter_symbols = addrs
         .iter()
         .map(|addr| {
-            let symbols = match atos_dwarf(dwarf, addr, ctx.include_inlined) {
+            let symbols = match atos_dwarf(dwarf, *addr, ctx.include_inlined) {
                 Err(Error::AddrNotFound(addr)) | Err(Error::AddrDebugInfoOffsetMissing(addr)) => {
                     atos_obj(obj, addr)?
                 }
