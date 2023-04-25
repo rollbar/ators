@@ -55,10 +55,7 @@ pub mod object {
 
         fn vmaddr(&self) -> Result<Addr, Error> {
             self.segments()
-                .find_map(|seg| match seg.name().ok()? {
-                    Some(name) if name == "__TEXT" => Some(seg.address()),
-                    _ => None,
-                })
+                .find_map(|seg| seg.name().ok()??.eq("__TEXT").then(|| seg.address()))
                 .ok_or(Error::VmAddrTextSegmentNotFound)
                 .map(Addr::from)
         }

@@ -1,6 +1,7 @@
 use crate::{cli, Addr};
 use anyhow::{Context as _, Result};
 use atorsl::ext::object::Architecture as _;
+use itertools::Either;
 use object::Architecture;
 use std::{
     fs,
@@ -49,11 +50,9 @@ pub struct Context<'ctx> {
     /// The location address of the binary image containing the addresses to symbolicate.
     pub base_addr: &'ctx Loc,
 
-    /// The addresses to symbolicate.
-    pub addrs: Option<Vec<Addr>>,
-
-    /// Input file with white-separated numeric addresses.
-    pub input_addr_file: Option<&'ctx Path>,
+    /// Either a list of addresses to symbolicate or an input file with white-separated
+    /// numeric addresses.
+    pub addrs: Either<Vec<Addr>, &'ctx Path>,
 
     /// The particular architecure of a binary image file in which to look up symbols.
     pub arch: Option<Architecture>,
@@ -97,13 +96,16 @@ impl<'a> Context<'a> {
                 .find_map(|opt| args.get_one(&opt.to_string()))
                 .unwrap_or(&Loc::Offset),
 
-            addrs: args
-                .get_many(&cli::Opt::Addr.to_string())
-                .map(|addrs| addrs.copied().collect()),
+            addrs: {
+                let addr_list = args.get_many(&cli::Opt::Addr.to_string());
+                let addr_file = args.get_one::<PathBuf>(&cli::Opt::AddrFile.to_string());
 
-            input_addr_file: args
-                .get_one::<PathBuf>(&cli::Opt::AddrFile.to_string())
-                .map(PathBuf::as_path),
+                match (addr_list, addr_file) {
+                    (Some(list), _) => Either::Left(list.copied().collect()),
+                    (_, Some(file)) => Either::Right(file),
+                    _ => Either::Left(Vec::default()),
+                }
+            },
 
             arch: args
                 .get_one(&cli::Opt::Arch.to_string())

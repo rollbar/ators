@@ -10,6 +10,7 @@ use atorsl::{
     *,
 };
 use context::{Context, Loc, Mode};
+use fallible_iterator::FallibleIterator;
 use itertools::{Either, Itertools};
 use memmap2::Mmap;
 use object::Object;
@@ -121,35 +122,30 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
 }
 
 fn compute_addrs(obj: &object::File, ctx: &Context) -> Result<Vec<Addr>> {
-    let addrs = if let Some(file) = ctx.input_addr_file {
-        fs::File::open(file)
-            .map(io::BufReader::new)?
+    let addrs = match &ctx.addrs {
+        Either::Left(addrs) => addrs.clone(),
+        Either::Right(file) => io::BufReader::new(fs::File::open(file)?)
             .split(b' ')
-            .flat_map(|buf| Result::<Addr>::Ok(buf?.try_into()?))
-            .collect()
-    } else {
-        ctx.addrs.clone().context("No input address")?
+            .flat_map(|buf| Addr::try_from(&*buf?))
+            .collect(),
     };
 
     let offset_addr = match ctx.base_addr {
+        Loc::Offset => *obj.vmaddr()? as i64,
+        Loc::Slide(slide) => -(**slide as i64),
         Loc::Load(load_addr) => {
             -(load_addr
                 .checked_sub(*obj.vmaddr()?)
                 .context(format!("Invalid load address: {}", load_addr))? as i64)
         }
-        Loc::Slide(slide) => -(**slide as i64),
-        Loc::Offset => *obj.vmaddr()? as i64,
     };
 
-    addrs
-        .iter()
-        .map(|addr| {
-            Ok(addr
-                .checked_add_signed(offset_addr)
-                .context(format!("Invalid address: {}", addr))?
-                .into())
-        })
-        .collect()
+    fallible_iterator::convert(addrs.iter().map(|addr| {
+        addr.checked_add_signed(offset_addr)
+            .map(Addr::from)
+            .context(format!("Invalid address: {}", addr))
+    }))
+    .collect()
 }
 
 trait LossyFileName {

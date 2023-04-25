@@ -3,7 +3,7 @@ use std::{
     cmp::Ordering,
     fmt,
     ops::{Deref, DerefMut},
-    str::FromStr,
+    str::{self, FromStr},
 };
 
 /// A 64-bit address.
@@ -50,11 +50,11 @@ impl From<u64> for Addr {
     }
 }
 
-impl TryFrom<Vec<u8>> for Addr {
+impl TryFrom<&[u8]> for Addr {
     type Error = Error;
 
-    fn try_from(buf: Vec<u8>) -> Result<Self, Self::Error> {
-        Ok(Addr::from_str(&String::from_utf8(buf)?)?)
+    fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
+        Ok(str::from_utf8(buf)?.parse()?)
     }
 }
 
