@@ -7,7 +7,10 @@ use gimli::{
 };
 use itertools::Either;
 use object::Object;
-use std::{borrow::Cow, path::PathBuf};
+use std::{
+    borrow::Cow,
+    path::{Path, PathBuf},
+};
 
 pub fn atos_dwarf(
     dwarf: &Dwarf,
@@ -55,7 +58,7 @@ pub fn atos_dwarf(
             gimli::DW_TAG_subprogram if entry.pc().is_some_and(|pc| pc.contains(addr)) => {
                 symbols.push(Symbol {
                     name: demangler::demangle(&dwarf.entry_symbol(entry, &unit)?, comp_unit.lang),
-                    loc: Either::Left(dwarf.entry_source_loc(entry, &unit)),
+                    loc: Either::Left(dwarf.entry_source_loc(entry, &comp_unit.dir, &unit)),
                 });
 
                 break entry;
@@ -90,7 +93,11 @@ pub fn atos_dwarf(
                                 &dwarf.entry_symbol(parent, &unit)?,
                                 comp_unit.lang,
                             ),
-                            loc: Either::Left(dwarf.entry_source_loc(child, &unit)),
+                            loc: Either::Left(dwarf.entry_source_loc(
+                                child,
+                                &comp_unit.dir,
+                                &unit,
+                            )),
                         },
                     );
                 }
@@ -170,7 +177,7 @@ pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
 trait DwarfExt {
     fn entry_name<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error>;
     fn entry_symbol<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error>;
-    fn entry_source_loc(&self, entry: &Entry, unit: &Unit) -> Option<SourceLoc>;
+    fn entry_source_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> Option<SourceLoc>;
 
     fn entry_contains(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> bool;
     fn entry_ranges_contain(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> Option<bool>;
@@ -210,12 +217,16 @@ impl DwarfExt for Dwarf<'_> {
             })
     }
 
-    fn entry_source_loc(&self, entry: &Entry, unit: &Unit) -> Option<SourceLoc> {
-        let AttrValue::FileIndex(offset) = [DW_AT_decl_file, DW_AT_call_file]
+    fn entry_source_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> Option<SourceLoc> {
+        let Some(AttrValue::FileIndex(offset)) = [DW_AT_decl_file, DW_AT_call_file]
             .into_iter()
-            .find_map(|name| entry.attr_value(name).ok()?)?
+            .find_map(|name| entry.attr_value(name).ok()?)
         else {
-            None?
+            return Some(SourceLoc {
+                file: path.join("<compiler-generated>"),
+                line: 0,
+                col: None,
+            })
         };
 
         let header = unit.line_program.as_ref()?.header();
@@ -254,11 +265,11 @@ impl DwarfExt for Dwarf<'_> {
             .ok()
     }
 
-    fn attr_lossy_string<'a>(
-        &'a self,
-        unit: &Unit<'a>,
-        attr: AttrValue<'a>,
-    ) -> Result<Cow<str>, gimli::Error> {
+    fn attr_lossy_string<'input>(
+        &'input self,
+        unit: &Unit<'input>,
+        attr: AttrValue<'input>,
+    ) -> Result<Cow<'_, str>, gimli::Error> {
         Ok(self.attr_string(unit, attr)?.to_string_lossy())
     }
 
