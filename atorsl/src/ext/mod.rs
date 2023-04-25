@@ -1,5 +1,3 @@
-pub(crate) mod gimli;
-
 pub mod object {
     use crate::data::{Addr, Error};
     use object::{

@@ -1,9 +1,9 @@
-use crate::{data::*, ext::gimli::DebuggingInformationEntry, *};
+use crate::{data::*, *};
 use fallible_iterator::FallibleIterator;
 use gimli::{
     ColumnType, DW_AT_abstract_origin, DW_AT_call_column, DW_AT_call_file, DW_AT_call_line,
-    DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_linkage_name, DW_AT_name,
-    DW_AT_ranges, DebugInfoOffset,
+    DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_high_pc, DW_AT_linkage_name,
+    DW_AT_low_pc, DW_AT_name, DW_AT_ranges, DebugInfoOffset,
 };
 use itertools::Either;
 use object::Object;
@@ -55,7 +55,7 @@ pub fn atos_dwarf(
             .ok_or_else(|| Error::AddrNotFound(*addr))?;
 
         match entry.tag() {
-            gimli::DW_TAG_subprogram if entry.pc().is_some_and(|pc| pc.contains(addr)) => {
+            gimli::DW_TAG_subprogram if dwarf.entry_contains(entry, addr, &unit) => {
                 symbols.push(Symbol {
                     name: demangler::demangle(&dwarf.entry_symbol(entry, &unit)?, comp_unit.lang),
                     loc: Either::Left(dwarf.entry_source_loc(entry, &comp_unit.dir, &unit)),
@@ -83,7 +83,7 @@ pub fn atos_dwarf(
             }
 
             if child.tag() == gimli::DW_TAG_inlined_subroutine
-                && dwarf.entry_contains(addr, child, &unit)
+                && dwarf.entry_contains(child, addr, &unit)
             {
                 if let Some(ref parent) = parent {
                     symbols.insert(
@@ -179,8 +179,9 @@ trait DwarfExt {
     fn entry_symbol<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error>;
     fn entry_source_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> Option<SourceLoc>;
 
-    fn entry_contains(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> bool;
-    fn entry_ranges_contain(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> Option<bool>;
+    fn entry_contains(&self, entry: &Entry, addr: &Addr, unit: &Unit) -> bool;
+    fn entry_pc_contains(&self, entry: &Entry, addr: &Addr) -> Option<bool>;
+    fn entry_ranges_contain(&self, entry: &Entry, addr: &Addr, unit: &Unit) -> Option<bool>;
 
     fn attr_lossy_string<'a>(
         &'a self,
@@ -250,12 +251,28 @@ impl DwarfExt for Dwarf<'_> {
         })
     }
 
-    fn entry_contains(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> bool {
-        entry.pc().is_some_and(|pc| pc.contains(addr))
-            || self.entry_ranges_contain(addr, entry, unit) == Some(true)
+    fn entry_contains(&self, entry: &Entry, addr: &Addr, unit: &Unit) -> bool {
+        self.entry_pc_contains(entry, addr)
+            .or_else(|| self.entry_ranges_contain(entry, addr, unit))
+            .unwrap_or(false)
     }
 
-    fn entry_ranges_contain(&self, addr: &Addr, entry: &Entry, unit: &Unit) -> Option<bool> {
+    fn entry_pc_contains(&self, entry: &Entry, addr: &Addr) -> Option<bool> {
+        let low = match entry.attr_value(DW_AT_low_pc).ok()?? {
+            AttrValue::Addr(addr) => addr,
+            _ => None?,
+        };
+
+        let high = match entry.attr_value(DW_AT_high_pc).ok()?? {
+            AttrValue::Addr(addr) => addr,
+            AttrValue::Udata(len) => low + len,
+            _ => None?,
+        };
+
+        Some((low..high).contains(addr))
+    }
+
+    fn entry_ranges_contain(&self, entry: &Entry, addr: &Addr, unit: &Unit) -> Option<bool> {
         let AttrValue::RangeListsRef(offset) = entry.attr_value(DW_AT_ranges).ok()?? else {
             None?
         };
