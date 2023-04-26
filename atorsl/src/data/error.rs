@@ -19,9 +19,6 @@ pub enum Error {
     #[error("vmaddr: __TEXT segment not found")]
     VmAddrTextSegmentNotFound,
 
-    #[error("Compilation unit for address has no name: {0}")]
-    CompUnitNameMissing(Addr),
-
     #[error("Compilation unit for address has no path: {0}")]
     CompUnitDirMissing(Addr),
 

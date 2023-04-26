@@ -16,32 +16,12 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
     let unit = dwarf.unit_from_addr(&addr)?;
     let mut entries = unit.entries();
 
-    let builder = &mut CompilationUnitBuilder::default();
-
-    let (_, comp_unit) = entries
-        .next_dfs()?
-        .ok_or_else(|| Error::AddrNotFound(addr))?;
-
-    let comp_unit = comp_unit
-        .attrs()
-        .fold(builder, |builder, attr| {
-            Ok(match attr.name() {
-                gimli::DW_AT_name => builder.name(
-                    dwarf
-                        .attr_lossy_string(&unit, attr.value())?
-                        .into_owned(),
-                ),
-                gimli::DW_AT_comp_dir => builder.dir(PathBuf::from(
-                    &*dwarf.attr_lossy_string(&unit, attr.value())?,
-                )),
-                gimli::DW_AT_language => match attr.value() {
-                    AttrValue::Language(dw_lang) => builder.lang(dw_lang),
-                    _ => builder,
-                },
-                _ => builder,
-            })
-        })?
-        .build()?;
+    let comp_dir = PathBuf::from(
+        &*unit
+            .comp_dir
+            .ok_or(Error::CompUnitDirMissing(addr))?
+            .to_string_lossy(),
+    );
 
     let mut debug_line_rows = unit
         .line_program
@@ -67,10 +47,10 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
     if !subprogram.has_children() {
         symbols.push(Symbol {
             addr,
-            name: demangler::demangle(&dwarf.entry_symbol(subprogram, &unit)?, comp_unit.lang),
+            name: demangler::demangle(&dwarf.entry_symbol(subprogram, &unit)?),
             loc: Either::Left(Some(dwarf.entry_debug_line(
                 &addr,
-                &comp_unit.dir,
+                &comp_dir,
                 &mut debug_line_rows,
                 &unit,
             )?)),
@@ -90,18 +70,16 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
                 break parent;
             }
 
-            if child.tag() == gimli::DW_TAG_inlined_subroutine
-                && dwarf.entry_contains(child, &addr, &unit)
-            {
+            if matches!(
+                child.tag(),
+                gimli::DW_TAG_inlined_subroutine if dwarf.entry_contains(child, &addr, &unit)
+            ) {
                 symbols.insert(
                     0,
                     Symbol {
                         addr,
-                        name: demangler::demangle(
-                            &dwarf.entry_symbol(&parent, &unit)?,
-                            comp_unit.lang,
-                        ),
-                        loc: Either::Left(dwarf.entry_source_loc(child, &comp_unit.dir, &unit)),
+                        name: demangler::demangle(&dwarf.entry_symbol(&parent, &unit)?),
+                        loc: Either::Left(dwarf.entry_source_loc(child, &comp_dir, &unit)),
                     },
                 );
 
@@ -113,13 +91,10 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
             0,
             Symbol {
                 addr,
-                name: demangler::demangle(
-                    &dwarf.entry_symbol(&last_child, &unit)?,
-                    comp_unit.lang,
-                ),
+                name: demangler::demangle(&dwarf.entry_symbol(&last_child, &unit)?),
                 loc: Either::Left(Some(dwarf.entry_debug_line(
                     &addr,
-                    &comp_unit.dir,
+                    &comp_dir,
                     &mut debug_line_rows,
                     &unit,
                 )?)),
@@ -138,7 +113,7 @@ pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
 
     Ok(vec![Symbol {
         addr: Addr::from(symbol.address()),
-        name: demangler::demangle(symbol.name(), None),
+        name: demangler::demangle(symbol.name()),
         loc: Either::Right(addr - symbol.address()),
     }])
 }
@@ -210,23 +185,14 @@ impl DwarfExt for Dwarf<'_> {
             if row.address() == addr {
                 let path = row
                     .file(header)
-                    .ok_or_else(|| Error::AddrFileInfoMissing(*addr))
-                    .and_then(|file| {
-                        let mut path = match file.directory(header) {
-                            Some(dir) if file.directory_index() != 0 => {
-                                PathBuf::from(&*self.attr_lossy_string(unit, dir)?)
-                            }
-                            _ => comp_dir.to_path_buf(),
-                        };
-
-                        path.push(&*self.attr_lossy_string(unit, file.path_name())?);
-
-                        Ok(path)
-                    })?;
+                    .ok_or_else(|| Error::AddrFileInfoMissing(*addr))?
+                    .path_name();
 
                 break SourceLoc {
-                    file: path,
+                    file: comp_dir.join(&*self.attr_lossy_string(unit, path)?),
+
                     line: row.line().map(|l| l.get()).unwrap_or_default() as u16,
+
                     col: match row.column() {
                         ColumnType::LeftEdge => Some(0),
                         ColumnType::Column(c) => Some(c.get() as u16),
