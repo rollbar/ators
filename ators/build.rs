@@ -8,13 +8,16 @@ use std::{
     process::Command,
 };
 
-const SYMBOLICATE: &str = "/usr/bin/atos";
+#[cfg(target_os = "macos")]
+const ATOS: &str = "/usr/bin/atos";
+
 const TEST_DWARF: &str = "test.dwarf";
 const TEST_ADDRS: &str = "test_addrs.txt";
 const TEST_SYMR: &str = "test_symr.txt";
 
 fn main() -> Result<()> {
     println!("cargo:rerun-if-changed={}", path(TEST_ADDRS)?.display());
+    #[cfg(target_os = "macos")]
     println!("cargo:rerun-if-changed={}", path(TEST_SYMR)?.display());
 
     path(TEST_ADDRS)?
@@ -22,6 +25,7 @@ fn main() -> Result<()> {
         .eq(&false)
         .then(generate_test_addrs_file);
 
+    #[cfg(target_os = "macos")]
     path(TEST_SYMR)?
         .exists()
         .eq(&false)
@@ -52,8 +56,9 @@ fn generate_test_addrs_file() -> Result<()> {
     Ok(addrs_file.flush()?)
 }
 
+#[cfg(target_os = "macos")]
 fn generate_test_symr_file() -> Result<()> {
-    let output = Command::new(SYMBOLICATE)
+    let output = Command::new(ATOS)
         .args([
             "-i",
             "-o",
