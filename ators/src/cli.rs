@@ -17,6 +17,7 @@ pub enum Opt {
     Inline,
     Delimiter,
     FullPath,
+    PrefixAddr,
     Uuid,
 }
 
@@ -150,6 +151,10 @@ pub fn build() -> Command {
             Arg::new(Opt::FullPath)
                 .long("fullPath")
                 .help("Print the full path of the source files")
+                .action(ArgAction::SetTrue),
+            Arg::new(Opt::PrefixAddr)
+                .long("prefixAddr")
+                .hide(true)
                 .action(ArgAction::SetTrue),
         ])
         .after_long_help(

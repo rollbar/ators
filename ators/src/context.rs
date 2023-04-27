@@ -67,7 +67,7 @@ pub struct Context<'ctx> {
     pub show_full_path: bool,
 
     /// Prefix all symbols with their respective address
-    pub show_addrs: bool,
+    pub prefix_addrs: bool,
 }
 
 impl<'a> Context<'a> {
@@ -124,7 +124,7 @@ impl<'a> Context<'a> {
 
             show_full_path: args.get_flag(&cli::Opt::FullPath.to_string()),
 
-            show_addrs: false,
+            prefix_addrs: args.get_flag(&cli::Opt::PrefixAddr.to_string()),
         })
     }
 }

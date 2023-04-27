@@ -89,7 +89,7 @@ fn symbolicate(dwarf: &Dwarf, obj: &object::File, addrs: &[Addr], ctx: &Context)
 }
 
 fn format(symbol: &Symbol, ctx: &Context) -> String {
-    let symbol_addr_fmt = if ctx.show_addrs {
+    let symbol_addr_fmt = if ctx.prefix_addrs {
         format!("{}: ", symbol.addr)
     } else {
         String::default()
