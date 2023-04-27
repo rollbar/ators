@@ -1,4 +1,4 @@
-
+__mh_execute_header (in test.dwarf) + 0
 
 NSTextCheckingResult.groups(in:) (in test.dwarf) (Prelude.swift:27)
 
@@ -152,7 +152,7 @@ lazy protocol witness table accessor for type String and conformance String (in 
 
 lazy protocol witness table accessor for type RoundedBorderTextFieldStyle and conformance RoundedBorderTextFieldStyle (in test.dwarf) + 0
 
-keypath_setTm (in test.dwarf) + 0
+_keypath_setTm (in test.dwarf) + 0
 
 partial apply for closure #2 in closure #2 in closure #1 in closure #1 in closure #1 in ContentView.body.getter (in test.dwarf) (<compiler-generated>:0)
 
@@ -236,7 +236,7 @@ partial apply for implicit closure #4 in implicit closure #3 in closure #1 in cl
 
 partial apply for closure #1 in closure #1 in closure #1 in closure #1 in closure #1 in ContentView.body.getter (in test.dwarf) (<compiler-generated>:0)
 
-objectdestroyTm (in test.dwarf) + 0
+_objectdestroyTm (in test.dwarf) + 0
 
 Example.implicitlyUnwrapped(_:) (in test.dwarf) (<compiler-generated>:0)
 closure #2 in closure #1 in closure #1 in closure #1 in closure #1 in ContentView.body.getter (in test.dwarf) (ContentView.swift:57)
