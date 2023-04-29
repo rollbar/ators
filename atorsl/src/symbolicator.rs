@@ -44,18 +44,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
         }
     };
 
-    if !subprogram.has_children() {
-        symbols.push(Symbol {
-            addr,
-            name: demangler::demangle(&dwarf.entry_symbol(subprogram, &unit)?),
-            loc: Either::Left(Some(dwarf.entry_debug_line(
-                &addr,
-                &comp_dir,
-                &mut debug_line_rows,
-                &unit,
-            )?)),
-        });
-    } else if include_inlined && subprogram.has_children() {
+    if include_inlined && subprogram.has_children() {
         let mut parent = subprogram.clone();
         let mut depth = 0;
 
@@ -100,6 +89,16 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
                 )?)),
             },
         );
+    } else {
+        symbols.push(Symbol {
+            addr,
+            name: demangler::demangle(&dwarf.entry_symbol(addr, subprogram, &unit)?),
+            loc: Either::Left(Some(dwarf.entry_debug_line(
+                &addr,
+                &mut debug_line_rows,
+                &unit,
+            )?)),
+        });
     }
 
     Ok(symbols)
