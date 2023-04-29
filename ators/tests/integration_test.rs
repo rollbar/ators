@@ -1,13 +1,22 @@
-mod common;
-
-use common::*;
+use anyhow::Result;
 use pretty_assertions::assert_str_eq;
 use std::{
-    fs,
+    env, fs,
     io::{self, BufRead},
+    path::PathBuf,
     process::Command,
     str,
 };
+
+pub const TEST_DWARF: &str = "test.dwarf";
+pub const TEST_ADDRS: &str = "test_addrs.txt";
+pub const TEST_SYMR: &str = "test_symr.txt";
+
+pub fn path(file: &str) -> Result<PathBuf> {
+    Ok([&env::var("CARGO_MANIFEST_DIR")?, "..", "fixtures", file]
+        .iter()
+        .collect())
+}
 
 #[test]
 fn test() {
