@@ -57,8 +57,18 @@ pub(crate) type Entry<'abbrev, 'unit, 'input> = gimli::DebuggingInformationEntry
     usize,
 >;
 
+/// Executes a `LineProgram` to iterate over the rows in the matrix of line number information.
+///
+/// "The hypothetical machine used by a consumer of the line number information
+/// to expand the byte-coded instruction stream into a matrix of line number
+/// information." -- Section 6.2.1
 pub(crate) type IncompleteLineProgramRows<'input> = gimli::LineRows<
     gimli::EndianSlice<'input, gimli::RunTimeEndian>,
     gimli::IncompleteLineProgram<gimli::EndianSlice<'input, gimli::RunTimeEndian>, usize>,
     usize,
 >;
+
+/// A header for a line number program in the `.debug_line` section, as defined
+/// in section 6.2.4 of the standard.
+pub(crate) type LineProgramHeader<'input> =
+    gimli::LineProgramHeader<gimli::EndianSlice<'input, gimli::RunTimeEndian>, usize>;

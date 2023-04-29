@@ -1,8 +1,9 @@
 use super::Addr;
 use std::{ffi, num::ParseIntError, str, string::FromUtf8Error};
+use thiserror::Error;
 
 /// An atorsl error.
-#[derive(thiserror::Error, Debug)]
+#[derive(Error, Debug)]
 pub enum Error {
     #[error("Failed to open file: {0}")]
     Io(#[from] std::io::Error),
@@ -29,10 +30,16 @@ pub enum Error {
     AddrNotFound(Addr),
 
     #[error("Address does not point to a symbol")]
-    AddrSymbolMissing,
+    AddrSymbolMissing(Addr),
 
     #[error("Address does not point to a named entry")]
     AddrNameMissing,
+
+    #[error("DebugInfoRef offset not found: {0}")]
+    AddrDebugInfoRefOffsetNofFound(Addr),
+
+    #[error("DebugInfoRef offset out of bounds: {0}")]
+    AddrDebugInfoRefOffsetOutOfBounds(Addr),
 
     #[error("Address has no line information: {0}")]
     AddrLineInfoMissing(Addr),

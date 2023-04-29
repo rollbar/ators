@@ -3,7 +3,8 @@ use fallible_iterator::FallibleIterator;
 use gimli::{
     ColumnType, DW_AT_abstract_origin, DW_AT_artificial, DW_AT_call_column, DW_AT_call_file,
     DW_AT_call_line, DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_high_pc,
-    DW_AT_linkage_name, DW_AT_low_pc, DW_AT_name, DW_AT_ranges, DebugInfoOffset,
+    DW_AT_linkage_name, DW_AT_low_pc, DW_AT_name, DW_AT_ranges, DebugInfoOffset, LineRow,
+    UnitSectionOffset,
 };
 use itertools::Either;
 use object::Object;
@@ -67,7 +68,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
                     0,
                     Symbol {
                         addr,
-                        name: demangler::demangle(&dwarf.entry_symbol(&parent, &unit)?),
+                        name: demangler::demangle(&dwarf.entry_symbol(addr, &parent, &unit)?),
                         loc: Either::Left(dwarf.entry_source_loc(child, &comp_dir, &unit)),
                     },
                 );
@@ -80,10 +81,9 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
             0,
             Symbol {
                 addr,
-                name: demangler::demangle(&dwarf.entry_symbol(&last_child, &unit)?),
+                name: demangler::demangle(&dwarf.entry_symbol(addr, &last_child, &unit)?),
                 loc: Either::Left(Some(dwarf.entry_debug_line(
                     &addr,
-                    &comp_dir,
                     &mut debug_line_rows,
                     &unit,
                 )?)),
@@ -119,13 +119,17 @@ pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
 
 trait DwarfExt {
     fn entry_name<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error>;
-    fn entry_symbol<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error>;
+    fn entry_symbol<'a>(
+        &'a self,
+        addr: Addr,
+        entry: &'a Entry,
+        unit: &'a Unit,
+    ) -> Result<Cow<str>, Error>;
 
     fn entry_source_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> Option<SourceLoc>;
     fn entry_debug_line(
         &self,
         addr: &Addr,
-        comp_dir: &Path,
         line_rows: &mut IncompleteLineProgramRows,
         unit: &Unit,
     ) -> Result<SourceLoc, Error>;
@@ -134,12 +138,22 @@ trait DwarfExt {
     fn entry_pc_contains(&self, entry: &Entry, addr: &Addr) -> Option<bool>;
     fn entry_ranges_contain(&self, entry: &Entry, addr: &Addr, unit: &Unit) -> Option<bool>;
 
+    fn line_row_file(
+        &self,
+        row: &LineRow,
+        header: &LineProgramHeader,
+        unit: &Unit,
+    ) -> Result<PathBuf, Error>;
+
     fn attr_lossy_string<'a>(
         &'a self,
         unit: &Unit<'a>,
         attr: AttrValue<'a>,
     ) -> Result<Cow<str>, gimli::Error>;
+
+    fn unit_from_offset(&self, addr: Addr, offset: DebugInfoOffset) -> Result<Unit, Error>;
     fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error>;
+
     fn debug_info_offset(&self, addr: &Addr) -> Result<DebugInfoOffset, Error>;
 }
 
@@ -155,16 +169,36 @@ impl DwarfExt for Dwarf<'_> {
         })
     }
 
-    fn entry_symbol<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error> {
+    fn entry_symbol<'a>(
+        &'a self,
+        addr: Addr,
+        entry: &'a Entry,
+        unit: &'a Unit,
+    ) -> Result<Cow<str>, Error> {
         [DW_AT_linkage_name, DW_AT_abstract_origin, DW_AT_name]
             .into_iter()
             .find_map(|dw_at| entry.attr_value(dw_at).ok()?)
-            .ok_or(Error::AddrSymbolMissing)
+            .ok_or(Error::AddrSymbolMissing(addr))
             .and_then(|attr| match attr {
                 AttrValue::UnitRef(offset) => Ok(Cow::Owned(
-                    self.entry_symbol(&unit.entry(offset)?, unit)?
+                    self.entry_symbol(addr, &unit.entry(offset)?, unit)?
                         .into_owned(),
                 )),
+
+                AttrValue::DebugInfoRef(offset) => {
+                    let new_unit = self.unit_from_offset(addr, offset)?;
+                    let new_entry = new_unit.entry(
+                        UnitSectionOffset::from(offset)
+                            .to_unit_offset(&new_unit)
+                            .ok_or(Error::AddrDebugInfoRefOffsetOutOfBounds(addr))?,
+                    )?;
+
+                    Ok(Cow::Owned(
+                        self.entry_symbol(addr, &new_entry, &new_unit)?
+                            .into_owned(),
+                    ))
+                }
+
                 attr => Ok(self.attr_lossy_string(unit, attr)?),
             })
     }
@@ -172,33 +206,36 @@ impl DwarfExt for Dwarf<'_> {
     fn entry_debug_line(
         &self,
         addr: &Addr,
-        comp_dir: &Path,
         line_rows: &mut IncompleteLineProgramRows,
         unit: &Unit,
     ) -> Result<SourceLoc, Error> {
-        Ok(loop {
-            let (header, row) = line_rows
-                .next_row()?
-                .ok_or_else(|| Error::AddrLineInfoMissing(*addr))?;
+        let mut file = None;
+        let mut source_locs = Vec::default();
 
-            if row.address() == addr {
-                let path = row
-                    .file(header)
-                    .ok_or_else(|| Error::AddrFileInfoMissing(*addr))?
-                    .path_name();
+        while let Some((header, line_row)) = line_rows.next_row()? {
+            if line_row.address() == addr {
+                if file.is_none() {
+                    file.replace(self.line_row_file(line_row, header, unit)?);
+                }
 
-                break SourceLoc {
-                    file: comp_dir.join(&*self.attr_lossy_string(unit, path)?),
-
-                    line: row.line().map(|l| l.get()).unwrap_or_default() as u16,
-
-                    col: match row.column() {
-                        ColumnType::LeftEdge => Some(0),
-                        ColumnType::Column(c) => Some(c.get() as u16),
+                source_locs.push(SourceLoc {
+                    // SAFETY: `file` is always `Some` at this point.
+                    file: unsafe { file.clone().unwrap_unchecked() },
+                    line: line_row
+                        .line()
+                        .map(|line| line.get() as u16)
+                        .unwrap_or_default(),
+                    col: match line_row.column() {
+                        ColumnType::LeftEdge => 0,
+                        ColumnType::Column(c) => c.get() as u16,
                     },
-                };
+                });
             }
-        })
+        }
+
+        source_locs
+            .pop()
+            .ok_or(Error::AddrLineInfoMissing(*addr))
     }
 
     fn entry_source_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> Option<SourceLoc> {
@@ -209,7 +246,7 @@ impl DwarfExt for Dwarf<'_> {
             return Some(SourceLoc {
                 file: path.join("<compiler-generated>"),
                 line: 0,
-                col: None,
+                col: 0,
             })
         };
 
@@ -234,11 +271,12 @@ impl DwarfExt for Dwarf<'_> {
             },
 
             col: if is_artificial {
-                Some(0)
+                0
             } else {
                 [DW_AT_decl_column, DW_AT_call_column]
                     .into_iter()
                     .find_map(|name| entry.attr_value(name).ok()??.u16_value())
+                    .unwrap_or_default()
             },
         })
     }
@@ -274,12 +312,49 @@ impl DwarfExt for Dwarf<'_> {
             .ok()
     }
 
+    fn line_row_file(
+        &self,
+        row: &LineRow,
+        header: &LineProgramHeader,
+        unit: &Unit,
+    ) -> Result<PathBuf, Error> {
+        row.file(header)
+            .ok_or_else(|| Error::AddrFileInfoMissing(Addr::from(row.address())))
+            .and_then(|file| {
+                Ok(match file.directory(header) {
+                    Some(dir) if file.directory_index() != 0 => {
+                        PathBuf::from(&*self.attr_lossy_string(unit, dir)?)
+                    }
+                    _ => PathBuf::default(),
+                }
+                .join(&*self.attr_lossy_string(unit, file.path_name())?))
+            })
+    }
+
     fn attr_lossy_string<'input>(
         &'input self,
         unit: &Unit<'input>,
         attr: AttrValue<'input>,
     ) -> Result<Cow<'_, str>, gimli::Error> {
         Ok(self.attr_string(unit, attr)?.to_string_lossy())
+    }
+
+    fn unit_from_offset(&self, addr: Addr, offset: DebugInfoOffset) -> Result<Unit, Error> {
+        let unit_offset = UnitSectionOffset::from(offset);
+        let mut headers = self.units().peekable();
+        let header = loop {
+            match (headers.next()?, headers.peek()?) {
+                (Some(header), Some(next_header))
+                    if (header.offset()..next_header.offset()).contains(&unit_offset) =>
+                {
+                    break header
+                }
+                (Some(header), None) if unit_offset > header.offset() => break header,
+                (None, _) => Err(Error::AddrDebugInfoRefOffsetNofFound(addr))?,
+                (_, _) => continue,
+            };
+        };
+        Ok(self.unit(header)?)
     }
 
     fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error> {

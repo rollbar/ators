@@ -6,7 +6,7 @@ use std::path::PathBuf;
 pub struct SourceLoc {
     pub file: PathBuf,
     pub line: u16,
-    pub col: Option<u16>,
+    pub col: u16,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
