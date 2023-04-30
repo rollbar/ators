@@ -24,7 +24,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
             .to_string_lossy(),
     );
 
-    let mut debug_line_rows = unit
+    let mut line_rows = unit
         .line_program
         .clone()
         .ok_or_else(|| Error::CompUnitLineProgramMissing(addr))?
@@ -49,7 +49,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
         let mut parent = subprogram.clone();
         let mut depth = 0;
 
-        let last_child = loop {
+        let leaf = loop {
             let Some((step, child)) = entries.next_dfs()? else {
                 break parent
             };
@@ -68,7 +68,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
                     0,
                     Symbol {
                         addr,
-                        name: demangler::demangle(&dwarf.entry_symbol(addr, &parent, &unit)?),
+                        name: dwarf.entry_symbol(addr, &parent, &unit)?,
                         loc: Either::Left(dwarf.entry_source_loc(child, &comp_dir, &unit)),
                     },
                 );
@@ -81,10 +81,10 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
             0,
             Symbol {
                 addr,
-                name: demangler::demangle(&dwarf.entry_symbol(addr, &last_child, &unit)?),
+                name: dwarf.entry_symbol(addr, &leaf, &unit)?,
                 loc: Either::Left(Some(dwarf.entry_debug_line(
                     &addr,
-                    &mut debug_line_rows,
+                    &mut line_rows,
                     &unit,
                 )?)),
             },
@@ -92,10 +92,10 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
     } else {
         symbols.push(Symbol {
             addr,
-            name: demangler::demangle(&dwarf.entry_symbol(addr, subprogram, &unit)?),
+            name: dwarf.entry_symbol(addr, subprogram, &unit)?,
             loc: Either::Left(Some(dwarf.entry_debug_line(
                 &addr,
-                &mut debug_line_rows,
+                &mut line_rows,
                 &unit,
             )?)),
         });
@@ -112,19 +112,18 @@ pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
 
     Ok(vec![Symbol {
         addr: Addr::from(symbol.address()),
-        name: demangler::demangle(symbol.name()),
+        name: demangler::demangle(symbol.name()).to_string(),
         loc: Either::Right(addr - symbol.address()),
     }])
 }
 
 trait DwarfExt {
-    fn entry_name<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error>;
     fn entry_symbol<'a>(
         &'a self,
         addr: Addr,
         entry: &'a Entry,
         unit: &'a Unit,
-    ) -> Result<Cow<str>, Error>;
+    ) -> Result<String, Error>;
 
     fn entry_source_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> Option<SourceLoc>;
     fn entry_debug_line(
@@ -158,49 +157,33 @@ trait DwarfExt {
 }
 
 impl DwarfExt for Dwarf<'_> {
-    fn entry_name<'a>(&'a self, entry: &'a Entry, unit: &'a Unit) -> Result<Cow<str>, Error> {
-        Ok(match entry.attr_value(DW_AT_name)? {
-            Some(AttrValue::UnitRef(offset)) => Cow::Owned(
-                self.entry_name(&unit.entry(offset)?, unit)?
-                    .into_owned(),
-            ),
-            Some(attr) => self.attr_lossy_string(unit, attr)?,
-            None => Err(Error::AddrNameMissing)?,
-        })
-    }
-
     fn entry_symbol<'a>(
         &'a self,
         addr: Addr,
         entry: &'a Entry,
         unit: &'a Unit,
-    ) -> Result<Cow<str>, Error> {
-        [DW_AT_linkage_name, DW_AT_abstract_origin, DW_AT_name]
+    ) -> Result<String, Error> {
+        let attr_value = [DW_AT_linkage_name, DW_AT_abstract_origin, DW_AT_name]
             .into_iter()
             .find_map(|dw_at| entry.attr_value(dw_at).ok()?)
-            .ok_or(Error::AddrSymbolMissing(addr))
-            .and_then(|attr| match attr {
-                AttrValue::UnitRef(offset) => Ok(Cow::Owned(
-                    self.entry_symbol(addr, &unit.entry(offset)?, unit)?
-                        .into_owned(),
-                )),
+            .ok_or(Error::AddrSymbolMissing(addr))?;
 
-                AttrValue::DebugInfoRef(offset) => {
-                    let new_unit = self.unit_from_offset(addr, offset)?;
-                    let new_entry = new_unit.entry(
-                        UnitSectionOffset::from(offset)
-                            .to_unit_offset(&new_unit)
-                            .ok_or(Error::AddrDebugInfoRefOffsetOutOfBounds(addr))?,
-                    )?;
+        let symbol = match attr_value {
+            AttrValue::UnitRef(offset) => self.entry_symbol(addr, &unit.entry(offset)?, unit)?,
+            AttrValue::DebugInfoRef(offset) => {
+                let new_unit = self.unit_from_offset(addr, offset)?;
+                let new_entry = new_unit.entry(
+                    UnitSectionOffset::from(offset)
+                        .to_unit_offset(&new_unit)
+                        .ok_or(Error::AddrDebugInfoRefOffsetOutOfBounds(addr))?,
+                )?;
 
-                    Ok(Cow::Owned(
-                        self.entry_symbol(addr, &new_entry, &new_unit)?
-                            .into_owned(),
-                    ))
-                }
+                self.entry_symbol(addr, &new_entry, &new_unit)?
+            }
+            attr => demangler::demangle(&self.attr_lossy_string(unit, attr)?).into_owned(),
+        };
 
-                attr => Ok(self.attr_lossy_string(unit, attr)?),
-            })
+        Ok(symbol)
     }
 
     fn entry_debug_line(

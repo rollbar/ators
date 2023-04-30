@@ -1,12 +1,15 @@
 use super::Addr;
-use std::{ffi, num::ParseIntError, str, string::FromUtf8Error};
+use std::{ffi, fmt, io, num::ParseIntError, str, string::FromUtf8Error};
 use thiserror::Error;
 
 /// An atorsl error.
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("Failed to open file: {0}")]
-    Io(#[from] std::io::Error),
+    Io(#[from] io::Error),
+
+    #[error("Formatting error: {0}")]
+    Fmt(#[from] fmt::Error),
 
     #[error("Error reading DWARF: {0}")]
     Gimli(#[from] gimli::Error),
@@ -29,11 +32,11 @@ pub enum Error {
     #[error("Address not found: {0}")]
     AddrNotFound(Addr),
 
-    #[error("Address does not point to a symbol")]
+    #[error("Address does not point to a symbol: {0}")]
     AddrSymbolMissing(Addr),
 
-    #[error("Address does not point to a named entry")]
-    AddrNameMissing,
+    #[error("Address does not point to a named entry: {0}")]
+    AddrNameMissing(Addr),
 
     #[error("DebugInfoRef offset not found: {0}")]
     AddrDebugInfoRefOffsetNofFound(Addr),
@@ -52,9 +55,6 @@ pub enum Error {
 
     #[error("Invalid address: {0}")]
     AddrInvalid(Addr),
-
-    #[error("Cannot demangle symbol: {0}")]
-    CannotDemangleSymbol(String),
 
     #[error("A string passed had an interior nul byte: {0}")]
     InteriorNul(#[from] ffi::NulError),
@@ -76,4 +76,19 @@ pub enum Error {
 
     #[error("Found no UUID in the given object")]
     ObjectHasNoUuid,
+
+    #[error("Cannot demangle symbol of unknown language: {0}")]
+    DemangleUnknownLanguage(String),
+
+    #[error("Cannot demangle MSVC/C++ symbol: {0}")]
+    DemangleErrorMsvc(#[from] msvc_demangler::Error),
+
+    #[error("Cannot demangle C/C++ symbol: {0}")]
+    DemangleErrorCppParse(#[from] cpp_demangle::error::Error),
+
+    #[error("Cannot demangle Rust symbol: {0}")]
+    DemangleErrorRust(String),
+
+    #[error("Cannot demangle Swift symbol: {0}")]
+    DemangleErrorSwift(String),
 }

@@ -1,6 +1,6 @@
-use crate::IsOkAnd;
+use crate::{Error, IsOkAnd};
 use msvc_demangler::DemangleFlags;
-use std::convert::identity;
+use std::{borrow::Cow, convert::identity};
 use swift::Scope;
 
 pub enum Lang {
@@ -32,37 +32,36 @@ pub fn language_of(s: &str) -> Option<Lang> {
     }
 }
 
-pub fn demangle(symbol: &str) -> String {
+pub fn demangle(symbol: &str) -> Cow<'_, str> {
+    try_demangle(symbol).map_or(Cow::Borrowed(symbol), Cow::Owned)
+}
+
+pub fn try_demangle(symbol: &str) -> Result<String, Error> {
     match language_of(symbol) {
         Some(Lang::C | Lang::Cpp) => {
             if symbol.starts_with('?') || symbol.starts_with("@?") {
-                msvc_demangler::demangle(symbol, DemangleFlags::llvm()).ok()
+                Ok(msvc_demangler::demangle(symbol, DemangleFlags::llvm())?)
             } else {
-                cpp_demangle::Symbol::new(symbol)
-                    .map(|s| s.to_string())
-                    .ok()
+                Ok(cpp_demangle::Symbol::new(symbol)?.to_string())
             }
         }
 
         Some(Lang::ObjC | Lang::ObjCpp) => {
             if (symbol.starts_with("-[") || symbol.starts_with("+[")) && symbol.ends_with(']') {
-                None
+                Ok(symbol.to_owned())
             } else {
-                cpp_demangle::Symbol::new(symbol)
-                    .ok()
-                    .map(|s| s.to_string())
+                Ok(cpp_demangle::Symbol::new(symbol)?.to_string())
             }
         }
 
-        Some(Lang::Swift) => swift::try_demangle(symbol, Scope::Compact).ok(),
+        Some(Lang::Swift) => Ok(swift::try_demangle(symbol, Scope::Compact)?),
 
-        Some(Lang::Rust) => rustc_demangle::try_demangle(symbol)
-            .map(|s| s.to_string())
-            .ok(),
+        Some(Lang::Rust) => Ok(rustc_demangle::try_demangle(symbol)
+            .map_err(|_| Error::DemangleErrorRust(symbol.to_owned()))?
+            .to_string()),
 
-        None => None,
+        None => Err(Error::DemangleUnknownLanguage(symbol.to_owned())),
     }
-    .unwrap_or_else(|| symbol.to_string())
 }
 
 pub mod swift {
@@ -102,7 +101,7 @@ pub mod swift {
             if demangleSwiftSymbol(c_sym.as_ptr(), buf.as_mut_ptr(), buf.len(), scope) != 0 {
                 Ok(CStr::from_ptr(buf.as_ptr()).to_str()?.to_string())
             } else {
-                Err(Error::CannotDemangleSymbol(symbol.to_owned()))
+                Err(Error::DemangleErrorSwift(symbol.to_owned()))
             }
         }
     }
