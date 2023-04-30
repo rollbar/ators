@@ -1,5 +1,4 @@
 use crate::{Error, IsOkAnd};
-use msvc_demangler::DemangleFlags;
 use std::{borrow::Cow, convert::identity};
 use swift::Scope;
 
@@ -40,7 +39,10 @@ pub fn try_demangle(symbol: &str) -> Result<String, Error> {
     match language_of(symbol) {
         Some(Lang::C | Lang::Cpp) => {
             if symbol.starts_with('?') || symbol.starts_with("@?") {
-                Ok(msvc_demangler::demangle(symbol, DemangleFlags::llvm())?)
+                Ok(msvc_demangler::demangle(
+                    symbol,
+                    msvc_demangler::DemangleFlags::llvm(),
+                )?)
             } else {
                 Ok(cpp_demangle::Symbol::new(symbol)?.to_string())
             }

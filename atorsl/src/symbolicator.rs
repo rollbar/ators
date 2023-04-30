@@ -3,8 +3,8 @@ use fallible_iterator::FallibleIterator;
 use gimli::{
     ColumnType, DW_AT_abstract_origin, DW_AT_artificial, DW_AT_call_column, DW_AT_call_file,
     DW_AT_call_line, DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_high_pc,
-    DW_AT_linkage_name, DW_AT_low_pc, DW_AT_name, DW_AT_ranges, DebugInfoOffset, LineRow,
-    UnitSectionOffset,
+    DW_AT_linkage_name, DW_AT_low_pc, DW_AT_name, DW_AT_ranges, DW_AT_specification,
+    DebugInfoOffset, LineRow, UnitSectionOffset,
 };
 use itertools::Either;
 use object::Object;
@@ -163,10 +163,15 @@ impl DwarfExt for Dwarf<'_> {
         entry: &'a Entry,
         unit: &'a Unit,
     ) -> Result<String, Error> {
-        let attr_value = [DW_AT_linkage_name, DW_AT_abstract_origin, DW_AT_name]
-            .into_iter()
-            .find_map(|dw_at| entry.attr_value(dw_at).ok()?)
-            .ok_or(Error::AddrSymbolMissing(addr))?;
+        let attr_value = [
+            DW_AT_linkage_name,
+            DW_AT_abstract_origin,
+            DW_AT_specification,
+            DW_AT_name,
+        ]
+        .into_iter()
+        .find_map(|dw_at| entry.attr_value(dw_at).ok()?)
+        .ok_or(Error::AddrSymbolMissing(addr))?;
 
         let symbol = match attr_value {
             AttrValue::UnitRef(offset) => self.entry_symbol(addr, &unit.entry(offset)?, unit)?,

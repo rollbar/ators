@@ -3978,7 +3978,7 @@ handleDealloc_NSProxy (in test.dwarf) (KSCrashMonitor_Zombie.c:155)
 
 isEnabled (in test.dwarf) (KSCrashMonitor_Zombie.c:229)
 
-CPPExceptionTerminate() (.cold.1) (in test.dwarf) (KSCrashMonitor_CPPException.cpp:0)
+CPPExceptionTerminate() [clone .cold.1] (in test.dwarf) (KSCrashMonitor_CPPException.cpp:0)
 
 kscpu_currentArch (in test.dwarf) (KSCPU.c:40)
 
@@ -4032,9 +4032,9 @@ ksdm_demangleCPP (in test.dwarf) (KSDemangle_CPP.cpp:33)
 
 ksdm_demangleSwift (in test.dwarf) (KSDemangle_Swift.cpp:32)
 
-std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::basic_string[abi:v15006]<std::nullptr_t>(char const*) (in test.dwarf) (string:841)
+char const* std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::basic_string[abi:v15006]<std::nullptr_t>() (in test.dwarf) (string:841)
 
-std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::__throw_length_error[abi:v15006]() const (in test.dwarf) (string:1804)
+std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__throw_length_error[abi:v15006]() const (in test.dwarf) (string:1804)
 
 std::__1::__throw_length_error[abi:v15006](char const*) (in test.dwarf) (stdexcept:255)
 
