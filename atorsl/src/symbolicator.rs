@@ -2,9 +2,8 @@ use crate::{data::*, *};
 use fallible_iterator::FallibleIterator;
 use gimli::{
     ColumnType, DW_AT_abstract_origin, DW_AT_artificial, DW_AT_call_column, DW_AT_call_file,
-    DW_AT_call_line, DW_AT_decl_column, DW_AT_decl_file, DW_AT_decl_line, DW_AT_high_pc,
-    DW_AT_linkage_name, DW_AT_low_pc, DW_AT_name, DW_AT_ranges, DW_AT_specification,
-    DebugInfoOffset, LineRow, UnitSectionOffset,
+    DW_AT_call_line, DW_AT_high_pc, DW_AT_linkage_name, DW_AT_low_pc, DW_AT_name, DW_AT_ranges,
+    DW_AT_specification, DebugInfoOffset, LineRow, UnitSectionOffset,
 };
 use itertools::Either;
 use object::Object;
@@ -20,7 +19,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
     let comp_dir = PathBuf::from(
         &*unit
             .comp_dir
-            .ok_or(Error::CompUnitDirMissing(addr))?
+            .ok_or_else(|| Error::CompUnitDirMissing(addr))?
             .to_string_lossy(),
     );
 
@@ -69,7 +68,12 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
                     Symbol {
                         addr,
                         name: dwarf.entry_symbol(addr, &parent, &unit)?,
-                        loc: Either::Left(dwarf.entry_source_loc(child, &comp_dir, &unit)),
+                        loc: Either::Left(dwarf.entry_call_loc(
+                            child,
+                            &mut line_rows,
+                            &comp_dir,
+                            &unit,
+                        )?),
                     },
                 );
 
@@ -82,22 +86,14 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
             Symbol {
                 addr,
                 name: dwarf.entry_symbol(addr, &leaf, &unit)?,
-                loc: Either::Left(Some(dwarf.entry_debug_line(
-                    &addr,
-                    &mut line_rows,
-                    &unit,
-                )?)),
+                loc: Either::Left(dwarf.entry_debug_line(addr, &mut line_rows, &unit)?),
             },
         );
     } else {
         symbols.push(Symbol {
             addr,
             name: dwarf.entry_symbol(addr, subprogram, &unit)?,
-            loc: Either::Left(Some(dwarf.entry_debug_line(
-                &addr,
-                &mut line_rows,
-                &unit,
-            )?)),
+            loc: Either::Left(dwarf.entry_debug_line(addr, &mut line_rows, &unit)?),
         });
     }
 
@@ -125,10 +121,17 @@ trait DwarfExt {
         unit: &'a Unit,
     ) -> Result<String, Error>;
 
-    fn entry_source_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> Option<SourceLoc>;
+    fn entry_call_loc(
+        &self,
+        entry: &Entry,
+        line_rows: &mut IncompleteLineProgramRows,
+        path: &Path,
+        unit: &Unit,
+    ) -> Result<SourceLoc, Error>;
+
     fn entry_debug_line(
         &self,
-        addr: &Addr,
+        addr: Addr,
         line_rows: &mut IncompleteLineProgramRows,
         unit: &Unit,
     ) -> Result<SourceLoc, Error>;
@@ -193,7 +196,7 @@ impl DwarfExt for Dwarf<'_> {
 
     fn entry_debug_line(
         &self,
-        addr: &Addr,
+        addr: Addr,
         line_rows: &mut IncompleteLineProgramRows,
         unit: &Unit,
     ) -> Result<SourceLoc, Error> {
@@ -215,7 +218,7 @@ impl DwarfExt for Dwarf<'_> {
                         .unwrap_or_default(),
                     col: match line_row.column() {
                         ColumnType::LeftEdge => 0,
-                        ColumnType::Column(c) => c.get(),
+                        ColumnType::Column(col) => col.get(),
                     },
                 });
             }
@@ -223,48 +226,52 @@ impl DwarfExt for Dwarf<'_> {
 
         source_locs
             .pop()
-            .ok_or(Error::AddrLineInfoMissing(*addr))
+            .ok_or(Error::AddrLineInfoMissing(addr))
     }
 
-    fn entry_source_loc(&self, entry: &Entry, path: &Path, unit: &Unit) -> Option<SourceLoc> {
-        let Some(AttrValue::FileIndex(offset)) = [DW_AT_decl_file, DW_AT_call_file]
-            .into_iter()
-            .find_map(|name| entry.attr_value(name).ok()?)
-        else {
-            return Some(SourceLoc {
+    fn entry_call_loc(
+        &self,
+        entry: &Entry,
+        line_rows: &mut IncompleteLineProgramRows,
+        path: &Path,
+        unit: &Unit,
+    ) -> Result<SourceLoc, Error> {
+        let Some(file) = (match entry.attr_value(DW_AT_call_file)? {
+            Some(AttrValue::FileIndex(offset)) => line_rows.header().file(offset),
+            _ => None,
+        }) else {
+            return Ok(SourceLoc {
                 file: path.join("<compiler-generated>"),
                 line: 0,
                 col: 0,
             })
         };
 
-        let header = unit.line_program.as_ref()?.header();
-        let file = header.file(offset)?;
         let is_artificial = entry.attr_value(DW_AT_artificial) == Ok(Some(AttrValue::Flag(true)));
 
-        Some(SourceLoc {
-            file: PathBuf::from(
-                &*self
-                    .attr_lossy_string(unit, file.directory(header)?)
-                    .ok()?,
-            )
-            .join(&*self.attr_lossy_string(unit, file.path_name()).ok()?),
+        Ok(SourceLoc {
+            file: file
+                .directory(line_rows.header())
+                .and_then(|dir| Some(PathBuf::from(&*self.attr_lossy_string(unit, dir).ok()?)))
+                .unwrap_or(path.to_path_buf())
+                .join(&*self.attr_lossy_string(unit, file.path_name())?),
 
-            line: if is_artificial {
-                0
+            line: if !is_artificial {
+                entry
+                    .attr_value(DW_AT_call_line)?
+                    .and_then(|line| line.udata_value())
+                    .unwrap_or(0)
             } else {
-                [DW_AT_decl_line, DW_AT_call_line]
-                    .into_iter()
-                    .find_map(|name| entry.attr_value(name).ok()??.udata_value())?
+                0
             },
 
-            col: if is_artificial {
-                0
+            col: if !is_artificial {
+                entry
+                    .attr_value(DW_AT_call_column)?
+                    .and_then(|col| col.udata_value())
+                    .unwrap_or(0)
             } else {
-                [DW_AT_decl_column, DW_AT_call_column]
-                    .into_iter()
-                    .find_map(|name| entry.attr_value(name).ok()??.udata_value())
-                    .unwrap_or_default()
+                0
             },
         })
     }

@@ -13,5 +13,5 @@ pub struct SourceLoc {
 pub struct Symbol {
     pub addr: Addr,
     pub name: String,
-    pub loc: Either<Option<SourceLoc>, Addr>,
+    pub loc: Either<SourceLoc, Addr>,
 }

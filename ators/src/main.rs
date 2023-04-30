@@ -96,7 +96,7 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
     };
 
     match symbol.loc.as_ref() {
-        Either::Left(Some(source_loc)) => {
+        Either::Left(source_loc) => {
             format!(
                 "{}{} (in {}) ({}:{})",
                 symbol_addr_fmt,
@@ -108,14 +108,6 @@ fn format(symbol: &Symbol, ctx: &Context) -> String {
                     source_loc.file.lossy_file_name()
                 },
                 source_loc.line,
-            )
-        }
-        Either::Left(None) => {
-            format!(
-                "{}{} (in {}) (?)",
-                symbol_addr_fmt,
-                symbol.name,
-                ctx.obj_path.lossy_file_name(),
             )
         }
         Either::Right(offset) => {
