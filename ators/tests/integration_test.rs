@@ -22,6 +22,7 @@ pub fn path(file: &str) -> Result<PathBuf> {
 fn test() {
     let output = Command::new("../target/debug/ators")
         .args([
+            "--prefixAddr",
             "-i",
             "-o",
             &path(TEST_DWARF)
@@ -40,7 +41,7 @@ fn test() {
     str::from_utf8(&output.stdout)
         .expect("ators output to be utf8")
         .lines()
-        .map(|line| line.to_string())
+        .map(|line| line.split_once(": ").unwrap_or(("?", line)))
         .zip(
             io::BufReader::new(
                 fs::File::open(path(TEST_SYMR).expect("test symr to exist"))
@@ -49,5 +50,5 @@ fn test() {
             .lines()
             .map(|line| line.expect("test symr line to be ok")),
         )
-        .for_each(|(expected, actual)| assert_str_eq!(expected, actual));
+        .for_each(|((addr, actual), expected)| assert_str_eq!(actual, expected, "at {}", addr));
 }
