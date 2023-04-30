@@ -211,11 +211,11 @@ impl DwarfExt for Dwarf<'_> {
                     file: unsafe { file.clone().unwrap_unchecked() },
                     line: line_row
                         .line()
-                        .map(|line| line.get() as u16)
+                        .map(|line| line.get())
                         .unwrap_or_default(),
                     col: match line_row.column() {
                         ColumnType::LeftEdge => 0,
-                        ColumnType::Column(c) => c.get() as u16,
+                        ColumnType::Column(c) => c.get(),
                     },
                 });
             }
@@ -255,7 +255,7 @@ impl DwarfExt for Dwarf<'_> {
             } else {
                 [DW_AT_decl_line, DW_AT_call_line]
                     .into_iter()
-                    .find_map(|name| entry.attr_value(name).ok()??.u16_value())?
+                    .find_map(|name| entry.attr_value(name).ok()??.udata_value())?
             },
 
             col: if is_artificial {
@@ -263,7 +263,7 @@ impl DwarfExt for Dwarf<'_> {
             } else {
                 [DW_AT_decl_column, DW_AT_call_column]
                     .into_iter()
-                    .find_map(|name| entry.attr_value(name).ok()??.u16_value())
+                    .find_map(|name| entry.attr_value(name).ok()??.udata_value())
                     .unwrap_or_default()
             },
         })
