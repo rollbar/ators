@@ -5523,17 +5523,17 @@ std::__1::__allocation_result<std::__1::allocator_traits<std::__1::allocator<swi
 
 std::__throw_bad_array_new_length([abi:v15006], void) (in test.dwarf) (new:155)
 
-OUTLINED_FUNCTION_0 (in test.dwarf) + 0
+_OUTLINED_FUNCTION_0 (in test.dwarf) + 0
 
-OUTLINED_FUNCTION_1 (in test.dwarf) + 0
+_OUTLINED_FUNCTION_1 (in test.dwarf) + 0
 
-OUTLINED_FUNCTION_2 (in test.dwarf) + 0
+_OUTLINED_FUNCTION_2 (in test.dwarf) + 0
 
-OUTLINED_FUNCTION_3 (in test.dwarf) + 0
+_OUTLINED_FUNCTION_3 (in test.dwarf) + 0
 
-OUTLINED_FUNCTION_4 (in test.dwarf) + 0
+_OUTLINED_FUNCTION_4 (in test.dwarf) + 0
 
-OUTLINED_FUNCTION_5 (in test.dwarf) + 0
+_OUTLINED_FUNCTION_5 (in test.dwarf) + 0
 
 swift::Demangle::DemanglerPrinter::operator<<(unsigned long long) & (in test.dwarf) (NodePrinter.cpp:34)
 
@@ -5573,7 +5573,7 @@ needSpaceBeforeType(swift::Demangle::Node*) (in test.dwarf) (NodePrinter.cpp:938
 
 (anonymous namespace)::NodePrinter::printEntityType(swift::Demangle::Node*, swift::Demangle::Node*, swift::Demangle::Node*) (in test.dwarf) (NodePrinter.cpp:2359)
 
-(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::'lambda'(swift::Demangle::Node*)::operator()(swift::Demangle::Node*) const (in test.dwarf) (NodePrinter.cpp:684)
+(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const (in test.dwarf) (NodePrinter.cpp:684)
 
 (anonymous namespace)::NodePrinter::printBoundGenericNoSugar(swift::Demangle::Node*) (in test.dwarf) (NodePrinter.cpp:228)
 
@@ -5583,11 +5583,11 @@ needSpaceBeforeType(swift::Demangle::Node*) (in test.dwarf) (NodePrinter.cpp:938
 
 (anonymous namespace)::NodePrinter::isSwiftModule(swift::Demangle::Node*) (in test.dwarf) (NodePrinter.cpp:238)
 
-OUTLINED_FUNCTION_0 (in test.dwarf) + 0
+_OUTLINED_FUNCTION_0 (in test.dwarf) + 0
 
-OUTLINED_FUNCTION_1 (in test.dwarf) + 0
+_OUTLINED_FUNCTION_1 (in test.dwarf) + 0
 
-OUTLINED_FUNCTION_2 (in test.dwarf) + 0
+_OUTLINED_FUNCTION_2 (in test.dwarf) + 0
 
 swift::Demangle::demangleOldSymbolAsNode(llvm::StringRef, swift::Demangle::NodeFactory&) (in test.dwarf) (OldDemangler.cpp:2289)
 
@@ -5605,15 +5605,15 @@ swift::Demangle::demangleOldSymbolAsNode(llvm::StringRef, swift::Demangle::NodeF
 
 (anonymous namespace)::OldDemangler::demangleBuiltinSize(unsigned long long&) (in test.dwarf) (OldDemangler.cpp:283)
 
-swift::Demangle::DemanglerPrinter&& swift::Demangle::DemanglerPrinter::operator<<<char const (&) [15]>(char const (&) [15]) && (in test.dwarf) (Demangle.h:541)
+swift::Demangle::DemanglerPrinter&& swift::Demangle::DemanglerPrinter::operator<< <char const (&) [15]>(char const (&) [15]) && (in test.dwarf) (Demangle.h:541)
 
-swift::Demangle::DemanglerPrinter&& swift::Demangle::DemanglerPrinter::operator<<<char const (&) [12]>(char const (&) [12]) && (in test.dwarf) (Demangle.h:541)
+swift::Demangle::DemanglerPrinter&& swift::Demangle::DemanglerPrinter::operator<< <char const (&) [12]>(char const (&) [12]) && (in test.dwarf) (Demangle.h:541)
 
 (anonymous namespace)::OldDemangler::demangleNatural(unsigned long long&) (in test.dwarf) (OldDemangler.cpp:262)
 
-swift::Demangle::DemanglerPrinter&& swift::Demangle::DemanglerPrinter::operator<<<char const (&) [5]>(char const (&) [5]) && (in test.dwarf) (Demangle.h:541)
+swift::Demangle::DemanglerPrinter&& swift::Demangle::DemanglerPrinter::operator<< <char const (&) [5]>(char const (&) [5]) && (in test.dwarf) (Demangle.h:541)
 
-swift::Demangle::DemanglerPrinter&& swift::Demangle::DemanglerPrinter::operator<<<char const (&) [7]>(char const (&) [7]) && (in test.dwarf) (Demangle.h:541)
+swift::Demangle::DemanglerPrinter&& swift::Demangle::DemanglerPrinter::operator<< <char const (&) [7]>(char const (&) [7]) && (in test.dwarf) (Demangle.h:541)
 
 (anonymous namespace)::OldDemangler::demangleDeclarationName(swift::Demangle::Node::Kind) (in test.dwarf) (OldDemangler.cpp:937)
 
@@ -5665,7 +5665,7 @@ swift::Demangle::DemanglerPrinter&& swift::Demangle::DemanglerPrinter::operator<
 
 (anonymous namespace)::OldDemangler::demangleGenericParamIndex() (in test.dwarf) (OldDemangler.cpp:1390)
 
-(anonymous namespace)::OldDemangler::demangleArchetypeType()::'lambda'(swift::Demangle::Node*)::operator()(swift::Demangle::Node*) const (in test.dwarf) (OldDemangler.cpp:1701)
+(anonymous namespace)::OldDemangler::demangleArchetypeType()::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const (in test.dwarf) (OldDemangler.cpp:1701)
 
 (anonymous namespace)::OldDemangler::demangleDependentMemberTypeName(swift::Demangle::Node*) (in test.dwarf) (OldDemangler.cpp:1414)
 
@@ -5675,27 +5675,27 @@ swift::Demangle::DemanglerPrinter&& swift::Demangle::DemanglerPrinter::operator<
 
 (anonymous namespace)::OldDemangler::demangleImplParameterOrResult(swift::Demangle::Node::Kind) (in test.dwarf) (OldDemangler.cpp:2254)
 
-(anonymous namespace)::NameSource::readUntil(char, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&) (in test.dwarf) (OldDemangler.cpp:155)
+(anonymous namespace)::NameSource::readUntil(char, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) (in test.dwarf) (OldDemangler.cpp:155)
 
 (anonymous namespace)::OldDemangler::demangleDirectness() (in test.dwarf) (OldDemangler.cpp:254)
 
 (anonymous namespace)::OldDemangler::demangleReabstractSignature(swift::Demangle::Node*) (in test.dwarf) (OldDemangler.cpp:2104)
 
-swift::Punycode::decodePunycode(llvm::StringRef, std::__1::vector<unsigned int, std::__1::allocator<unsigned int>>&) (in test.dwarf) (Punycode.cpp:75)
+swift::Punycode::decodePunycode(llvm::StringRef, std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >&) (in test.dwarf) (Punycode.cpp:75)
 
-std::__1::vector<unsigned int, std::__1::allocator<unsigned int>>::reserve(unsigned long) (in test.dwarf) (vector:1494)
+std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >::reserve(unsigned long) (in test.dwarf) (vector:1494)
 
-std::__1::vector<unsigned int, std::__1::allocator<unsigned int>>::insert(std::__1::__wrap_iter<unsigned int const*>, unsigned int const&) (in test.dwarf) (vector:1680)
+std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >::insert(std::__1::__wrap_iter<unsigned int const*>, unsigned int const&) (in test.dwarf) (vector:1680)
 
-swift::Punycode::decodePunycodeUTF8(llvm::StringRef, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&) (in test.dwarf) (Punycode.cpp:269)
+swift::Punycode::decodePunycodeUTF8(llvm::StringRef, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) (in test.dwarf) (Punycode.cpp:269)
 
-std::__1::vector<unsigned int, std::__1::allocator<unsigned int>>::__throw_length_error[abi:v15006]() const (in test.dwarf) (vector:851)
+std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >::__throw_length_error[abi:v15006]() const (in test.dwarf) (vector:851)
 
-std::__1::__allocation_result<std::__1::allocator_traits<std::__1::allocator<unsigned int>>::pointer> std::__1::__allocate_at_least[abi:v15006]<std::__1::allocator<unsigned int>>(std::__1::allocator<unsigned int>&, unsigned long) (in test.dwarf) (allocate_at_least.h:53)
+std::__1::__allocation_result<std::__1::allocator_traits<std::__1::allocator<unsigned int> >::pointer> std::__1::__allocate_at_least[abi:v15006]<std::__1::allocator<unsigned int> >(std::__1::allocator_traits&, unsigned long) (in test.dwarf) (allocate_at_least.h:53)
 
-llvm::StringRef::StringRef(char const*) (.cold.1) (in test.dwarf) (StringRef.h:0)
+llvm::StringRef::StringRef(char const*) [clone .cold.1] (in test.dwarf) (StringRef.h:0)
 
-isProtocolNode(swift::Demangle::Node*) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+isProtocolNode(swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
 swift::Demangle::Node::addChild(swift::Demangle::Node*, swift::Demangle::NodeFactory&) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
 
@@ -6301,11 +6301,11 @@ needSpaceBeforeType(swift::Demangle::Node*) (.cold.1) (in test.dwarf) (NodePrint
 
 (anonymous namespace)::NodePrinter::printEntityType(swift::Demangle::Node*, swift::Demangle::Node*, swift::Demangle::Node*) (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::'lambda'(swift::Demangle::Node*)::operator()(swift::Demangle::Node*) const (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::'lambda'(swift::Demangle::Node*)::operator()(swift::Demangle::Node*) const (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::'lambda'(swift::Demangle::Node*)::operator()(swift::Demangle::Node*) const (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
 
 (anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
 

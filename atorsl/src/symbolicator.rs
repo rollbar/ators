@@ -102,9 +102,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
 
 pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
     let map = obj.symbol_map();
-    let Some(symbol) = map.get(*addr) else {
-        Err(Error::AddrNotFound(addr))?
-    };
+    let symbol = map.get(*addr).ok_or(Error::AddrNotFound(addr))?;
 
     Ok(vec![Symbol {
         addr: Addr::from(symbol.address()),
