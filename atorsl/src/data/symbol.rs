@@ -1,4 +1,4 @@
-use super::Addr;
+use super::{Addr, Offset};
 use itertools::Either;
 use std::path::PathBuf;
 
@@ -13,5 +13,5 @@ pub struct SourceLoc {
 pub struct Symbol {
     pub addr: Addr,
     pub name: String,
-    pub loc: Either<SourceLoc, Addr>,
+    pub loc: Either<SourceLoc, Offset>,
 }

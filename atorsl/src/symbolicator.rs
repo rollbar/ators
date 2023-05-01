@@ -122,7 +122,7 @@ pub fn atos_map(
             symbols.push(Symbol {
                 addr,
                 name: demangled_symbol_name.to_string(),
-                loc: Either::Right(addr - symbol.address()),
+                loc: Either::Right(Offset::from(*addr - symbol.address())),
             });
         }
     }
