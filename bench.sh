@@ -17,11 +17,12 @@
 #     3.56 ± 0.06 times faster than 'atos -i -o dwarf -l 0x0100360000 -f ./fixtures/many_addrs.txt'
 #    19.58 ± 0.34 times faster than 'atosl -o dwarf -l 0 ...
 
+OBJ="./fixtures/test.dwarf"
+ADDRS="./fixtures/test_addrs.txt"
+
 cargo build --release
 
-OBJ="./fixtures/objects/rollbar60.dwarf"
-
 hyperfine --warmup 3 \
-    "./target/release/ators -i -o $OBJ -l 0x0100360000 -f ./fixtures/many_addrs.txt" \
-    "atos -i -o $OBJ -l 0x0100360000 -f ./fixtures/many_addrs.txt"
-    #"atosl -o $OBJ -l 0x0100360000 $(cat ./fixtures/many_addrs.txt)"
+    "./target/release/ators -i -o $OBJ -s 0 -f $ADDRS" \
+    "atos -i -o $OBJ -s 0 -f $ADDRS"
+    #"atosl -o $OBJ -s 0 $(cat $ADDRS)"
