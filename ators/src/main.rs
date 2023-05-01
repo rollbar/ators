@@ -36,7 +36,7 @@ fn main() -> Result<()> {
             let dwarf = load_dwarf!(&obj, cow);
             let addrs = compute_addrs(&obj, &ctx)?;
 
-            symbolicate(&dwarf, &obj, &addrs, &ctx)
+            symbolicate(&dwarf, &obj.symbol_map(), &addrs, &ctx)
                 .iter()
                 .for_each(|symbol| println!("{symbol}"));
         }
@@ -54,7 +54,12 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn symbolicate(dwarf: &Dwarf, obj: &object::File, addrs: &[Addr], ctx: &Context) -> Vec<String> {
+fn symbolicate(
+    dwarf: &Dwarf,
+    symbol_map: &object::SymbolMap<object::SymbolMapName>,
+    addrs: &[Addr],
+    ctx: &Context,
+) -> Vec<String> {
     let iter_symbols = addrs
         .iter()
         .map(|addr| {
@@ -63,7 +68,7 @@ fn symbolicate(dwarf: &Dwarf, obj: &object::File, addrs: &[Addr], ctx: &Context)
                     Error::AddrNotFound(addr)
                     | Error::AddrDebugInfoOffsetMissing(addr)
                     | Error::AddrLineInfoMissing(addr),
-                ) => atos_obj(obj, addr)?,
+                ) => atos_map(symbol_map, addr)?,
                 symbols => symbols?,
             };
 
