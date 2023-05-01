@@ -103,10 +103,14 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
 pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
     let map = obj.symbol_map();
     let symbol = map.get(*addr).ok_or(Error::AddrNotFound(addr))?;
+    let symbol_name = symbol
+        .name()
+        .strip_prefix('_')
+        .unwrap_or(symbol.name());
 
     Ok(vec![Symbol {
         addr: Addr::from(symbol.address()),
-        name: demangler::demangle(symbol.name()).to_string(),
+        name: demangler::demangle(symbol_name).to_string(),
         loc: Either::Right(addr - symbol.address()),
     }])
 }

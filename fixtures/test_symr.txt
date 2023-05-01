@@ -1,4 +1,4 @@
-__mh_execute_header (in test.dwarf) + 0
+_mh_execute_header (in test.dwarf) + 0
 
 NSTextCheckingResult.groups(in:) (in test.dwarf) (Prelude.swift:27)
 
@@ -152,7 +152,7 @@ lazy protocol witness table accessor for type String and conformance String (in 
 
 lazy protocol witness table accessor for type RoundedBorderTextFieldStyle and conformance RoundedBorderTextFieldStyle (in test.dwarf) + 0
 
-_keypath_setTm (in test.dwarf) + 0
+keypath_setTm (in test.dwarf) + 0
 
 partial apply for closure #2 in closure #2 in closure #1 in closure #1 in closure #1 in ContentView.body.getter (in test.dwarf) (<compiler-generated>:0)
 
@@ -236,7 +236,7 @@ partial apply for implicit closure #4 in implicit closure #3 in closure #1 in cl
 
 partial apply for closure #1 in closure #1 in closure #1 in closure #1 in closure #1 in ContentView.body.getter (in test.dwarf) (<compiler-generated>:0)
 
-_objectdestroyTm (in test.dwarf) + 0
+objectdestroyTm (in test.dwarf) + 0
 
 Example.implicitlyUnwrapped(_:) (in test.dwarf) (<compiler-generated>:0)
 closure #2 in closure #1 in closure #1 in closure #1 in closure #1 in ContentView.body.getter (in test.dwarf) (ContentView.swift:57)
@@ -5523,17 +5523,17 @@ std::__1::__allocation_result<std::__1::allocator_traits<std::__1::allocator<swi
 
 std::__throw_bad_array_new_length([abi:v15006], void) (in test.dwarf) (new:155)
 
-_OUTLINED_FUNCTION_0 (in test.dwarf) + 0
+OUTLINED_FUNCTION_0 (in test.dwarf) + 0
 
-_OUTLINED_FUNCTION_1 (in test.dwarf) + 0
+OUTLINED_FUNCTION_1 (in test.dwarf) + 0
 
-_OUTLINED_FUNCTION_2 (in test.dwarf) + 0
+OUTLINED_FUNCTION_2 (in test.dwarf) + 0
 
-_OUTLINED_FUNCTION_3 (in test.dwarf) + 0
+OUTLINED_FUNCTION_3 (in test.dwarf) + 0
 
-_OUTLINED_FUNCTION_4 (in test.dwarf) + 0
+OUTLINED_FUNCTION_4 (in test.dwarf) + 0
 
-_OUTLINED_FUNCTION_5 (in test.dwarf) + 0
+OUTLINED_FUNCTION_5 (in test.dwarf) + 0
 
 swift::Demangle::DemanglerPrinter::operator<<(unsigned long long) & (in test.dwarf) (NodePrinter.cpp:34)
 
@@ -5583,11 +5583,11 @@ needSpaceBeforeType(swift::Demangle::Node*) (in test.dwarf) (NodePrinter.cpp:938
 
 (anonymous namespace)::NodePrinter::isSwiftModule(swift::Demangle::Node*) (in test.dwarf) (NodePrinter.cpp:238)
 
-_OUTLINED_FUNCTION_0 (in test.dwarf) + 0
+OUTLINED_FUNCTION_0 (in test.dwarf) + 0
 
-_OUTLINED_FUNCTION_1 (in test.dwarf) + 0
+OUTLINED_FUNCTION_1 (in test.dwarf) + 0
 
-_OUTLINED_FUNCTION_2 (in test.dwarf) + 0
+OUTLINED_FUNCTION_2 (in test.dwarf) + 0
 
 swift::Demangle::demangleOldSymbolAsNode(llvm::StringRef, swift::Demangle::NodeFactory&) (in test.dwarf) (OldDemangler.cpp:2289)
 
@@ -5697,643 +5697,643 @@ llvm::StringRef::StringRef(char const*) [clone .cold.1] (in test.dwarf) (StringR
 
 isProtocolNode(swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Node::addChild(swift::Demangle::Node*, swift::Demangle::NodeFactory&) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Node::addChild(swift::Demangle::Node*, swift::Demangle::NodeFactory&) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Node::addChild(swift::Demangle::Node*, swift::Demangle::NodeFactory&) (.cold.2) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Node::addChild(swift::Demangle::Node*, swift::Demangle::NodeFactory&) [clone .cold.2] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Node::removeChildAt(unsigned int, swift::Demangle::NodeFactory&) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Node::removeChildAt(unsigned int, swift::Demangle::NodeFactory&) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Node** swift::Demangle::NodeFactory::Allocate<swift::Demangle::Node*>(unsigned long) (.cold.1) (in test.dwarf) (Demangler.h:0)
+swift::Demangle::Node** swift::Demangle::NodeFactory::Allocate<swift::Demangle::Node*>(unsigned long) [clone .cold.1] (in test.dwarf) (Demangler.h:0)
 
-swift::Demangle::Node::reverseChildren(unsigned long) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Node::reverseChildren(unsigned long) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::NodeFactory::clear() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::NodeFactory::clear() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Node* swift::Demangle::NodeFactory::Allocate<swift::Demangle::Node>(unsigned long) (.cold.1) (in test.dwarf) (Demangler.h:0)
+swift::Demangle::Node* swift::Demangle::NodeFactory::Allocate<swift::Demangle::Node>(unsigned long) [clone .cold.1] (in test.dwarf) (Demangler.h:0)
 
-swift::Demangle::CharVector::str() const (.cold.1) (in test.dwarf) (Demangler.h:0)
+swift::Demangle::CharVector::str() const [clone .cold.1] (in test.dwarf) (Demangler.h:0)
 
-swift::Demangle::CharVector::append(llvm::StringRef, swift::Demangle::NodeFactory&) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::CharVector::append(llvm::StringRef, swift::Demangle::NodeFactory&) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::CharVector::append(int, swift::Demangle::NodeFactory&) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::CharVector::append(int, swift::Demangle::NodeFactory&) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleSymbol(llvm::StringRef) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleSymbol(llvm::StringRef) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::nextIf(llvm::StringRef) (.cold.1) (in test.dwarf) (Demangler.h:0)
+swift::Demangle::Demangler::nextIf(llvm::StringRef) [clone .cold.1] (in test.dwarf) (Demangler.h:0)
 
-swift::Demangle::Demangler::demangleOperator() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleOperator() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleOperator() (.cold.2) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleOperator() [clone .cold.2] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Node::getText() const (.cold.1) (in test.dwarf) (Demangle.h:0)
+swift::Demangle::Node::getText() const [clone .cold.1] (in test.dwarf) (Demangle.h:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.2) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.2] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.3) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.3] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.4) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.4] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.5) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.5] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.6) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.6] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.7) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.7] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.8) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.8] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.9) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.9] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.10) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.10] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) (.cold.11) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParamLabels(swift::Demangle::Node*) [clone .cold.11] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleBuiltinType() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleBuiltinType() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleBuiltinType() (.cold.2) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleBuiltinType() [clone .cold.2] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleBuiltinType() (.cold.3) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleBuiltinType() [clone .cold.3] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleIdentifier() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleIdentifier() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleIdentifier() (.cold.2) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleIdentifier() [clone .cold.2] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleIdentifier() (.cold.3) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleIdentifier() [clone .cold.3] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleImplFunctionType() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleImplFunctionType() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleImplFunctionType() (.cold.2) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleImplFunctionType() [clone .cold.2] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleMetatype() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleMetatype() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleGenericRequirement() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleGenericRequirement() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleStandardSubstitution() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleStandardSubstitution() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleSpecialType() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleSpecialType() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleSpecialType() (.cold.2) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleSpecialType() [clone .cold.2] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleSpecialType() (.cold.3) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleSpecialType() [clone .cold.3] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleSpecialType() (.cold.4) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleSpecialType() [clone .cold.4] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleSpecialType() (.cold.5) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleSpecialType() [clone .cold.5] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleOperatorIdentifier() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleOperatorIdentifier() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleOperatorIdentifier() (.cold.2) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleOperatorIdentifier() [clone .cold.2] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleOperatorIdentifier() (.cold.3) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleOperatorIdentifier() [clone .cold.3] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::getDependentGenericParamType(int, int) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::getDependentGenericParamType(int, int) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::consumeAll() (.cold.1) (in test.dwarf) (Demangler.h:0)
+swift::Demangle::Demangler::consumeAll() [clone .cold.1] (in test.dwarf) (Demangler.h:0)
 
-swift::Demangle::Demangler::consumeAll() (.cold.2) (in test.dwarf) (Demangler.h:0)
+swift::Demangle::Demangler::consumeAll() [clone .cold.2] (in test.dwarf) (Demangler.h:0)
 
-swift::Demangle::Vector<char>::push_back(char const&, swift::Demangle::NodeFactory&) (.cold.1) (in test.dwarf) (Demangler.h:0)
+swift::Demangle::Vector<char>::push_back(char const&, swift::Demangle::NodeFactory&) [clone .cold.1] (in test.dwarf) (Demangler.h:0)
 
-swift::Demangle::Demangler::popFunctionParams(swift::Demangle::Node::Kind) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::popFunctionParams(swift::Demangle::Node::Kind) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Vector<swift::Demangle::Node*>::push_back(swift::Demangle::Node* const&, swift::Demangle::NodeFactory&) (.cold.1) (in test.dwarf) (Demangler.h:0)
+swift::Demangle::Vector<swift::Demangle::Node*>::push_back(swift::Demangle::Node* const&, swift::Demangle::NodeFactory&) [clone .cold.1] (in test.dwarf) (Demangler.h:0)
 
-swift::Demangle::Demangler::demangleBoundGenericArgs(swift::Demangle::Node*, swift::Demangle::Vector<swift::Demangle::Node*> const&, unsigned long) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleBoundGenericArgs(swift::Demangle::Node*, swift::Demangle::Vector<swift::Demangle::Node*> const&, unsigned long) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleBoundGenericArgs(swift::Demangle::Node*, swift::Demangle::Vector<swift::Demangle::Node*> const&, unsigned long) (.cold.2) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleBoundGenericArgs(swift::Demangle::Node*, swift::Demangle::Vector<swift::Demangle::Node*> const&, unsigned long) [clone .cold.2] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleImplParamConvention() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleImplParamConvention() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleImplResultConvention(swift::Demangle::Node::Kind) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleImplResultConvention(swift::Demangle::Node::Kind) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleFunctionSpecialization() (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleFunctionSpecialization() [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleFunctionSpecialization() (.cold.2) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleFunctionSpecialization() [clone .cold.2] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::demangleFunctionSpecialization() (.cold.3) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::demangleFunctionSpecialization() [clone .cold.3] (in test.dwarf) (Demangler.cpp:0)
 
-swift::Demangle::Demangler::addFuncSpecParamNumber(swift::Demangle::Node*, swift::Demangle::FunctionSigSpecializationParamKind) (.cold.1) (in test.dwarf) (Demangler.cpp:0)
+swift::Demangle::Demangler::addFuncSpecParamNumber(swift::Demangle::Node*, swift::Demangle::FunctionSigSpecializationParamKind) [clone .cold.1] (in test.dwarf) (Demangler.cpp:0)
 
-llvm::StringRef llvm::StringRef::copy<swift::Demangle::NodeFactory>(swift::Demangle::NodeFactory&) const (.cold.1) (in test.dwarf) (StringRef.h:0)
+llvm::StringRef llvm::StringRef::copy<swift::Demangle::NodeFactory>(swift::Demangle::NodeFactory&) const [clone .cold.1] (in test.dwarf) (StringRef.h:0)
 
-char* swift::Demangle::NodeFactory::Allocate<char>(unsigned long) (.cold.1) (in test.dwarf) (Demangler.h:0)
+char* swift::Demangle::NodeFactory::Allocate<char>(unsigned long) [clone .cold.1] (in test.dwarf) (Demangler.h:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.3] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.4) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.4] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.5) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.5] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.6) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.6] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.7) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.7] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.8) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.8] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.9) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.9] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.10) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.10] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.11) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.11] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.12) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.12] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.13) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.13] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.14) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.14] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.15) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.15] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.16) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.16] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.17) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.17] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.18) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.18] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.19) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.19] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.20) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.20] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.21) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.21] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.22) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.22] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.23) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.23] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.24) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.24] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.25) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.25] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.26) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.26] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.27) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.27] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.28) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.28] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.29) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.29] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.30) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.30] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.31) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.31] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.32) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.32] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.33) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.33] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.34) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.34] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.35) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.35] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.36) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.36] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.37) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.37] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.38) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.38] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.39) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.39] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.40) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.40] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.41) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.41] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.42) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.42] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.43) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.43] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.44) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.44] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.45) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.45] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.46) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.46] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.47) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.47] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.48) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.48] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.49) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.49] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.50) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.50] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.51) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.51] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.52) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.52] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.53) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.53] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.54) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.54] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.55) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.55] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.56) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.56] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.57) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.57] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.58) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.58] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.59) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.59] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.60) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.60] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.61) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.61] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.62) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.62] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.63) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.63] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.64) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.64] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.65) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.65] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.66) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.66] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.67) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.67] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.68) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.68] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.69) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.69] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.70) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.70] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.71) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.71] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.72) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.72] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.73) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.73] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.74) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.74] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.75) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.75] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.76) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.76] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.77) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.77] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.78) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.78] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.79) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.79] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.80) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.80] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.81) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.81] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.82) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.82] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.83) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.83] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.84) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.84] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.85) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.85] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.86) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.86] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.87) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.87] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.88) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.88] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.89) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.89] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.90) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.90] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.91) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.91] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.92) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.92] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.93) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.93] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.94) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.94] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.95) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.95] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.96) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.96] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.97) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.97] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.98) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.98] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.99) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.99] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.100) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.100] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.101) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.101] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.102) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.102] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.103) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.103] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.104) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.104] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.105) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.105] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.106) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.106] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.107) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.107] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.108) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.108] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.109) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.109] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.110) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.110] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.111) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.111] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.112) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.112] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.113) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.113] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.114) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.114] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.115) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.115] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.116) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.116] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.117) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.117] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.118) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.118] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.119) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.119] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.120) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.120] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.121) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.121] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.122) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.122] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.123) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.123] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.124) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.124] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.125) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.125] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.126) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.126] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.127) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.127] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.128) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.128] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.129) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.129] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.130) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.130] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.131) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.131] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.132) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.132] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.133) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.133] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.134) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.134] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.135) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.135] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.136) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.136] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.137) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.137] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.138) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.138] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.139) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.139] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.140) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.140] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.141) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.141] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.142) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.142] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.143) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.143] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.144) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.144] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.145) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.145] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.146) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.146] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.147) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.147] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.148) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.148] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.149) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.149] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.150) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.150] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.151) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.151] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.152) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.152] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.153) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.153] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.154) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.154] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.155) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.155] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.156) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.156] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.157) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.157] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.158) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.158] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.159) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.159] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.160) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.160] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.161) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.161] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.162) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.162] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.163) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.163] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.164) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.164] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.165) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.165] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.166) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.166] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.167) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.167] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.168) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.168] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.169) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.169] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.170) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.170] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.171) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.171] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.172) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.172] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.173) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.173] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.174) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.174] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.175) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.175] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.176) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.176] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.177) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.177] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.178) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.178] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.179) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.179] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.180) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.180] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.181) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.181] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.182) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.182] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.183) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.183] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.184) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.184] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.185) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.185] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.186) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.186] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.187) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.187] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.188) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.188] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.189) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.189] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.190) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.190] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.191) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.191] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.192) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.192] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.193) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.193] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.194) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.194] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.195) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.195] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.196) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.196] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.197) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.197] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.198) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.198] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.199) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.199] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.200) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.200] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) (.cold.201) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::print(swift::Demangle::Node*, bool) [clone .cold.201] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) [clone .cold.3] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) (.cold.4) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) [clone .cold.4] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) (.cold.5) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) [clone .cold.5] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) (.cold.6) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) [clone .cold.6] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) (.cold.7) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) [clone .cold.7] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) (.cold.8) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) [clone .cold.8] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) (.cold.9) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntity(swift::Demangle::Node*, bool, (anonymous namespace)::NodePrinter::TypePrinting, bool, llvm::StringRef, int, llvm::StringRef) [clone .cold.9] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionType(swift::Demangle::Node*, swift::Demangle::Node*) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionType(swift::Demangle::Node*, swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionType(swift::Demangle::Node*, swift::Demangle::Node*) (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionType(swift::Demangle::Node*, swift::Demangle::Node*) [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool) (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool) [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool) (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool) [clone .cold.3] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printSpecializationPrefix(swift::Demangle::Node*, llvm::StringRef, llvm::StringRef) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printSpecializationPrefix(swift::Demangle::Node*, llvm::StringRef, llvm::StringRef) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printSpecializationPrefix(swift::Demangle::Node*, llvm::StringRef, llvm::StringRef) (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printSpecializationPrefix(swift::Demangle::Node*, llvm::StringRef, llvm::StringRef) [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printSpecializationPrefix(swift::Demangle::Node*, llvm::StringRef, llvm::StringRef) (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printSpecializationPrefix(swift::Demangle::Node*, llvm::StringRef, llvm::StringRef) [clone .cold.3] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.3] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.4) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.4] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.5) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.5] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.6) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.6] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.7) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.7] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.8) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.8] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.9) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.9] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.10) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.10] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.11) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.11] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.12) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.12] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.13) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.13] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) (.cold.14) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionSigSpecializationParam(swift::Demangle::Node*, unsigned int) [clone .cold.14] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printWithParens(swift::Demangle::Node*) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printWithParens(swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printWithParens(swift::Demangle::Node*) (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printWithParens(swift::Demangle::Node*) [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printWithParens(swift::Demangle::Node*) (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printWithParens(swift::Demangle::Node*) [clone .cold.3] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printImplFunctionType(swift::Demangle::Node*) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printImplFunctionType(swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printImplFunctionType(swift::Demangle::Node*) (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printImplFunctionType(swift::Demangle::Node*) [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-needSpaceBeforeType(swift::Demangle::Node*) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+needSpaceBeforeType(swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntityType(swift::Demangle::Node*, swift::Demangle::Node*, swift::Demangle::Node*) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntityType(swift::Demangle::Node*, swift::Demangle::Node*, swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntityType(swift::Demangle::Node*, swift::Demangle::Node*, swift::Demangle::Node*) (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntityType(swift::Demangle::Node*, swift::Demangle::Node*, swift::Demangle::Node*) [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printEntityType(swift::Demangle::Node*, swift::Demangle::Node*, swift::Demangle::Node*) (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printEntityType(swift::Demangle::Node*, swift::Demangle::Node*, swift::Demangle::Node*) [clone .cold.3] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::printFunctionParameters(swift::Demangle::Node*, swift::Demangle::Node*, bool)::{lambda(swift::Demangle::Node*)#1}::operator()(swift::Demangle::Node*) const [clone .cold.3] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) (.cold.1) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) (.cold.2) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) [clone .cold.2] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) (.cold.3) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) [clone .cold.3] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) (.cold.4) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) [clone .cold.4] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) (.cold.5) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) [clone .cold.5] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) (.cold.6) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) [clone .cold.6] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) (.cold.7) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) [clone .cold.7] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) (.cold.8) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) [clone .cold.8] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) (.cold.9) (in test.dwarf) (NodePrinter.cpp:0)
+(anonymous namespace)::NodePrinter::findSugar(swift::Demangle::Node*) [clone .cold.9] (in test.dwarf) (NodePrinter.cpp:0)
 
-(anonymous namespace)::NameSource::advanceOffset(unsigned long) (.cold.1) (in test.dwarf) (OldDemangler.cpp:0)
+(anonymous namespace)::NameSource::advanceOffset(unsigned long) [clone .cold.1] (in test.dwarf) (OldDemangler.cpp:0)
 
-(anonymous namespace)::OldDemangler::demangleTypeImpl() (.cold.1) (in test.dwarf) (OldDemangler.cpp:0)
+(anonymous namespace)::OldDemangler::demangleTypeImpl() [clone .cold.1] (in test.dwarf) (OldDemangler.cpp:0)
 
-(anonymous namespace)::OldDemangler::demangleEntity() (.cold.1) (in test.dwarf) (OldDemangler.cpp:0)
+(anonymous namespace)::OldDemangler::demangleEntity() [clone .cold.1] (in test.dwarf) (OldDemangler.cpp:0)
 
-(anonymous namespace)::OldDemangler::demangleBoundGenericArgs(swift::Demangle::Node*) (.cold.1) (in test.dwarf) (OldDemangler.cpp:0)
+(anonymous namespace)::OldDemangler::demangleBoundGenericArgs(swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (OldDemangler.cpp:0)
 
-(anonymous namespace)::OldDemangler::demangleDependentMemberTypeName(swift::Demangle::Node*) (.cold.1) (in test.dwarf) (OldDemangler.cpp:0)
+(anonymous namespace)::OldDemangler::demangleDependentMemberTypeName(swift::Demangle::Node*) [clone .cold.1] (in test.dwarf) (OldDemangler.cpp:0)
 
 -[RollbarDTO(CustomData) addKeyed:DataTransferObject:] (in test.dwarf) (RollbarDTO+CustomData.m:5)
 
@@ -6631,17 +6631,17 @@ __47+[RollbarMemoryStatsDescriptors sharedInstance]_block_invoke (in test.dwarf)
 
 +[RollbarTriStateFlagUtil TriStateFlagFromString:] (in test.dwarf) (RollbarTriStateFlag.m:18)
 
-swift::AsyncTask::waitFuture(swift::AsyncTask*, swift::AsyncContext*, void (swift::AsyncContext* swift_async_context) swiftasynccall*, swift::AsyncContext*, swift::OpaqueValue*) (in test.dwarf) + 0
+swift::AsyncTask::waitFuture(swift::AsyncTask*, swift::AsyncContext*, void (*)(swift::AsyncContext* swift_async_context) swiftasynccall, swift::AsyncContext*, swift::OpaqueValue*) (in test.dwarf) + 0
 
-swift::swift56override_swift_task_future_wait(swift::OpaqueValue*, swift::AsyncContext*, swift::AsyncTask*, void (swift::AsyncContext* swift_async_context) swiftasynccall*, swift::AsyncContext*, void (swift::OpaqueValue*, swift::AsyncContext* swift_async_context, swift::AsyncTask*, void (swift::AsyncContext* swift_async_context), swift::AsyncContext*) swiftasynccall*) (in test.dwarf) + 0
+swift::swift56override_swift_task_future_wait(swift::OpaqueValue*, swift::AsyncContext*, swift::AsyncTask*, void (*)(swift::AsyncContext* swift_async_context) swiftasynccall, swift::AsyncContext*, void (*)(swift::OpaqueValue*, swift::AsyncContext* swift_async_context, swift::AsyncTask*, void (swift::AsyncContext* swift_async_context), swift::AsyncContext*) swiftasynccall) (in test.dwarf) + 0
 
 task_future_wait_resume_adapter(swift::AsyncContext*) (in test.dwarf) + 0
 
-swift::swift56override_swift_task_future_wait_throwing(swift::OpaqueValue*, swift::AsyncContext*, swift::AsyncTask*, void (swift::AsyncContext* swift_async_context, void* swift_context) swiftasynccall*, swift::AsyncContext*, void (swift::OpaqueValue*, swift::AsyncContext* swift_async_context, swift::AsyncTask*, void* swift_context, swift::AsyncContext*) swiftasynccall*) (in test.dwarf) + 0
+swift::swift56override_swift_task_future_wait_throwing(swift::OpaqueValue*, swift::AsyncContext*, swift::AsyncTask*, void (*)(swift::AsyncContext* swift_async_context, void* swift_context) swiftasynccall, swift::AsyncContext*, void (*)(swift::OpaqueValue*, swift::AsyncContext* swift_async_context, swift::AsyncTask*, void* swift_context, swift::AsyncContext*) swiftasynccall) (in test.dwarf) + 0
 
 task_wait_throwing_resume_adapter(swift::AsyncContext*) (in test.dwarf) + 0
 
-swift::swift56override_swift_task_create_common(unsigned long, swift::TaskOptionRecord*, swift::TargetMetadata<swift::InProcess> const*, void (swift::AsyncContext* swift_async_context) swiftasynccall*, void*, unsigned long, swift::AsyncTaskAndContext (unsigned long, swift::TaskOptionRecord*, swift::TargetMetadata<swift::InProcess> const*, void (swift::AsyncContext* swift_async_context), void (swift::AsyncContext* swift_async_context) swiftasynccall, unsigned long) swiftcall*) (in test.dwarf) + 0
+swift::swift56override_swift_task_create_common(unsigned long, swift::TaskOptionRecord*, swift::TargetMetadata<swift::InProcess> const*, void (*)(swift::AsyncContext* swift_async_context) swiftasynccall, void*, unsigned long, swift::AsyncTaskAndContext (*)(unsigned long, swift::TaskOptionRecord*, swift::TargetMetadata<swift::InProcess> const*, void (swift::AsyncContext* swift_async_context), void (swift::AsyncContext* swift_async_context) swiftasynccall, unsigned long) swiftcall) (in test.dwarf) + 0
 
 swift::AsyncTask::flagAsRunning_slow() (in test.dwarf) + 0
 
@@ -6649,7 +6649,7 @@ swift::AsyncTask::flagAsSuspended_slow() (in test.dwarf) + 0
 
 swift::swift_task_escalateBackdeploy56(swift::AsyncTask*, swift::JobPriority) (in test.dwarf) + 0
 
-swift::swift_task_escalateBackdeploy56(swift::AsyncTask*, swift::JobPriority)::$_2::operator()() const::'lambda'(void*)::__invoke(void*) (in test.dwarf) + 0
+swift::swift_task_escalateBackdeploy56(swift::AsyncTask*, swift::JobPriority)::$_2::operator()() const::{lambda(void*)#1}::__invoke(void*) (in test.dwarf) + 0
 
 swift::waitForStatusRecordUnlock(swift::AsyncTask*, swift::ActiveTaskStatus&) (in test.dwarf) + 0
 
@@ -6663,15 +6663,15 @@ swift::adoptTaskVoucher(swift::AsyncTask*) (in test.dwarf) + 0
 
 swift::restoreTaskVoucher(swift::AsyncTask*) (in test.dwarf) + 0
 
-swift_voucher_needs_adopt(voucher_s*)::'lambda'()::operator()() const::'lambda'(void*)::__invoke(void*) (in test.dwarf) + 0
+swift_voucher_needs_adopt(voucher_s*)::{lambda()#1}::operator()() const::{lambda(void*)#1}::__invoke(void*) (in test.dwarf) + 0
 
 swift::_swift_tsan_acquire(void*) (in test.dwarf) + 0
 
 swift::_swift_tsan_release(void*) (in test.dwarf) + 0
 
-swift::_swift_tsan_acquire(void*)::$_0::operator()() const::'lambda'(void*)::__invoke(void*) (in test.dwarf) + 0
+swift::_swift_tsan_acquire(void*)::$_0::operator()() const::{lambda(void*)#1}::__invoke(void*) (in test.dwarf) + 0
 
-swift::_swift_tsan_release(void*)::$_1::operator()() const::'lambda'(void*)::__invoke(void*) (in test.dwarf) + 0
+swift::_swift_tsan_release(void*)::$_1::operator()() const::{lambda(void*)#1}::__invoke(void*) (in test.dwarf) + 0
 
 swift::MutexPlatformHelper::init(os_unfair_lock_s&, bool) (in test.dwarf) + 0
 
@@ -6685,9 +6685,9 @@ swift::swift_task_enterThreadLocalContextBackdeploy56(char*) (in test.dwarf) + 0
 
 swift::swift_task_exitThreadLocalContextBackdeploy56(char*) (in test.dwarf) + 0
 
-swift::swift_task_enterThreadLocalContextBackdeploy56(char*)::$_0::operator()() const::'lambda'(void*)::__invoke(void*) (in test.dwarf) + 0
+swift::swift_task_enterThreadLocalContextBackdeploy56(char*)::$_0::operator()() const::{lambda(void*)#1}::__invoke(void*) (in test.dwarf) + 0
 
-swift::swift_task_exitThreadLocalContextBackdeploy56(char*)::$_1::operator()() const::'lambda'(void*)::__invoke(void*) (in test.dwarf) + 0
+swift::swift_task_exitThreadLocalContextBackdeploy56(char*)::$_1::operator()() const::{lambda(void*)#1}::__invoke(void*) (in test.dwarf) + 0
 
 objc_msgSend$CPUArchForMajor:minor: (in test.dwarf) + 0
 
@@ -13105,7 +13105,7 @@ swift::swift_task_escalateBackdeploy56(swift::AsyncTask*, swift::JobPriority)::$
 
 swift::StatusRecordLockLock (in test.dwarf) + 0
 
-swift_voucher_needs_adopt(voucher_s*)::'lambda'()::operator()() const::TheLazy (in test.dwarf) + 0
+swift_voucher_needs_adopt(voucher_s*)::{lambda()#1}::operator()() const::TheLazy (in test.dwarf) + 0
 
 swift::_swift_tsan_acquire(void*)::$_0::operator()() const::TheLazy (in test.dwarf) + 0
 
