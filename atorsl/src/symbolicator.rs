@@ -12,7 +12,7 @@ use std::{
 };
 
 pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Vec<Symbol>, Error> {
-    let unit = dwarf.unit_from_addr(&addr)?;
+    let unit = dwarf.unit_from_addr(addr)?;
     let mut entries = unit.entries();
 
     let comp_dir = PathBuf::from(
@@ -37,7 +37,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
 
         if matches!(
             entry.tag(),
-            gimli::DW_TAG_subprogram if dwarf.entry_contains(entry, &addr, &unit)
+            gimli::DW_TAG_subprogram if dwarf.entry_contains(entry, addr, &unit)
         ) {
             break entry;
         }
@@ -60,7 +60,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
 
             if matches!(
                 child.tag(),
-                gimli::DW_TAG_inlined_subroutine if dwarf.entry_contains(child, &addr, &unit)
+                gimli::DW_TAG_inlined_subroutine if dwarf.entry_contains(child, addr, &unit)
             ) {
                 symbols.insert(
                     0,
@@ -153,9 +153,9 @@ trait DwarfExt {
         unit: &Unit,
     ) -> Result<SourceLoc, Error>;
 
-    fn entry_contains(&self, entry: &Entry, addr: &Addr, unit: &Unit) -> bool;
-    fn entry_pc_contains(&self, entry: &Entry, addr: &Addr) -> Option<bool>;
-    fn entry_ranges_contain(&self, entry: &Entry, addr: &Addr, unit: &Unit) -> Option<bool>;
+    fn entry_contains(&self, entry: &Entry, addr: Addr, unit: &Unit) -> bool;
+    fn entry_pc_contains(&self, entry: &Entry, addr: Addr) -> Option<bool>;
+    fn entry_ranges_contain(&self, entry: &Entry, addr: Addr, unit: &Unit) -> Option<bool>;
 
     fn line_row_file(
         &self,
@@ -171,9 +171,9 @@ trait DwarfExt {
     ) -> Result<Cow<str>, gimli::Error>;
 
     fn unit_from_offset(&self, addr: Addr, offset: DebugInfoOffset) -> Result<Unit, Error>;
-    fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error>;
+    fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error>;
 
-    fn debug_info_offset(&self, addr: &Addr) -> Result<DebugInfoOffset, Error>;
+    fn debug_info_offset(&self, addr: Addr) -> Result<DebugInfoOffset, Error>;
 }
 
 impl DwarfExt for Dwarf<'_> {
@@ -289,13 +289,13 @@ impl DwarfExt for Dwarf<'_> {
         })
     }
 
-    fn entry_contains(&self, entry: &Entry, addr: &Addr, unit: &Unit) -> bool {
+    fn entry_contains(&self, entry: &Entry, addr: Addr, unit: &Unit) -> bool {
         self.entry_pc_contains(entry, addr)
             .or_else(|| self.entry_ranges_contain(entry, addr, unit))
             .unwrap_or(false)
     }
 
-    fn entry_pc_contains(&self, entry: &Entry, addr: &Addr) -> Option<bool> {
+    fn entry_pc_contains(&self, entry: &Entry, addr: Addr) -> Option<bool> {
         let low = match entry.attr_value(DW_AT_low_pc).ok()?? {
             AttrValue::Addr(addr) => addr,
             _ => None?,
@@ -307,16 +307,16 @@ impl DwarfExt for Dwarf<'_> {
             _ => None?,
         };
 
-        Some((low..high).contains(addr))
+        Some((low..high).contains(&addr))
     }
 
-    fn entry_ranges_contain(&self, entry: &Entry, addr: &Addr, unit: &Unit) -> Option<bool> {
+    fn entry_ranges_contain(&self, entry: &Entry, addr: Addr, unit: &Unit) -> Option<bool> {
         let AttrValue::RangeListsRef(offset) = entry.attr_value(DW_AT_ranges).ok()?? else {
             None?
         };
 
         self.ranges(unit, self.ranges_offset_from_raw(unit, offset))
-            .and_then(|mut rs| rs.any(|r| Ok((r.begin..r.end).contains(addr))))
+            .and_then(|mut rs| rs.any(|r| Ok((r.begin..r.end).contains(&addr))))
             .ok()
     }
 
@@ -365,13 +365,13 @@ impl DwarfExt for Dwarf<'_> {
         Ok(self.unit(header)?)
     }
 
-    fn unit_from_addr(&self, addr: &Addr) -> Result<Unit, Error> {
+    fn unit_from_addr(&self, addr: Addr) -> Result<Unit, Error> {
         let offset = self.debug_info_offset(addr)?;
         let header = self.debug_info.header_from_offset(offset)?;
         Ok(self.unit(header)?)
     }
 
-    fn debug_info_offset(&self, addr: &Addr) -> Result<DebugInfoOffset, Error> {
+    fn debug_info_offset(&self, addr: Addr) -> Result<DebugInfoOffset, Error> {
         let contains = |addr| {
             move |arange: gimli::ArangeEntry| {
                 arange
@@ -387,9 +387,9 @@ impl DwarfExt for Dwarf<'_> {
             .find_map(|header| {
                 Ok(header
                     .entries()
-                    .any(contains(addr))?
+                    .any(contains(&addr))?
                     .then(|| header.debug_info_offset()))
             })?
-            .ok_or(Error::AddrDebugInfoOffsetMissing(*addr))
+            .ok_or(Error::AddrDebugInfoOffsetMissing(addr))
     }
 }
