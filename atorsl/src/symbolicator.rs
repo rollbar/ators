@@ -203,7 +203,7 @@ impl DwarfExt for Dwarf<'_> {
         let mut source_locs = Vec::default();
 
         while let Some((header, line_row)) = line_rows.next_row()? {
-            if line_row.address() != addr {
+            if line_row.end_sequence() || line_row.address() != addr {
                 continue;
             }
 
