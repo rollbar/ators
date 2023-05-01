@@ -200,28 +200,24 @@ impl DwarfExt for Dwarf<'_> {
         line_rows: &mut IncompleteLineProgramRows,
         unit: &Unit,
     ) -> Result<SourceLoc, Error> {
-        let mut file = None;
         let mut source_locs = Vec::default();
 
         while let Some((header, line_row)) = line_rows.next_row()? {
-            if line_row.address() == addr {
-                if file.is_none() {
-                    file.replace(self.line_row_file(line_row, header, unit)?);
-                }
-
-                source_locs.push(SourceLoc {
-                    // SAFETY: `file` is always `Some` at this point.
-                    file: unsafe { file.clone().unwrap_unchecked() },
-                    line: line_row
-                        .line()
-                        .map(|line| line.get())
-                        .unwrap_or_default(),
-                    col: match line_row.column() {
-                        ColumnType::LeftEdge => 0,
-                        ColumnType::Column(col) => col.get(),
-                    },
-                });
+            if line_row.address() != addr {
+                continue;
             }
+
+            source_locs.push(SourceLoc {
+                file: self.line_row_file(line_row, header, unit)?,
+                line: line_row
+                    .line()
+                    .map(|line| line.get())
+                    .unwrap_or_default(),
+                col: match line_row.column() {
+                    ColumnType::LeftEdge => 0,
+                    ColumnType::Column(col) => col.get(),
+                },
+            });
         }
 
         source_locs

@@ -5258,13 +5258,13 @@ llvm::StringRef::str() const (in test.dwarf) (StringRef.h:197)
 
 swift::Demangle::demangleSymbolAsString(char const*, unsigned long, swift::Demangle::DemangleOptions const&) (in test.dwarf) (Context.cpp:180)
 
-std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::__throw_length_error[abi:v15006]() const (in test.dwarf) (string:1804)
+std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__throw_length_error[abi:v15006]() const (in test.dwarf) (string:1804)
 
 std::__1::__throw_length_error[abi:v15006](char const*) (in test.dwarf) (stdexcept:255)
 
 std::length_error::length_error[abi:v15006](char const*) (in test.dwarf) (stdexcept:154)
 
-std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::basic_string[abi:v15006]<std::nullptr_t>(char const*) (in test.dwarf) (string:841)
+char const* std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::basic_string[abi:v15006]<std::nullptr_t>() (in test.dwarf) (string:841)
 
 llvm::StringRef::StringRef(char const*) (in test.dwarf) (StringRef.h:72)
 
@@ -5482,7 +5482,7 @@ swift::Demangle::Demangler::demangleSpecAttributes(swift::Demangle::Node::Kind) 
 
 swift::Demangle::Demangler::demangleFunctionSpecialization() (in test.dwarf) (Demangler.cpp:2189)
 
-std::__1::vector<swift::Demangle::Node*, std::__1::allocator<swift::Demangle::Node*>>::push_back[abi:v15006](swift::Demangle::Node* const&) (in test.dwarf) (vector:1547)
+std::__1::vector<swift::Demangle::Node*, std::__1::allocator<swift::Demangle::Node*> >::push_back[abi:v15006](swift::Demangle::Node* const&) (in test.dwarf) (vector:1547)
 
 swift::Demangle::Demangler::demangleBridgedMethodParams() (in test.dwarf) (Demangler.cpp:2152)
 
@@ -5517,11 +5517,11 @@ std::__1::bad_function_call::~bad_function_call() (in test.dwarf) (function.h:50
 
 std::__1::bad_function_call::~bad_function_call() (in test.dwarf) (function.h:50)
 
-std::__1::vector<swift::Demangle::Node*, std::__1::allocator<swift::Demangle::Node*>>::__throw_length_error[abi:v15006]() const (in test.dwarf) (vector:851)
+std::__1::vector<swift::Demangle::Node*, std::__1::allocator<swift::Demangle::Node*> >::__throw_length_error[abi:v15006]() const (in test.dwarf) (vector:851)
 
-std::__1::__allocation_result<std::__1::allocator_traits<std::__1::allocator<swift::Demangle::Node*>>::pointer> std::__1::__allocate_at_least[abi:v15006]<std::__1::allocator<swift::Demangle::Node*>>(std::__1::allocator<swift::Demangle::Node*>&, unsigned long) (in test.dwarf) (allocate_at_least.h:53)
+std::__1::__allocation_result<std::__1::allocator_traits<std::__1::allocator<swift::Demangle::Node*> >::pointer> std::__1::__allocate_at_least[abi:v15006]<std::__1::allocator<swift::Demangle::Node*> >(std::__1::allocator_traits&, unsigned long) (in test.dwarf) (allocate_at_least.h:53)
 
-std::__throw_bad_array_new_length[abi:v15006]() (in test.dwarf) (new:155)
+std::__throw_bad_array_new_length([abi:v15006], void) (in test.dwarf) (new:155)
 
 OUTLINED_FUNCTION_0 (in test.dwarf) + 0
 
