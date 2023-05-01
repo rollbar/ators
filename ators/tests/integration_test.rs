@@ -50,5 +50,8 @@ fn test() {
             .lines()
             .map(|line| line.expect("test symr line to be ok")),
         )
-        .for_each(|((addr, actual), expected)| assert_str_eq!(actual, expected, "at {}", addr));
+        .enumerate()
+        .for_each(|(count, ((addr, actual), expected))| {
+            assert_str_eq!(actual, expected, "in line {} for {}", count + 1, addr)
+        });
 }
