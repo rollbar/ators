@@ -9101,14 +9101,34 @@ nominal type descriptor for RollbarCrashFormattingFilter (in test.dwarf) + 0
 
 method descriptor for RollbarCrashFormattingFilter.filterReports(_:onCompletion:) (in test.dwarf) + 0
 
+property descriptor for Result.isSuccess (in test.dwarf) + 0
+property descriptor for Result.isFailure (in test.dwarf) + 0
+property descriptor for Result.success (in test.dwarf) + 0
+property descriptor for Result.failure (in test.dwarf) + 0
 property descriptor for Dictionary<>.subscript<A>(any:) (in test.dwarf) + 0
 
+property descriptor for Result.isSuccess (in test.dwarf) + 0
+property descriptor for Result.isFailure (in test.dwarf) + 0
+property descriptor for Result.success (in test.dwarf) + 0
+property descriptor for Result.failure (in test.dwarf) + 0
 property descriptor for Dictionary<>.subscript<A>(any:) (in test.dwarf) + 0
 
+property descriptor for Result.isSuccess (in test.dwarf) + 0
+property descriptor for Result.isFailure (in test.dwarf) + 0
+property descriptor for Result.success (in test.dwarf) + 0
+property descriptor for Result.failure (in test.dwarf) + 0
 property descriptor for Dictionary<>.subscript<A>(any:) (in test.dwarf) + 0
 
+property descriptor for Result.isSuccess (in test.dwarf) + 0
+property descriptor for Result.isFailure (in test.dwarf) + 0
+property descriptor for Result.success (in test.dwarf) + 0
+property descriptor for Result.failure (in test.dwarf) + 0
 property descriptor for Dictionary<>.subscript<A>(any:) (in test.dwarf) + 0
 
+property descriptor for Result.isSuccess (in test.dwarf) + 0
+property descriptor for Result.isFailure (in test.dwarf) + 0
+property descriptor for Result.success (in test.dwarf) + 0
+property descriptor for Result.failure (in test.dwarf) + 0
 property descriptor for Dictionary<>.subscript<A>(any:) (in test.dwarf) + 0
 
 protocol conformance descriptor for Address (in test.dwarf) + 0
@@ -9123,13 +9143,25 @@ protocol conformance descriptor for Address (in test.dwarf) + 0
 
 protocol conformance descriptor for Address (in test.dwarf) + 0
 
+property descriptor for Address.value (in test.dwarf) + 0
 property descriptor for Address.description (in test.dwarf) + 0
+property descriptor for Address.hashValue (in test.dwarf) + 0
+property descriptor for Address.size (in test.dwarf) + 0
 
+property descriptor for Address.value (in test.dwarf) + 0
 property descriptor for Address.description (in test.dwarf) + 0
+property descriptor for Address.hashValue (in test.dwarf) + 0
+property descriptor for Address.size (in test.dwarf) + 0
 
+property descriptor for Address.value (in test.dwarf) + 0
 property descriptor for Address.description (in test.dwarf) + 0
+property descriptor for Address.hashValue (in test.dwarf) + 0
+property descriptor for Address.size (in test.dwarf) + 0
 
+property descriptor for Address.value (in test.dwarf) + 0
 property descriptor for Address.description (in test.dwarf) + 0
+property descriptor for Address.hashValue (in test.dwarf) + 0
+property descriptor for Address.size (in test.dwarf) + 0
 
 nominal type descriptor for Address (in test.dwarf) + 0
 
@@ -10093,17 +10125,17 @@ __block_descriptor_56_e8_32s40s48bs_e38_v24?0"NSHTTPURLResponse"8"NSData"16l 
 
 __block_descriptor_48_e8_32s40bs_e17_v16?0"NSError"8l (in test.dwarf) + 0
 
-vtable for swift::Demangle::NodeFactory (in test.dwarf) + 0
+{vtable(swift::Demangle::NodeFactory)} (in test.dwarf) + 0
 
 typeinfo for swift::Demangle::NodeFactory (in test.dwarf) + 0
 
-vtable for swift::Demangle::Demangler (in test.dwarf) + 0
+{vtable(swift::Demangle::Demangler)} (in test.dwarf) + 0
 
 typeinfo for swift::Demangle::Demangler (in test.dwarf) + 0
 
 typeinfo for std::__1::bad_function_call (in test.dwarf) + 0
 
-vtable for std::__1::bad_function_call (in test.dwarf) + 0
+{vtable(std::__1::bad_function_call)} (in test.dwarf) + 0
 
 __block_descriptor_64_e8_32s40s48s56s_e5_v8?0l (in test.dwarf) + 0
 
@@ -11611,8 +11643,10 @@ _DATA__TtC12Rollbar_Demo11AppDelegate (in test.dwarf) + 0
 
 full type metadata for AppDelegate (in test.dwarf) + 0
 
+type metadata for AppDelegate (in test.dwarf) + 0
 OBJC_CLASS_$__TtC12Rollbar_Demo11AppDelegate (in test.dwarf) + 0
 
+type metadata for AppDelegate (in test.dwarf) + 0
 OBJC_CLASS_$__TtC12Rollbar_Demo11AppDelegate (in test.dwarf) + 0
 
 OBJC_METACLASS_$_RollbarAppLanguageUtil (in test.dwarf) + 0
@@ -11880,15 +11914,19 @@ _DATA__TtC18RollbarCrashReport28RollbarCrashDiagnosticFilter (in test.dwarf) + 0
 full type metadata for RollbarCrashDiagnosticFilter (in test.dwarf) + 0
 
 type metadata for RollbarCrashDiagnosticFilter (in test.dwarf) + 0
+OBJC_CLASS_$__TtC18RollbarCrashReport28RollbarCrashDiagnosticFilter (in test.dwarf) + 0
 
 type metadata for RollbarCrashDiagnosticFilter (in test.dwarf) + 0
+OBJC_CLASS_$__TtC18RollbarCrashReport28RollbarCrashDiagnosticFilter (in test.dwarf) + 0
 
 _DATA__TtC18RollbarCrashReport23SwiftDiagnosisFormatter (in test.dwarf) + 0
 
 full type metadata for SwiftDiagnosisFormatter (in test.dwarf) + 0
 
+type metadata for SwiftDiagnosisFormatter (in test.dwarf) + 0
 OBJC_CLASS_$__TtC18RollbarCrashReport23SwiftDiagnosisFormatter (in test.dwarf) + 0
 
+type metadata for SwiftDiagnosisFormatter (in test.dwarf) + 0
 OBJC_CLASS_$__TtC18RollbarCrashReport23SwiftDiagnosisFormatter (in test.dwarf) + 0
 
 _DATA__TtC18RollbarCrashReport28RollbarCrashFormattingFilter (in test.dwarf) + 0
@@ -11896,8 +11934,10 @@ _DATA__TtC18RollbarCrashReport28RollbarCrashFormattingFilter (in test.dwarf) + 0
 full type metadata for RollbarCrashFormattingFilter (in test.dwarf) + 0
 
 type metadata for RollbarCrashFormattingFilter (in test.dwarf) + 0
+OBJC_CLASS_$__TtC18RollbarCrashReport28RollbarCrashFormattingFilter (in test.dwarf) + 0
 
 type metadata for RollbarCrashFormattingFilter (in test.dwarf) + 0
+OBJC_CLASS_$__TtC18RollbarCrashReport28RollbarCrashFormattingFilter (in test.dwarf) + 0
 
 _DATA__TtC18RollbarCrashReportP33_7FFAE222EEA03028C0A0EA7AEC39C83716ISO8601Formatter (in test.dwarf) + 0
 

@@ -17,6 +17,12 @@ pub enum Error {
     #[error("Error reading binary image object: {0}")]
     Object(#[from] object::read::Error),
 
+    #[error("Object has no debug symbols")]
+    ObjectNoDebugSymbols,
+
+    #[error("Symbol in object has an invalid index: {0}")]
+    ObjectSymbolInvalidIndex(Addr),
+
     #[error("Error building structure: {0}")]
     Builder(#[from] derive_builder::UninitializedFieldError),
 

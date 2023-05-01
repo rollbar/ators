@@ -6,7 +6,6 @@ use gimli::{
     DW_AT_specification, DebugInfoOffset, LineRow, UnitSectionOffset,
 };
 use itertools::Either;
-use object::Object;
 use std::{
     borrow::Cow,
     path::{Path, PathBuf},
@@ -100,19 +99,35 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
     Ok(symbols)
 }
 
-pub fn atos_obj(obj: &object::File, addr: Addr) -> Result<Vec<Symbol>, Error> {
-    let map = obj.symbol_map();
-    let symbol = map.get(*addr).ok_or(Error::AddrNotFound(addr))?;
-    let symbol_name = symbol
-        .name()
-        .strip_prefix('_')
-        .unwrap_or(symbol.name());
+pub fn atos_map(
+    symbol_map: &object::SymbolMap<object::SymbolMapName>,
+    addr: Addr,
+) -> Result<Vec<Symbol>, Error> {
+    let mut symbols = Vec::default();
+    let mut symbol_map_iter = symbol_map.symbols().iter().peekable();
 
-    Ok(vec![Symbol {
-        addr: Addr::from(symbol.address()),
-        name: demangler::demangle(symbol_name).to_string(),
-        loc: Either::Right(addr - symbol.address()),
-    }])
+    while let (Some(symbol), next_symbol) = (symbol_map_iter.next(), symbol_map_iter.peek()) {
+        if addr == symbol.address()
+            || (addr > symbol.address()
+                && (next_symbol.is_none()
+                    || next_symbol.is_some_and(|next| addr < next.address())))
+        {
+            let demangled_symbol_name = demangler::demangle(
+                symbol
+                    .name()
+                    .strip_prefix('_')
+                    .unwrap_or(symbol.name()),
+            );
+
+            symbols.push(Symbol {
+                addr,
+                name: demangled_symbol_name.to_string(),
+                loc: Either::Right(addr - symbol.address()),
+            });
+        }
+    }
+
+    Ok(symbols)
 }
 
 trait DwarfExt {

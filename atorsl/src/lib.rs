@@ -6,7 +6,7 @@ pub mod ext;
 pub mod symbolicator;
 
 pub use data::Error;
-pub use symbolicator::{atos_dwarf, atos_obj};
+pub use symbolicator::{atos_dwarf, atos_map};
 
 pub(crate) mod prelude;
 pub(crate) use prelude::*;
