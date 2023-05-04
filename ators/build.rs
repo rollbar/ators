@@ -3,16 +3,19 @@ use memmap2::Mmap;
 use object::Object;
 use std::{
     env, fs,
-    io::{self, BufRead, Write},
+    io::{self, Write},
     path::PathBuf,
-    process::Command,
 };
+#[cfg(target_os = "macos")]
+use std::{io::BufRead, process::Command};
 
 #[cfg(target_os = "macos")]
 const ATOS: &str = "/usr/bin/atos";
 
 const TEST_DWARF: &str = "test.dwarf";
 const TEST_ADDRS: &str = "test_addrs.txt";
+
+#[cfg(target_os = "macos")]
 const TEST_SYMR: &str = "test_symr.txt";
 
 fn main() -> Result<()> {
