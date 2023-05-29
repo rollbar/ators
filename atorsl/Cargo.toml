@@ -17,7 +17,7 @@ build = "build.rs"
 fallible-iterator = "0.2.0"
 itertools = "0.10.5"
 thiserror = "1.0.40"
-memmap2 = "0.5.10"
+memmap2 = "0.6.2"
 object = "0.31.0"
 gimli = "0.27.2"
 
