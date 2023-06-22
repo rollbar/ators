@@ -11643,11 +11643,11 @@ _DATA__TtC12Rollbar_Demo11AppDelegate (in test.dwarf) + 0
 
 full type metadata for AppDelegate (in test.dwarf) + 0
 
-type metadata for AppDelegate (in test.dwarf) + 0
 OBJC_CLASS_$__TtC12Rollbar_Demo11AppDelegate (in test.dwarf) + 0
+type metadata for AppDelegate (in test.dwarf) + 0
 
-type metadata for AppDelegate (in test.dwarf) + 0
 OBJC_CLASS_$__TtC12Rollbar_Demo11AppDelegate (in test.dwarf) + 0
+type metadata for AppDelegate (in test.dwarf) + 0
 
 OBJC_METACLASS_$_RollbarAppLanguageUtil (in test.dwarf) + 0
 

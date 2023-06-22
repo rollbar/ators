@@ -219,22 +219,31 @@ impl DwarfExt for Dwarf<'_> {
     ) -> Result<SourceLoc, Error> {
         let mut source_locs = Vec::default();
 
+        let mut prev_row: Option<LineRow> = None;
         while let Some((header, line_row)) = line_rows.next_row()? {
-            if line_row.end_sequence() || line_row.address() != addr {
-                continue;
+            if let Some(prev_row_value) = prev_row {
+                let previous_match = prev_row_value.address() <= addr && addr < line_row.address();
+
+                if previous_match {
+                    source_locs.push(SourceLoc {
+                        file: self.line_row_file(&prev_row_value, header, unit)?,
+                        line: prev_row_value
+                            .line()
+                            .map(|line| line.get())
+                            .unwrap_or_default(),
+                        col: match prev_row_value.column() {
+                            ColumnType::LeftEdge => 0,
+                            ColumnType::Column(col) => col.get(),
+                        },
+                    });
+                }
             }
 
-            source_locs.push(SourceLoc {
-                file: self.line_row_file(line_row, header, unit)?,
-                line: line_row
-                    .line()
-                    .map(|line| line.get())
-                    .unwrap_or_default(),
-                col: match line_row.column() {
-                    ColumnType::LeftEdge => 0,
-                    ColumnType::Column(col) => col.get(),
-                },
-            });
+            prev_row = Some(line_row.to_owned());
+
+            if line_row.end_sequence() {
+                prev_row = None;
+            }
         }
 
         source_locs
