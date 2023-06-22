@@ -1,6 +1,6 @@
 [package]
 name = "ators"
-version = "0.3.0"
+version = "0.3.1"
 description = "convert numeric addresses to symbols of binary images"
 authors.workspace = true
 license.workspace = true
