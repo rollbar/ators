@@ -8,9 +8,6 @@ pub mod symbolicator;
 pub use data::Error;
 pub use symbolicator::{atos_dwarf, atos_map};
 
-pub(crate) mod prelude;
-pub(crate) use prelude::*;
-
 /// Loads a binary image object as DWARF.
 #[macro_export]
 macro_rules! load_dwarf {
