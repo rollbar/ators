@@ -1,4 +1,4 @@
-use crate::{Error, IsOkAnd};
+use crate::Error;
 use std::{borrow::Cow, convert::identity};
 use swift::Scope;
 
