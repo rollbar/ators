@@ -49,7 +49,7 @@ pub fn atos_dwarf(dwarf: &Dwarf, addr: Addr, include_inlined: bool) -> Result<Ve
 
         let leaf = loop {
             let Some((step, child)) = entries.next_dfs()? else {
-                break parent
+                break parent;
             };
 
             depth += step;
@@ -266,7 +266,7 @@ impl DwarfExt for Dwarf<'_> {
                 file: path.join("<compiler-generated>"),
                 line: 0,
                 col: 0,
-            })
+            });
         };
 
         let is_artificial = entry.attr_value(DW_AT_artificial) == Ok(Some(AttrValue::Flag(true)));
