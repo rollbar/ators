@@ -1,5 +1,6 @@
 [workspace]
 members = ["ators", "atorsl"]
+resolver = "2"
 
 [workspace.package]
 authors = ["Matias Pequeno <matias.pequeno@gmail.com>"]
