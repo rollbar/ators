@@ -1,5 +1,3 @@
-#![allow(unstable_name_collisions)]
-
 pub mod data;
 pub mod demangler;
 pub mod ext;
@@ -7,9 +5,6 @@ pub mod symbolicator;
 
 pub use data::Error;
 pub use symbolicator::{atos_dwarf, atos_map};
-
-pub(crate) mod prelude;
-pub(crate) use prelude::*;
 
 /// Loads a binary image object as DWARF.
 #[macro_export]
